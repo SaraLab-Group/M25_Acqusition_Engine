@@ -575,12 +575,112 @@ void SetPixelFormat(INodeMap& nodemap, String_t format) {
 //	}
 //}
 //
+// 
+
+// variables for scan opt
+uint32_t seconds = 0;
+uint32_t horz = 1920;
+uint32_t vert = 1200;
+uint8_t bitDepth = 8;
+uint8_t fps = 100;
+
+// Lets See if I can reuse this old code for arg parsing
+int scan_opts(int argc, char** argv) {
+
+	std::vector<std::string> opts;
+	for (int i = 1; i < argc; i++) {
+		std::string incoming = argv[i];
+		std::cout << incoming << std::endl;
+		opts.push_back(incoming);
+	}
+
+	for (int i = 0; i < opts.size(); i++) {
+		if (!opts[i].compare("-s")) {
+			if (argc > (i)) {
+				seconds = atoi(opts[i + 1].c_str());
+				i++;
+				std::cout << "seconds: " << seconds << std::endl;
+			}
+			else {
+				std::cout << "Malformed input exiting:" << std::endl;
+				return -1;
+			}
+		}
+		else if (!opts[i].compare("-horz")) {
+			if (argc > (i)) {
+				horz = atoi(opts[i + 1].c_str());
+				i++;
+				std::cout << "horz: " << (int)horz << std::endl;
+			}
+			else {
+				std::cout << "Malformed input exiting:" << std::endl;
+				return -1;
+			}
+		}
+		else if (!opts[i].compare("-vert")) {
+			if (argc > (i)) {
+				vert = atoi(opts[i + 1].c_str());
+				i++;
+				std::cout << "vert: " << (int)vert << std::endl;
+			}
+			else {
+				std::cout << "Malformed input exiting:" << std::endl;
+				return -1;
+			}
+		}
+		else if (!opts[i].compare("-f")) {
+			if (argc > (i)) {
+				fps = atoi(opts[i + 1].c_str());
+				i++;
+				std::cout << "fps: " << (int)fps << std::endl;
+			}
+			else {
+				std::cout << "Malformed input exiting:" << std::endl;
+				return -1;
+			}
+		}
+		else if (!opts[i].compare("-bpp")) {
+			if (argc >= (i)) {
+				bitDepth = atoi(opts[i + 1].c_str());
+				i++;
+				if (bitDepth > 12 || bitDepth < 8 || bitDepth & 0x1) {
+					std::cout << "Not compatible Bit depth 8, 10, 12 bpp only" << std::endl;
+					return -1;
+				}
+				else {
+					std::cout << "bitDepth: " << (int)bitDepth << std::endl;
+				}
+			}
+			else {
+				std::cout << "Malformed input exiting:" << std::endl;
+				return -1;
+			}
+		}
+	}
+	return 0;
+
+}
 
 int main(int argc, char* argv[])
 {
 	// The exit code of the sample application.
 	int exitCode = 0;
-
+	if (argc < 2) {
+		std::cout << "Usage: " << argv[0] << " -s <seconds>" << std::endl;
+		std::cout << "Must at least use whole second intervals." << std::endl;
+		std::cout << "Other Flags:" << std::endl;
+		std::cout << "Capture Area: -horz <pixels> -vert <pixels>: (Default 1920 X 1200)" << std::endl;
+		std::cout << "Frame Rate: -f <fps>: (Default 100 NOT YET IMPLEMENTED)" << std::endl;
+		std::cout << "Bit Depth: -bpp <bits>: (Default 8bits, can operate at 10bits and 12bits But both alternatives require 16bpp storage)" << std::endl;
+		return exitCode;
+	}
+	else {
+		if (scan_opts(argc, argv) != 0) {
+			std::cout << "input error exiting" << std::endl;
+			return -1;
+		}
+		//return 0; // Just testing
+	}
 
 	// Before using any pylon methods, the pylon runtime must be initialized. 
 	PylonInitialize();
@@ -699,9 +799,9 @@ int main(int argc, char* argv[])
 		// of the lamda functions I'm using to make my thread loop.
 
 		// frames will probably need to come from the tcp/ip pycromanager interface
-		frames = 1000;
+		frames = seconds * fps;
 		// How Many Large Binary Chunks of 100 frames we'll Write
-		uint64_t binary_chunks = frames / 100;
+		uint64_t binary_chunks = seconds;
 
 		// Our Buffer Size is 100 Frames, which should be 1 second at 100fps
 		// Currently we are set to only 8bits and not handling crop factor
@@ -878,6 +978,7 @@ int main(int argc, char* argv[])
 
 		std::cout << "Image Aquisition Finished" << std::endl;
 
+		std::cout << "Converting images to tif" << std::endl;
 		// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
 		// to boost the write throughput more. It should be noted that we are currently unable to 
 		// Write to USB external drives for some odd reason.
@@ -894,6 +995,7 @@ int main(int argc, char* argv[])
 
 			// Middle Loop which frame index are we readng from the chunk?
 			for (int j = 0; j < 100; j++) {
+				std::cout << ".";
 
 				// Inner Loop Which Camera are we reading from the chunk
 				for (int k = 0; k < total_cams; k++) {
@@ -916,6 +1018,7 @@ int main(int argc, char* argv[])
 			}
 		}
 
+		std::cout << std::endl << "Finished Converting to tif" << std::endl;
 		// Free These Aligned Buffers PLEASE!
 		_aligned_free(buff1);
 		_aligned_free(buff2);
