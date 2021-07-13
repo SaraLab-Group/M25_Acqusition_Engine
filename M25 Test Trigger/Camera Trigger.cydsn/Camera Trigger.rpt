@@ -1,0 +1,3338 @@
+Loading plugins phase: Elapsed time ==> 0s.194ms
+<CYPRESSTAG name="CyDsfit arguments...">
+cydsfit arguments: -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -d CY8C5888LTI-LP097 -s C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Generated_Source\PSoC5 -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE
+</CYPRESSTAG>
+<CYPRESSTAG name="Design elaboration results...">
+</CYPRESSTAG>
+Elaboration phase: Elapsed time ==> 1s.899ms
+<CYPRESSTAG name="HDL generation results...">
+</CYPRESSTAG>
+HDL generation phase: Elapsed time ==> 0s.041ms
+<CYPRESSTAG name="Synthesis results...">
+
+     | | | | | | |
+   _________________
+  -|               |-
+  -|               |-
+  -|               |-
+  -|    CYPRESS    |-
+  -|               |-
+  -|               |-   Warp Verilog Synthesis Compiler: Version 6.3 IR 41
+  -|               |-   Copyright (C) 1991-2001 Cypress Semiconductor
+   |_______________|
+     | | | | | | |
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\bin\warp.exe
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -dcpsoc3 Camera Trigger.v -verilog
+======================================================================
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\bin\warp.exe
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -dcpsoc3 Camera Trigger.v -verilog
+======================================================================
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   vlogfe
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -dcpsoc3 -verilog Camera Trigger.v
+======================================================================
+
+vlogfe V6.3 IR 41:  Verilog parser
+Mon Jul 12 21:17:23 2021
+
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   vpp
+Options  :    -yv2 -q10 Camera Trigger.v
+======================================================================
+
+vpp V6.3 IR 41:  Verilog Pre-Processor
+Mon Jul 12 21:17:23 2021
+
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cydff_v1_30\cydff_v1_30.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_virtualmux_v1_0\cy_virtualmux_v1_0.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\ZeroTerminal\ZeroTerminal.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\OneTerminal\OneTerminal.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Counter_v3_0\B_Counter_v3_0.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cy_psoc3_inc.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Timer_v2_80\B_Timer_v2_80.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\and_v1_0.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.v'
+Flattening file 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\not_v1_0\not_v1_0.v'
+
+vpp:  No errors.
+
+Library 'work' => directory 'lcpsoc3'
+General_symbol_table
+General_symbol_table
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\std.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\work\cypress.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\ieee\work\stdlogic.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\lpmpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_cnst.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_mthv.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif'.
+Using control file 'Camera Trigger.ctl'.
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Timer_v2_80\B_Timer_v2_80.v (line 368, col 46):  Note: Substituting module 'cmp_vv_vv' for '='.
+C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Timer_v2_80\B_Timer_v2_80.v (line 374, col 62):  Note: Substituting module 'add_vv_vv' for '+'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3pkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3.vif'.
+
+vlogfe:  No errors.
+
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   tovif
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -dcpsoc3 -verilog Camera Trigger.v
+======================================================================
+
+tovif V6.3 IR 41:  High-level synthesis
+Mon Jul 12 21:17:23 2021
+
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\std.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\work\cypress.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\ieee\work\stdlogic.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\lpmpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_cnst.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_mthv.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif'.
+Linking 'C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\codegentemp\Camera Trigger.ctl'.
+Linking 'C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\codegentemp\Camera Trigger.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cydff_v1_30\cydff_v1_30.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_virtualmux_v1_0\cy_virtualmux_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\ZeroTerminal\ZeroTerminal.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\OneTerminal\OneTerminal.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Counter_v3_0\B_Counter_v3_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cy_psoc3_inc.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Timer_v2_80\B_Timer_v2_80.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\and_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\not_v1_0\not_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3pkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3.vif'.
+
+tovif:  No errors.
+
+
+======================================================================
+Compiling:  Camera Trigger.v
+Program  :   topld
+Options  :    -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -dcpsoc3 -verilog Camera Trigger.v
+======================================================================
+
+topld V6.3 IR 41:  Synthesis and optimization
+Mon Jul 12 21:17:24 2021
+
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\std.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.vhd'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\work\cypress.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\ieee\work\stdlogic.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\lpmpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_cnst.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_mthv.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\mod_genv.vif'.
+Linking 'C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\codegentemp\Camera Trigger.ctl'.
+Linking 'C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\codegentemp\Camera Trigger.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_constant_v1_0\cy_constant_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cydff_v1_30\cydff_v1_30.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\cy_virtualmux_v1_0\cy_virtualmux_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\ZeroTerminal\ZeroTerminal.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\OneTerminal\OneTerminal.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Counter_v3_0\B_Counter_v3_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cypress.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\cy_psoc3_inc.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyComponentLibrary\CyComponentLibrary.cylib\B_Timer_v2_80\B_Timer_v2_80.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\and_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\psoc\content\CyPrimitives\cyprimitives.cylib\not_v1_0\not_v1_0.v'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3pkg.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3.vif'.
+Linking 'C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\lcpsoc3\stdlogic\cpsoc3.vif'.
+
+----------------------------------------------------------
+Detecting unused logic.
+----------------------------------------------------------
+    User names
+	Net_44
+	\Trigger_Count:Net_82\
+	\Trigger_Count:Net_95\
+	\Trigger_Count:Net_91\
+	\Trigger_Count:Net_102\
+	\Trigger_Count:CounterUDB:ctrl_cmod_2\
+	\Trigger_Count:CounterUDB:ctrl_cmod_1\
+	\Trigger_Count:CounterUDB:ctrl_cmod_0\
+	Net_42
+	\Trigger_Count:CounterUDB:reload_tc\
+	\Frame_Period_Timer:Net_260\
+	\Frame_Period_Timer:TimerUDB:ctrl_ten\
+	\Frame_Period_Timer:TimerUDB:ctrl_cmode_0\
+	\Frame_Period_Timer:TimerUDB:ctrl_tmode_1\
+	\Frame_Period_Timer:TimerUDB:ctrl_tmode_0\
+	\Frame_Period_Timer:TimerUDB:ctrl_ic_1\
+	\Frame_Period_Timer:TimerUDB:ctrl_ic_0\
+	Net_252
+	\Frame_Period_Timer:Net_102\
+	\Frame_Period_Timer:Net_266\
+	\CMRA_RDY_TIMER:Net_260\
+	Net_197
+	Net_198
+	\CMRA_RDY_TIMER:Net_53\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_enable\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_ten\
+	\CMRA_RDY_TIMER:TimerUDB:control_7\
+	\CMRA_RDY_TIMER:TimerUDB:control_6\
+	\CMRA_RDY_TIMER:TimerUDB:control_5\
+	\CMRA_RDY_TIMER:TimerUDB:control_4\
+	\CMRA_RDY_TIMER:TimerUDB:control_3\
+	\CMRA_RDY_TIMER:TimerUDB:control_2\
+	\CMRA_RDY_TIMER:TimerUDB:control_1\
+	\CMRA_RDY_TIMER:TimerUDB:control_0\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_cmode_0\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_tmode_1\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_tmode_0\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_ic_1\
+	\CMRA_RDY_TIMER:TimerUDB:ctrl_ic_0\
+	Net_196
+	\CMRA_RDY_TIMER:Net_102\
+	\CMRA_RDY_TIMER:Net_266\
+	Net_223
+	Net_224
+	Net_225
+	Net_227
+	Net_228
+	Net_229
+	Net_230
+	\USBFS:dma_complete_0\
+	\USBFS:Net_1922\
+	\USBFS:dma_complete_1\
+	\USBFS:Net_1921\
+	\USBFS:dma_complete_2\
+	\USBFS:Net_1920\
+	\USBFS:dma_complete_3\
+	\USBFS:Net_1919\
+	\USBFS:dma_complete_4\
+	\USBFS:Net_1918\
+	\USBFS:dma_complete_5\
+	\USBFS:Net_1917\
+	\USBFS:dma_complete_6\
+	\USBFS:Net_1916\
+	\USBFS:dma_complete_7\
+	\USBFS:Net_1915\
+
+
+Deleted 65 User equations/components.
+Deleted 0 Synthesized equations/components.
+
+------------------------------------------------------
+Alias Detection
+------------------------------------------------------
+Aliasing \LCD_Char:tmpOE__LCDPort_net_5\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \LCD_Char:tmpOE__LCDPort_net_4\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \LCD_Char:tmpOE__LCDPort_net_3\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \LCD_Char:tmpOE__LCDPort_net_2\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \LCD_Char:tmpOE__LCDPort_net_1\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \LCD_Char:tmpOE__LCDPort_net_0\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing one to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing Net_288 to zero
+Aliasing \Trigger_Count:Net_89\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \Trigger_Count:CounterUDB:ctrl_capmode_1\ to zero
+Aliasing \Trigger_Count:CounterUDB:ctrl_capmode_0\ to zero
+Aliasing \Trigger_Count:CounterUDB:capt_rising\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:ctrl_cmode_1\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:trigger_enable\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \Frame_Period_Timer:TimerUDB:status_6\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:status_5\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:status_4\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:status_0\ to \Frame_Period_Timer:TimerUDB:tc_i\
+Aliasing tmpOE__CMRA_RDY_IN_net_0 to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing tmpOE__TRG_OUT_net_0 to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \CMRA_RDY_TIMER:TimerUDB:ctrl_cmode_1\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:trigger_enable\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \CMRA_RDY_TIMER:TimerUDB:status_6\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:status_5\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:status_4\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:status_0\ to \CMRA_RDY_TIMER:TimerUDB:tc_i\
+Aliasing \RESET_RDY_TIMER:clk\ to zero
+Aliasing \RESET_RDY_TIMER:rst\ to zero
+Aliasing \USBFS:tmpOE__Dm_net_0\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \USBFS:tmpOE__Dp_net_0\ to \LCD_Char:tmpOE__LCDPort_net_6\
+Aliasing \Trigger_Count:CounterUDB:prevCapture\\D\ to zero
+Aliasing \Trigger_Count:CounterUDB:cmp_out_reg_i\\D\ to \Trigger_Count:CounterUDB:prevCompare\\D\
+Aliasing \Frame_Period_Timer:TimerUDB:capture_last\\D\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:hwEnable_reg\\D\ to \Frame_Period_Timer:TimerUDB:run_mode\
+Aliasing \Frame_Period_Timer:TimerUDB:capture_out_reg_i\\D\ to \Frame_Period_Timer:TimerUDB:capt_fifo_load_int\
+Aliasing \CMRA_RDY_TIMER:TimerUDB:capture_last\\D\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:hwEnable_reg\\D\ to \CMRA_RDY_TIMER:TimerUDB:run_mode\
+Aliasing \CMRA_RDY_TIMER:TimerUDB:capture_out_reg_i\\D\ to \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load_int\
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_5\[2] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_4\[3] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_3\[4] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_2\[5] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_1\[6] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire \LCD_Char:tmpOE__LCDPort_net_0\[7] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Rhs of wire one[24] = \LCD_Char:tmpOE__LCDPort_net_6\[1]
+Removing Lhs of wire Net_288[26] = zero[8]
+Removing Lhs of wire Net_328[30] = cydff_1[28]
+Removing Rhs of wire Net_277[33] = \Trigger_Count:Net_49\[34]
+Removing Rhs of wire Net_277[33] = \Trigger_Count:CounterUDB:tc_reg_i\[90]
+Removing Lhs of wire \Trigger_Count:Net_89\[36] = one[24]
+Removing Lhs of wire \Trigger_Count:CounterUDB:ctrl_capmode_1\[45] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:ctrl_capmode_0\[46] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:ctrl_enable\[58] = \Trigger_Count:CounterUDB:control_7\[50]
+Removing Lhs of wire \Trigger_Count:CounterUDB:capt_rising\[60] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:capt_falling\[61] = \Trigger_Count:CounterUDB:prevCapture\[59]
+Removing Lhs of wire \Trigger_Count:CounterUDB:reload\[64] = Net_40[65]
+Removing Rhs of wire Net_40[65] = \Frame_Period_Timer:Net_53\[136]
+Removing Rhs of wire Net_40[65] = \Frame_Period_Timer:TimerUDB:tc_reg_i\[168]
+Removing Lhs of wire \Trigger_Count:CounterUDB:final_enable\[66] = \Trigger_Count:CounterUDB:control_7\[50]
+Removing Rhs of wire \Trigger_Count:CounterUDB:status_0\[71] = \Trigger_Count:CounterUDB:cmp_out_status\[72]
+Removing Rhs of wire \Trigger_Count:CounterUDB:status_1\[73] = \Trigger_Count:CounterUDB:per_zero\[74]
+Removing Lhs of wire \Trigger_Count:CounterUDB:status_2\[75] = \Trigger_Count:CounterUDB:overflow_status\[68]
+Removing Lhs of wire \Trigger_Count:CounterUDB:status_3\[76] = \Trigger_Count:CounterUDB:underflow_status\[69]
+Removing Lhs of wire \Trigger_Count:CounterUDB:status_4\[77] = \Trigger_Count:CounterUDB:hwCapture\[63]
+Removing Rhs of wire \Trigger_Count:CounterUDB:status_5\[78] = \Trigger_Count:CounterUDB:fifo_full\[79]
+Removing Rhs of wire \Trigger_Count:CounterUDB:status_6\[80] = \Trigger_Count:CounterUDB:fifo_nempty\[81]
+Removing Lhs of wire \Trigger_Count:CounterUDB:dp_dir\[84] = one[24]
+Removing Rhs of wire \Trigger_Count:CounterUDB:cmp_out_i\[91] = \Trigger_Count:CounterUDB:cmp_less\[92]
+Removing Lhs of wire \Trigger_Count:CounterUDB:cs_addr_2\[100] = one[24]
+Removing Lhs of wire \Trigger_Count:CounterUDB:cs_addr_1\[101] = \Trigger_Count:CounterUDB:count_enable\[98]
+Removing Lhs of wire \Trigger_Count:CounterUDB:cs_addr_0\[102] = Net_40[65]
+Removing Rhs of wire Net_292[134] = \Frame_Period_Timer:Net_55\[135]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:ctrl_enable\[150] = \Frame_Period_Timer:TimerUDB:control_7\[142]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:ctrl_cmode_1\[152] = zero[8]
+Removing Rhs of wire \Frame_Period_Timer:TimerUDB:timer_enable\[161] = \Frame_Period_Timer:TimerUDB:runmode_enable\[173]
+Removing Rhs of wire \Frame_Period_Timer:TimerUDB:run_mode\[162] = \Frame_Period_Timer:TimerUDB:hwEnable\[163]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:run_mode\[162] = \Frame_Period_Timer:TimerUDB:control_7\[142]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:trigger_enable\[165] = one[24]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:tc_i\[167] = \Frame_Period_Timer:TimerUDB:status_tc\[164]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:capt_fifo_load_int\[172] = \Frame_Period_Timer:TimerUDB:capt_fifo_load\[160]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:status_6\[175] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:status_5\[176] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:status_4\[177] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:status_0\[178] = \Frame_Period_Timer:TimerUDB:status_tc\[164]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:status_1\[179] = \Frame_Period_Timer:TimerUDB:capt_fifo_load\[160]
+Removing Rhs of wire \Frame_Period_Timer:TimerUDB:status_2\[180] = \Frame_Period_Timer:TimerUDB:fifo_full\[181]
+Removing Rhs of wire \Frame_Period_Timer:TimerUDB:status_3\[182] = \Frame_Period_Timer:TimerUDB:fifo_nempty\[183]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:cs_addr_2\[185] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:cs_addr_1\[186] = \Frame_Period_Timer:TimerUDB:trig_reg\[174]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:cs_addr_0\[187] = \Frame_Period_Timer:TimerUDB:per_zero\[166]
+Removing Lhs of wire tmpOE__CMRA_RDY_IN_net_0[365] = one[24]
+Removing Lhs of wire tmpOE__TRG_OUT_net_0[370] = one[24]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:ctrl_cmode_1\[395] = zero[8]
+Removing Rhs of wire \CMRA_RDY_TIMER:TimerUDB:timer_enable\[404] = \CMRA_RDY_TIMER:TimerUDB:runmode_enable\[417]
+Removing Rhs of wire \CMRA_RDY_TIMER:TimerUDB:run_mode\[405] = \CMRA_RDY_TIMER:TimerUDB:hwEnable\[406]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:run_mode\[405] = Net_322[413]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:trigger_enable\[408] = one[24]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:tc_i\[410] = \CMRA_RDY_TIMER:TimerUDB:status_tc\[407]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load_int\[416] = \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load\[403]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:status_6\[419] = zero[8]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:status_5\[420] = zero[8]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:status_4\[421] = zero[8]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:status_0\[422] = \CMRA_RDY_TIMER:TimerUDB:status_tc\[407]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:status_1\[423] = \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load\[403]
+Removing Rhs of wire \CMRA_RDY_TIMER:TimerUDB:status_2\[424] = \CMRA_RDY_TIMER:TimerUDB:fifo_full\[425]
+Removing Rhs of wire \CMRA_RDY_TIMER:TimerUDB:status_3\[426] = \CMRA_RDY_TIMER:TimerUDB:fifo_nempty\[427]
+Removing Rhs of wire Net_167[429] = \RESET_RDY_TIMER:control_out_0\[613]
+Removing Rhs of wire Net_167[429] = \RESET_RDY_TIMER:control_0\[636]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:cs_addr_2\[430] = Net_167[429]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:cs_addr_1\[431] = \CMRA_RDY_TIMER:TimerUDB:trig_reg\[418]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:cs_addr_0\[432] = \CMRA_RDY_TIMER:TimerUDB:per_zero\[409]
+Removing Lhs of wire \RESET_RDY_TIMER:clk\[611] = zero[8]
+Removing Lhs of wire \RESET_RDY_TIMER:rst\[612] = zero[8]
+Removing Lhs of wire \USBFS:tmpOE__Dm_net_0\[648] = one[24]
+Removing Lhs of wire \USBFS:tmpOE__Dp_net_0\[655] = one[24]
+Removing Lhs of wire cydff_1D[701] = Net_113[29]
+Removing Lhs of wire \Trigger_Count:CounterUDB:prevCapture\\D\[702] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:overflow_reg_i\\D\[704] = \Trigger_Count:CounterUDB:overflow\[83]
+Removing Lhs of wire \Trigger_Count:CounterUDB:underflow_reg_i\\D\[705] = \Trigger_Count:CounterUDB:underflow\[86]
+Removing Lhs of wire \Trigger_Count:CounterUDB:tc_reg_i\\D\[706] = \Trigger_Count:CounterUDB:tc_i\[89]
+Removing Lhs of wire \Trigger_Count:CounterUDB:prevCompare\\D\[707] = \Trigger_Count:CounterUDB:cmp_out_i\[91]
+Removing Lhs of wire \Trigger_Count:CounterUDB:cmp_out_reg_i\\D\[708] = \Trigger_Count:CounterUDB:cmp_out_i\[91]
+Removing Lhs of wire \Trigger_Count:CounterUDB:count_stored_i\\D\[709] = Net_295[97]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:capture_last\\D\[710] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:tc_reg_i\\D\[711] = \Frame_Period_Timer:TimerUDB:status_tc\[164]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:hwEnable_reg\\D\[712] = \Frame_Period_Timer:TimerUDB:control_7\[142]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:capture_out_reg_i\\D\[713] = \Frame_Period_Timer:TimerUDB:capt_fifo_load\[160]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:capture_last\\D\[714] = zero[8]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:tc_reg_i\\D\[715] = \CMRA_RDY_TIMER:TimerUDB:status_tc\[407]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:hwEnable_reg\\D\[716] = Net_322[413]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:capture_out_reg_i\\D\[717] = \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load\[403]
+
+------------------------------------------------------
+Aliased 0 equations, 93 wires.
+------------------------------------------------------
+
+----------------------------------------------------------
+Circuit simplification
+----------------------------------------------------------
+
+Substituting virtuals - pass 1:
+
+Note:  Expanding virtual equation for 'one' (cost = 0):
+one <=  ('1') ;
+
+Note:  Expanding virtual equation for 'zero' (cost = 0):
+zero <=  ('0') ;
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:capt_either_edge\' (cost = 0):
+\Trigger_Count:CounterUDB:capt_either_edge\ <= (\Trigger_Count:CounterUDB:prevCapture\);
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:overflow\' (cost = 0):
+\Trigger_Count:CounterUDB:overflow\ <= (\Trigger_Count:CounterUDB:per_equal\);
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:underflow\' (cost = 0):
+\Trigger_Count:CounterUDB:underflow\ <=  ('0') ;
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:counter_enable\' (cost = 1):
+\Trigger_Count:CounterUDB:counter_enable\ <= ((not \Trigger_Count:CounterUDB:disable_run_i\ and \Trigger_Count:CounterUDB:control_7\));
+
+Note:  Expanding virtual equation for '\Frame_Period_Timer:TimerUDB:fifo_load_polarized\' (cost = 0):
+\Frame_Period_Timer:TimerUDB:fifo_load_polarized\ <=  ('0') ;
+
+Note:  Expanding virtual equation for '\Frame_Period_Timer:TimerUDB:timer_enable\' (cost = 0):
+\Frame_Period_Timer:TimerUDB:timer_enable\ <= (\Frame_Period_Timer:TimerUDB:control_7\);
+
+Note:  Expanding virtual equation for 'Net_311' (cost = 0):
+Net_311 <= (not Net_277);
+
+Note:  Expanding virtual equation for '\CMRA_RDY_TIMER:TimerUDB:fifo_load_polarized\' (cost = 0):
+\CMRA_RDY_TIMER:TimerUDB:fifo_load_polarized\ <=  ('0') ;
+
+Note:  Expanding virtual equation for 'Net_322' (cost = 0):
+Net_322 <= (not cydff_1);
+
+
+Substituting virtuals - pass 2:
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:overflow_status\' (cost = 1):
+\Trigger_Count:CounterUDB:overflow_status\ <= ((not \Trigger_Count:CounterUDB:overflow_reg_i\ and \Trigger_Count:CounterUDB:per_equal\));
+
+Note:  Expanding virtual equation for '\Trigger_Count:CounterUDB:underflow_status\' (cost = 0):
+\Trigger_Count:CounterUDB:underflow_status\ <=  ('0') ;
+
+Note:  Expanding virtual equation for '\CMRA_RDY_TIMER:TimerUDB:timer_enable\' (cost = 0):
+\CMRA_RDY_TIMER:TimerUDB:timer_enable\ <= (not cydff_1);
+
+
+Substituting virtuals - pass 3:
+
+
+----------------------------------------------------------
+Circuit simplification results:
+
+	Expanded 14 signals.
+	Turned 0 signals into soft nodes.
+	Maximum default expansion cost was set at 3.
+----------------------------------------------------------
+
+------------------------------------------------------
+Alias Detection
+------------------------------------------------------
+Aliasing \Trigger_Count:CounterUDB:hwCapture\ to zero
+Aliasing \Trigger_Count:CounterUDB:underflow_status\ to zero
+Aliasing \Trigger_Count:CounterUDB:underflow\ to zero
+Aliasing \Frame_Period_Timer:TimerUDB:capt_fifo_load\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load\ to zero
+Aliasing \CMRA_RDY_TIMER:TimerUDB:trig_reg\ to Net_322
+Removing Lhs of wire \Trigger_Count:CounterUDB:hwCapture\[63] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:underflow_status\[69] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:underflow\[86] = zero[8]
+Removing Lhs of wire \Trigger_Count:CounterUDB:tc_i\[89] = \Trigger_Count:CounterUDB:per_equal\[85]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:capt_fifo_load\[160] = zero[8]
+Removing Lhs of wire \Frame_Period_Timer:TimerUDB:trig_reg\[174] = \Frame_Period_Timer:TimerUDB:control_7\[142]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:capt_fifo_load\[403] = zero[8]
+Removing Lhs of wire \CMRA_RDY_TIMER:TimerUDB:trig_reg\[418] = Net_322[413]
+
+------------------------------------------------------
+Aliased 0 equations, 8 wires.
+------------------------------------------------------
+
+----------------------------------------------------------
+Circuit simplification
+----------------------------------------------------------
+
+Eliminating unused logic - pass 1:
+
+
+Eliminating unused logic - pass 2:
+
+
+Substituting virtuals - pass 1:
+
+
+----------------------------------------------------------
+Circuit simplification results:
+
+	Expanded 0 signals.
+	Turned 0 signals into soft nodes.
+	Maximum default expansion cost was set at 3.
+----------------------------------------------------------
+
+topld:  No errors.
+
+CYPRESS_DIR    : C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp
+Warp Program   : C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\bin\warp.exe
+Warp Arguments : -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya "-.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj" -dcpsoc3 "Camera Trigger.v" -verilog
+</CYPRESSTAG>
+Warp synthesis phase: Elapsed time ==> 1s.299ms
+<CYPRESSTAG name="Fitter results...">
+<CYPRESSTAG name="Fitter startup details...">
+cyp3fit: V4.4.0.80, Family: PSoC3, Started at: Monday, 12 July 2021 21:17:24
+Options: -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE -ya -.fftprj=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj -d CY8C5888LTI-LP097 Camera Trigger.v -verilog
+</CYPRESSTAG>
+<CYPRESSTAG name="Design parsing">
+Design parsing phase: Elapsed time ==> 0s.015ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Tech Mapping">
+<CYPRESSTAG name="Initial Mapping" icon="FILE_RPT_TECHM">
+    Converted constant MacroCell: \Trigger_Count:CounterUDB:prevCapture\ from registered to combinatorial
+    Converted constant MacroCell: \Trigger_Count:CounterUDB:underflow_reg_i\ from registered to combinatorial
+    Converted constant MacroCell: \Frame_Period_Timer:TimerUDB:capture_last\ from registered to combinatorial
+    Converted constant MacroCell: \Frame_Period_Timer:TimerUDB:capture_out_reg_i\ from registered to combinatorial
+    Converted constant MacroCell: \CMRA_RDY_TIMER:TimerUDB:capture_last\ from registered to combinatorial
+    Converted constant MacroCell: \CMRA_RDY_TIMER:TimerUDB:capture_out_reg_i\ from registered to combinatorial
+Assigning clock Clock_1 to clock BUS_CLK because it is a pass-through
+Assigning clock timer_clock_1 to clock BUS_CLK because it is a pass-through
+<CYPRESSTAG name="Global Clock Selection" icon="FILE_RPT_TECHM">
+    Digital Clock 0: Automatic-assigning  clock 'Clock_2'. Fanout=2, Signal=Net_295
+</CYPRESSTAG>
+
+Removing unused cells resulting from optimization
+Done removing unused cells.
+<CYPRESSTAG name="UDB Clock/Enable Remapping Results">
+    UDB Clk/Enable \Trigger_Count:CounterUDB:clock_enable_block\: with output requested to be synchronous
+        ClockIn: BUS_CLK was determined to be a global clock that is synchronous to BUS_CLK
+        EnableIn: Constant 1 was determined to be synchronous to ClockIn
+        ClockOut: BUS_CLK, EnableOut: Constant 1
+    UDB Clk/Enable \Trigger_Count:CounterUDB:sCTRLReg:cy_psoc3_udb_Ctl_Clk_Sync\: with output requested to be synchronous
+        ClockIn: BUS_CLK was determined to be a global clock that is synchronous to BUS_CLK
+        EnableIn: Constant 1 was determined to be synchronous to ClockIn
+        ClockOut: BUS_CLK, EnableOut: Constant 1
+    UDB Clk/Enable \Frame_Period_Timer:TimerUDB:clock_enable_block\: with output requested to be synchronous
+        ClockIn: BUS_CLK was determined to be a global clock that is synchronous to BUS_CLK
+        EnableIn: Constant 1 was determined to be synchronous to ClockIn
+        ClockOut: BUS_CLK, EnableOut: Constant 1
+    UDB Clk/Enable \Frame_Period_Timer:TimerUDB:sCTRLReg:SyncCtl:cy_psoc3_udb_Ctl_Clk_Sync\: with output requested to be synchronous
+        ClockIn: BUS_CLK was determined to be a global clock that is synchronous to BUS_CLK
+        EnableIn: Constant 1 was determined to be synchronous to ClockIn
+        ClockOut: BUS_CLK, EnableOut: Constant 1
+    UDB Clk/Enable \CMRA_RDY_TIMER:TimerUDB:clock_enable_block\: with output requested to be synchronous
+        ClockIn: BUS_CLK was determined to be a global clock that is synchronous to BUS_CLK
+        EnableIn: Constant 1 was determined to be synchronous to ClockIn
+        ClockOut: BUS_CLK, EnableOut: Constant 1
+</CYPRESSTAG>
+ADD: pft.M0040: information: The following 2 pin(s) will be assigned a location by the fitter: \USBFS:Dm(0)\, \USBFS:Dp(0)\
+
+
+Removing unused cells resulting from optimization
+Done removing unused cells.
+<CYPRESSTAG name="Duplicate Macrocell detection">
+
+Removing duplicate macrocells
+    Removing Net_277, Duplicate of \Trigger_Count:CounterUDB:overflow_reg_i\ 
+    MacroCell: Name=Net_277, Mode=(D-Register)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:per_equal\
+        );
+        Output = Net_277 (fanout=1)
+
+End removing duplicate macrocells: used 1 pass
+</CYPRESSTAG>
+</CYPRESSTAG>
+<CYPRESSTAG name="Duplicate Macrocell detection">
+</CYPRESSTAG>
+<CYPRESSTAG name="Design Equations" icon="FILE_RPT_EQUATION">
+
+------------------------------------------------------------
+Design Equations
+------------------------------------------------------------
+    <CYPRESSTAG name="Pin listing">
+
+    ------------------------------------------------------------
+    Pin listing
+    ------------------------------------------------------------
+
+    Pin : Name = \LCD_Char:LCDPort(0)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(0)\__PA ,
+            pad => \LCD_Char:LCDPort(0)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(1)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(1)\__PA ,
+            pad => \LCD_Char:LCDPort(1)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(2)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(2)\__PA ,
+            pad => \LCD_Char:LCDPort(2)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(3)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(3)\__PA ,
+            pad => \LCD_Char:LCDPort(3)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(4)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(4)\__PA ,
+            pad => \LCD_Char:LCDPort(4)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(5)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(5)\__PA ,
+            pad => \LCD_Char:LCDPort(5)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = \LCD_Char:LCDPort(6)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \LCD_Char:LCDPort(6)\__PA ,
+            pad => \LCD_Char:LCDPort(6)_PAD\ );
+        Properties:
+        {
+        }
+
+    Pin : Name = CMRA_RDY_IN(0)
+        Attributes:
+            In Group/Port: True
+            In Sync Option: NOSYNC
+            Out Sync Option: AUTO
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: HI_Z_DIGITAL
+            VTrip: CMOS
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: True
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL, ROUTABLE
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => CMRA_RDY_IN(0)__PA ,
+            fb => Net_113 ,
+            pad => CMRA_RDY_IN(0)_PAD );
+        Properties:
+        {
+        }
+
+    Pin : Name = TRG_OUT(0)
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: NOSYNC
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: CMOS_OUT
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: True
+            Is OE Registered: False
+            Uses Analog: False
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: DIGITAL, ROUTABLE
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => TRG_OUT(0)__PA ,
+            pin_input => Net_325 ,
+            pad => TRG_OUT(0)_PAD );
+        Properties:
+        {
+        }
+
+    Pin : Name = \USBFS:Dm(0)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: AUTO
+            Out Sync Option: AUTO
+            Interrupt generated: False
+            Interrupt mode: NONE
+            Drive mode: HI_Z_ANALOG
+            VTrip: EITHER
+            Slew: FAST
+            Input Sync needed: False
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: True
+            Is OE Registered: False
+            Uses Analog: True
+            Can contain Digital: False
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: USB_D_MINUS
+            Initial Value: 0
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \USBFS:Dm(0)\__PA ,
+            analog_term => \USBFS:Net_597\ ,
+            pad => \USBFS:Dm(0)_PAD\ );
+
+    Pin : Name = \USBFS:Dp(0)\
+        Attributes:
+            In Group/Port: True
+            In Sync Option: SYNC
+            Out Sync Option: AUTO
+            Interrupt generated: True
+            Interrupt mode: FALLING
+            Drive mode: HI_Z_ANALOG
+            VTrip: CMOS
+            Slew: FAST
+            Input Sync needed: True
+            Output Sync needed: False
+            SC shield enabled: False
+            POR State: ANY
+            LCD Mode: COMMON
+            Register Mode: RegComb
+            CaSense Mode: NEITHER
+            Treat as pin: False
+            Is OE Registered: False
+            Uses Analog: True
+            Can contain Digital: True
+            Is SIO: False
+            SIO Output Buf: NONREGULATED
+            SIO Input Buf: SINGLE_ENDED
+            SIO HiFreq: LOW
+            SIO Hyst: DISABLED
+            SIO Vtrip: MULTIPLIER_0_5
+            SIO Multiplier Index: 0
+            SIO RefSel: VCC_IO
+            Required Capabilities: USB_D_PLUS
+            Initial Value: 1
+            IO Voltage: 0
+        PORT MAP (
+            pa_out => \USBFS:Dp(0)\__PA ,
+            analog_term => \USBFS:Net_1000\ ,
+            pad => \USBFS:Dp(0)_PAD\ );
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Macrocell listing" icon="FILE_RPT_EQUATION">
+
+    ------------------------------------------------------------
+    Macrocell listing
+    ------------------------------------------------------------
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:status_0\, Mode=(Combinatorial)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:cmp_out_i\ * 
+              !\Trigger_Count:CounterUDB:prevCompare\
+        );
+        Output = \Trigger_Count:CounterUDB:status_0\ (fanout=1)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:overflow_status\, Mode=(Combinatorial)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:per_equal\ * 
+              !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = \Trigger_Count:CounterUDB:overflow_status\ (fanout=1)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:count_enable\, Mode=(Combinatorial)
+        Total # of inputs        : 4
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:control_7\ * 
+              !\Trigger_Count:CounterUDB:disable_run_i\ * 
+              !\Trigger_Count:CounterUDB:count_stored_i\ * Net_295_local
+        );
+        Output = \Trigger_Count:CounterUDB:count_enable\ (fanout=1)
+
+    MacroCell: Name=\Frame_Period_Timer:TimerUDB:status_tc\, Mode=(Combinatorial)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Frame_Period_Timer:TimerUDB:control_7\ * 
+              \Frame_Period_Timer:TimerUDB:per_zero\
+        );
+        Output = \Frame_Period_Timer:TimerUDB:status_tc\ (fanout=1)
+
+    MacroCell: Name=\CMRA_RDY_TIMER:TimerUDB:status_tc\, Mode=(Combinatorial)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              !cydff_1 * \CMRA_RDY_TIMER:TimerUDB:per_zero\
+        );
+        Output = \CMRA_RDY_TIMER:TimerUDB:status_tc\ (fanout=1)
+
+    MacroCell: Name=Net_325, Mode=(Combinatorial)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              cydff_1 * !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = Net_325 (fanout=1)
+
+    MacroCell: Name=Net_322, Mode=(Combinatorial)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              !cydff_1
+        );
+        Output = Net_322 (fanout=4)
+
+    MacroCell: Name=__ONE__, Mode=(Combinatorial)
+        Total # of inputs        : 0
+        Total # of product terms : 0
+            Clock Enable: True
+        Main Equation            : 0 pterms
+        !(
+            0
+        );
+        Output = __ONE__ (fanout=1)
+
+    MacroCell: Name=cydff_1, Mode=(D-Register)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              Net_113
+        );
+        Output = cydff_1 (fanout=4)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:disable_run_i\, Mode=(D-Register)
+        Total # of inputs        : 4
+        Total # of product terms : 2
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 2 pterms
+        (
+              !Net_40 * \Trigger_Count:CounterUDB:disable_run_i\
+            + !Net_40 * \Trigger_Count:CounterUDB:per_equal\ * 
+              !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = \Trigger_Count:CounterUDB:disable_run_i\ (fanout=2)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:overflow_reg_i\, Mode=(D-Register)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:per_equal\
+        );
+        Output = \Trigger_Count:CounterUDB:overflow_reg_i\ (fanout=3)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:prevCompare\, Mode=(D-Register)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:cmp_out_i\
+        );
+        Output = \Trigger_Count:CounterUDB:prevCompare\ (fanout=1)
+
+    MacroCell: Name=\Trigger_Count:CounterUDB:count_stored_i\, Mode=(D-Register)
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              Net_295_local
+        );
+        Output = \Trigger_Count:CounterUDB:count_stored_i\ (fanout=1)
+
+    MacroCell: Name=Net_40, Mode=(D-Register)
+        Total # of inputs        : 2
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Frame_Period_Timer:TimerUDB:control_7\ * 
+              \Frame_Period_Timer:TimerUDB:per_zero\
+        );
+        Output = Net_40 (fanout=3)
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Datapath listing">
+
+    ------------------------------------------------------------
+    Datapath listing
+    ------------------------------------------------------------
+
+    datapathcell: Name =\Trigger_Count:CounterUDB:sC8:counterdp:u0\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_2 => __ONE__ ,
+            cs_addr_1 => \Trigger_Count:CounterUDB:count_enable\ ,
+            cs_addr_0 => Net_40 ,
+            ce0_comb => \Trigger_Count:CounterUDB:per_equal\ ,
+            z0_comb => \Trigger_Count:CounterUDB:status_1\ ,
+            cl1_comb => \Trigger_Count:CounterUDB:cmp_out_i\ ,
+            f0_bus_stat_comb => \Trigger_Count:CounterUDB:status_6\ ,
+            f0_blk_stat_comb => \Trigger_Count:CounterUDB:status_5\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000001000000001000000010000000000000010000000000000000100000010101000010100000010000001000000101010000101000011111111000000001111111111111111101000000000000000000001000000000000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+
+    datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u0\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+            cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+            chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry0\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111000000000000000000000001000000000000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+
+    datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+            cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+            chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry0\ ,
+            chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry1\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u0\
+        Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+
+    datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+            cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+            chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry1\ ,
+            chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry2\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+        Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u3\
+
+    datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u3\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+            cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+            z0_comb => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+            f0_bus_stat_comb => \Frame_Period_Timer:TimerUDB:status_3\ ,
+            f0_blk_stat_comb => \Frame_Period_Timer:TimerUDB:status_2\ ,
+            chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry2\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+
+    datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u0\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_2 => Net_167 ,
+            cs_addr_1 => Net_322 ,
+            cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+            chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry0\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111000000000000000000000001000000000000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+
+    datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_2 => Net_167 ,
+            cs_addr_1 => Net_322 ,
+            cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+            chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry0\ ,
+            chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry1\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u0\
+        Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+
+    datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_2 => Net_167 ,
+            cs_addr_1 => Net_322 ,
+            cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+            chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry1\ ,
+            chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry2\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+        Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u3\
+
+    datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u3\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            cs_addr_2 => Net_167 ,
+            cs_addr_1 => Net_322 ,
+            cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+            z0_comb => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+            f0_bus_stat_comb => \CMRA_RDY_TIMER:TimerUDB:status_3\ ,
+            f0_blk_stat_comb => \CMRA_RDY_TIMER:TimerUDB:status_2\ ,
+            chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry2\ );
+        Properties:
+        {
+            a0_init = "00000000"
+            a1_init = "00000000"
+            ce0_sync = 1
+            ce1_sync = 1
+            cl0_sync = 1
+            cl1_sync = 1
+            cmsb_sync = 1
+            co_msb_sync = 1
+            cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+            d0_init = "00000000"
+            d1_init = "00000000"
+            f0_blk_sync = 1
+            f0_bus_sync = 1
+            f1_blk_sync = 1
+            f1_bus_sync = 1
+            ff0_sync = 1
+            ff1_sync = 1
+            ov_msb_sync = 1
+            so_sync = 1
+            z0_sync = 1
+            z1_sync = 1
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+        Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Status register listing">
+    </CYPRESSTAG>
+    <CYPRESSTAG name="StatusI register listing">
+
+    ------------------------------------------------------------
+    StatusI register listing
+    ------------------------------------------------------------
+
+    statusicell: Name =\Trigger_Count:CounterUDB:sSTSReg:stsreg\
+        PORT MAP (
+            reset => Net_40 ,
+            clock => ClockBlock_BUS_CLK ,
+            status_6 => \Trigger_Count:CounterUDB:status_6\ ,
+            status_5 => \Trigger_Count:CounterUDB:status_5\ ,
+            status_2 => \Trigger_Count:CounterUDB:overflow_status\ ,
+            status_1 => \Trigger_Count:CounterUDB:status_1\ ,
+            status_0 => \Trigger_Count:CounterUDB:status_0\ );
+        Properties:
+        {
+            cy_force_order = 1
+            cy_int_mask = "1111111"
+            cy_md_select = "0011111"
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+
+    statusicell: Name =\Frame_Period_Timer:TimerUDB:rstSts:stsreg\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            status_3 => \Frame_Period_Timer:TimerUDB:status_3\ ,
+            status_2 => \Frame_Period_Timer:TimerUDB:status_2\ ,
+            status_0 => \Frame_Period_Timer:TimerUDB:status_tc\ ,
+            interrupt => Net_292 );
+        Properties:
+        {
+            cy_force_order = 1
+            cy_int_mask = "1111111"
+            cy_md_select = "0000011"
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+
+    statusicell: Name =\CMRA_RDY_TIMER:TimerUDB:rstSts:stsreg\
+        PORT MAP (
+            reset => Net_167 ,
+            clock => ClockBlock_BUS_CLK ,
+            status_3 => \CMRA_RDY_TIMER:TimerUDB:status_3\ ,
+            status_2 => \CMRA_RDY_TIMER:TimerUDB:status_2\ ,
+            status_0 => \CMRA_RDY_TIMER:TimerUDB:status_tc\ );
+        Properties:
+        {
+            cy_force_order = 1
+            cy_int_mask = "1111111"
+            cy_md_select = "0000011"
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Sync listing">
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Control register listing">
+
+    ------------------------------------------------------------
+    Control register listing
+    ------------------------------------------------------------
+
+    controlcell: Name =\Trigger_Count:CounterUDB:sCTRLReg:ctrlreg\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            control_7 => \Trigger_Count:CounterUDB:control_7\ ,
+            control_6 => \Trigger_Count:CounterUDB:control_6\ ,
+            control_5 => \Trigger_Count:CounterUDB:control_5\ ,
+            control_4 => \Trigger_Count:CounterUDB:control_4\ ,
+            control_3 => \Trigger_Count:CounterUDB:control_3\ ,
+            control_2 => \Trigger_Count:CounterUDB:control_2\ ,
+            control_1 => \Trigger_Count:CounterUDB:control_1\ ,
+            control_0 => \Trigger_Count:CounterUDB:control_0\ );
+        Properties:
+        {
+            cy_ctrl_mode_0 = "11111111"
+            cy_ctrl_mode_1 = "00000000"
+            cy_ext_reset = 0
+            cy_force_order = 1
+            cy_init_value = "00000000"
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+
+    controlcell: Name =\Frame_Period_Timer:TimerUDB:sCTRLReg:SyncCtl:ctrlreg\
+        PORT MAP (
+            clock => ClockBlock_BUS_CLK ,
+            control_7 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+            control_6 => \Frame_Period_Timer:TimerUDB:control_6\ ,
+            control_5 => \Frame_Period_Timer:TimerUDB:control_5\ ,
+            control_4 => \Frame_Period_Timer:TimerUDB:control_4\ ,
+            control_3 => \Frame_Period_Timer:TimerUDB:control_3\ ,
+            control_2 => \Frame_Period_Timer:TimerUDB:control_2\ ,
+            control_1 => \Frame_Period_Timer:TimerUDB:control_1\ ,
+            control_0 => \Frame_Period_Timer:TimerUDB:control_0\ );
+        Properties:
+        {
+            cy_ctrl_mode_0 = "11111111"
+            cy_ctrl_mode_1 = "00000000"
+            cy_ext_reset = 0
+            cy_force_order = 1
+            cy_init_value = "00000000"
+        }
+        Clock Polarity: Active High
+        Clock Enable: True
+
+    controlcell: Name =\RESET_RDY_TIMER:Sync:ctrl_reg\
+        PORT MAP (
+            control_7 => \RESET_RDY_TIMER:control_7\ ,
+            control_6 => \RESET_RDY_TIMER:control_6\ ,
+            control_5 => \RESET_RDY_TIMER:control_5\ ,
+            control_4 => \RESET_RDY_TIMER:control_4\ ,
+            control_3 => \RESET_RDY_TIMER:control_3\ ,
+            control_2 => \RESET_RDY_TIMER:control_2\ ,
+            control_1 => \RESET_RDY_TIMER:control_1\ ,
+            control_0 => Net_167 );
+        Properties:
+        {
+            cy_ctrl_mode_0 = "00000000"
+            cy_ctrl_mode_1 = "00000000"
+            cy_ext_reset = 0
+            cy_force_order = 1
+            cy_init_value = "00000000"
+        }
+        Clock Enable: True
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Count7 listing">
+    </CYPRESSTAG>
+    <CYPRESSTAG name="DRQ listing">
+
+    ------------------------------------------------------------
+    DRQ listing
+    ------------------------------------------------------------
+
+    drqcell: Name =\USBFS:ep2\
+        PORT MAP (
+            dmareq => \USBFS:dma_request_1\ ,
+            termin => \USBFS:dma_terminate\ ,
+            termout => \USBFS:Net_1498\ );
+        Properties:
+        {
+            drq_type = "10"
+            num_tds = 0
+        }
+
+    drqcell: Name =\USBFS:ep1\
+        PORT MAP (
+            dmareq => \USBFS:dma_request_0\ ,
+            termin => \USBFS:dma_terminate\ ,
+            termout => \USBFS:Net_1495\ );
+        Properties:
+        {
+            drq_type = "10"
+            num_tds = 0
+        }
+    </CYPRESSTAG>
+    <CYPRESSTAG name="Interrupt listing">
+
+    ------------------------------------------------------------
+    Interrupt listing
+    ------------------------------------------------------------
+
+    interrupt: Name =READY_ISR
+        PORT MAP (
+            interrupt => cydff_1 );
+        Properties:
+        {
+            int_type = "00"
+            is_nmi = 0
+        }
+
+    interrupt: Name =TRIG_ISR
+        PORT MAP (
+            interrupt => Net_292 );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:dp_int\
+        PORT MAP (
+            interrupt => \USBFS:Net_1010\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:ep_2\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_2\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:ep_1\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_1\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:ep_0\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_0\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:bus_reset\
+        PORT MAP (
+            interrupt => \USBFS:Net_1876\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+
+    interrupt: Name =\USBFS:arb_int\
+        PORT MAP (
+            interrupt => \USBFS:Net_1889\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+    </CYPRESSTAG>
+</CYPRESSTAG>
+<CYPRESSTAG name="Technology mapping summary" expanded>
+
+------------------------------------------------------------
+Technology mapping summary
+------------------------------------------------------------
+
+Resource Type                 : Used : Free :  Max :  % Used
+============================================================
+Digital Clocks                :    1 :    7 :    8 : 12.50 %
+Analog Clocks                 :    0 :    4 :    4 :  0.00 %
+CapSense Buffers              :    0 :    2 :    2 :  0.00 %
+Digital Filter Block          :    0 :    1 :    1 :  0.00 %
+Interrupts                    :    8 :   24 :   32 : 25.00 %
+IO                            :   14 :   34 :   48 : 29.17 %
+Segment LCD                   :    0 :    1 :    1 :  0.00 %
+CAN 2.0b                      :    0 :    1 :    1 :  0.00 %
+I2C                           :    0 :    1 :    1 :  0.00 %
+USB                           :    1 :    0 :    1 : 100.00 %
+DMA Channels                  :    2 :   22 :   24 :  8.33 %
+Timer                         :    0 :    4 :    4 :  0.00 %
+UDB                           :      :      :      :        
+  Macrocells                  :   14 :  178 :  192 :  7.29 %
+  Unique P-terms              :   13 :  371 :  384 :  3.39 %
+  Total P-terms               :   14 :      :      :        
+  Datapath Cells              :    9 :   15 :   24 : 37.50 %
+  Status Cells                :    3 :   21 :   24 : 12.50 %
+    StatusI Registers         :    3 :      :      :        
+  Control Cells               :    3 :   21 :   24 : 12.50 %
+    Control Registers         :    3 :      :      :        
+Opamp                         :    0 :    4 :    4 :  0.00 %
+Comparator                    :    0 :    4 :    4 :  0.00 %
+Delta-Sigma ADC               :    0 :    1 :    1 :  0.00 %
+LPF                           :    0 :    2 :    2 :  0.00 %
+SAR ADC                       :    0 :    2 :    2 :  0.00 %
+Analog (SC/CT) Blocks         :    0 :    4 :    4 :  0.00 %
+DAC                           :      :      :      :        
+  VIDAC                       :    0 :    4 :    4 :  0.00 %
+</CYPRESSTAG>
+Technology Mapping: Elapsed time ==> 0s.108ms
+Tech Mapping phase: Elapsed time ==> 0s.189ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Analog Placement">
+Initial Analog Placement Results:
+IO_5@[IOP=(1)][IoId=(5)] : CMRA_RDY_IN(0) (fixed)
+IO_4@[IOP=(1)][IoId=(4)] : TRG_OUT(0) (fixed)
+IO_0@[IOP=(2)][IoId=(0)] : \LCD_Char:LCDPort(0)\ (fixed)
+IO_1@[IOP=(2)][IoId=(1)] : \LCD_Char:LCDPort(1)\ (fixed)
+IO_2@[IOP=(2)][IoId=(2)] : \LCD_Char:LCDPort(2)\ (fixed)
+IO_3@[IOP=(2)][IoId=(3)] : \LCD_Char:LCDPort(3)\ (fixed)
+IO_4@[IOP=(2)][IoId=(4)] : \LCD_Char:LCDPort(4)\ (fixed)
+IO_5@[IOP=(2)][IoId=(5)] : \LCD_Char:LCDPort(5)\ (fixed)
+IO_6@[IOP=(2)][IoId=(6)] : \LCD_Char:LCDPort(6)\ (fixed)
+IO_7@[IOP=(15)][IoId=(7)] : \USBFS:Dm(0)\ (fixed)
+IO_6@[IOP=(15)][IoId=(6)] : \USBFS:Dp(0)\ (fixed)
+USB[0]@[FFB(USB,0)] : \USBFS:USB\
+Analog Placement phase: Elapsed time ==> 0s.017ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Analog Routing">
+Analog Routing phase: Elapsed time ==> 0s.000ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Analog Code Generation">
+============ Analog Final Answer Routes ============
+Dump of CyAnalogRoutingResultsDB
+Map of net to items {
+}
+Map of item to net {
+}
+Mux Info {
+}
+Dump of CyP35AnalogRoutingResultsDB
+IsVddaHalfUsedForComp = False
+IsVddaHalfUsedForSar0 = False
+IsVddaHalfUsedForSar1 = False
+Analog Code Generation phase: Elapsed time ==> 0s.249ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Digital Placement">
+<CYPRESSTAG name="Detailed placement messages">
+I2076: Total run-time: 0.8 sec.
+
+</CYPRESSTAG>
+<CYPRESSTAG name="PLD Packing">
+<CYPRESSTAG name="PLD Packing Summary" expanded>
+
+------------------------------------------------------------
+PLD Packing Summary
+------------------------------------------------------------
+            Resource Type : Used : Free :  Max :  % Used
+    ====================================================
+                     PLDs :    9 :   39 :   48 :  18.75%
+
+<CYPRESSTAG name="PLD Statistics">
+
+        PLD Resource Type :     Average/LAB
+    =======================================
+                   Inputs :            2.22
+                   Pterms :            1.44
+               Macrocells :            1.56
+</CYPRESSTAG>
+<CYPRESSTAG name="Packed PLD Contents">
+Packed PLD Contents not displayed at this verbose level.</CYPRESSTAG>
+</CYPRESSTAG>
+PLD Packing: Elapsed time ==> 0s.001ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Partitioning">
+<CYPRESSTAG name="Initial Partitioning Summary">
+Initial Partitioning Summary not displayed at this verbose level.</CYPRESSTAG>
+<CYPRESSTAG name="Final Partitioning Summary">
+Final Partitioning Summary not displayed at this verbose level.</CYPRESSTAG>
+Partitioning: Elapsed time ==> 0s.034ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Final Placement Summary">
+
+------------------------------------------------------------
+Final Placement Summary
+------------------------------------------------------------
+
+       Resource Type :      Count : Avg Inputs : Avg Outputs
+    ========================================================
+                 UDB :         10 :       1.90 :       1.40
+<CYPRESSTAG name="Final Placement Details">
+<CYPRESSTAG name="Component Details">
+
+------------------------------------------------------------
+Component Placement Details
+------------------------------------------------------------
+UDB [UDB=(0,0)] contents:
+datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+        cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+        chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry1\ ,
+        chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry2\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+    Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u3\
+
+UDB [UDB=(0,1)] contents:
+LAB@[UDB=(0,1)][LB=0] #macrocells=1, #inputs=1, #pterms=1
+{
+    [McSlotId=0]: (empty)
+    [McSlotId=1]: (empty)
+    [McSlotId=2]: (empty)
+    [McSlotId=3]:     MacroCell: Name=cydff_1, Mode=(D-Register) @ [UDB=(0,1)][LB=0][MC=3]
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              Net_113
+        );
+        Output = cydff_1 (fanout=4)
+        Properties               : 
+        {
+        }
+}
+
+LAB@[UDB=(0,1)][LB=1] #macrocells=1, #inputs=2, #pterms=1
+{
+    [McSlotId=0]: (empty)
+    [McSlotId=1]:     MacroCell: Name=Net_325, Mode=(Combinatorial) @ [UDB=(0,1)][LB=1][MC=1]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              cydff_1 * !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = Net_325 (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=2]: (empty)
+    [McSlotId=3]: (empty)
+}
+
+datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+        cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+        chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry0\ ,
+        chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry1\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u0\
+    Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+
+controlcell: Name =\Frame_Period_Timer:TimerUDB:sCTRLReg:SyncCtl:ctrlreg\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        control_7 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+        control_6 => \Frame_Period_Timer:TimerUDB:control_6\ ,
+        control_5 => \Frame_Period_Timer:TimerUDB:control_5\ ,
+        control_4 => \Frame_Period_Timer:TimerUDB:control_4\ ,
+        control_3 => \Frame_Period_Timer:TimerUDB:control_3\ ,
+        control_2 => \Frame_Period_Timer:TimerUDB:control_2\ ,
+        control_1 => \Frame_Period_Timer:TimerUDB:control_1\ ,
+        control_0 => \Frame_Period_Timer:TimerUDB:control_0\ );
+    Properties:
+    {
+        cy_ctrl_mode_0 = "11111111"
+        cy_ctrl_mode_1 = "00000000"
+        cy_ext_reset = 0
+        cy_force_order = 1
+        cy_init_value = "00000000"
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+UDB [UDB=(0,2)] contents:
+datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_2 => Net_167 ,
+        cs_addr_1 => Net_322 ,
+        cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+        chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry0\ ,
+        chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry1\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u0\
+    Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+
+controlcell: Name =\RESET_RDY_TIMER:Sync:ctrl_reg\
+    PORT MAP (
+        control_7 => \RESET_RDY_TIMER:control_7\ ,
+        control_6 => \RESET_RDY_TIMER:control_6\ ,
+        control_5 => \RESET_RDY_TIMER:control_5\ ,
+        control_4 => \RESET_RDY_TIMER:control_4\ ,
+        control_3 => \RESET_RDY_TIMER:control_3\ ,
+        control_2 => \RESET_RDY_TIMER:control_2\ ,
+        control_1 => \RESET_RDY_TIMER:control_1\ ,
+        control_0 => Net_167 );
+    Properties:
+    {
+        cy_ctrl_mode_0 = "00000000"
+        cy_ctrl_mode_1 = "00000000"
+        cy_ext_reset = 0
+        cy_force_order = 1
+        cy_init_value = "00000000"
+    }
+    Clock Enable: True
+
+UDB [UDB=(0,3)] contents:
+datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_2 => Net_167 ,
+        cs_addr_1 => Net_322 ,
+        cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+        chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry1\ ,
+        chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry2\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+    Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u3\
+
+UDB [UDB=(0,4)] is empty.
+UDB [UDB=(0,5)] is empty.
+UDB [UDB=(1,0)] contents:
+datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u3\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+        cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+        z0_comb => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+        f0_bus_stat_comb => \Frame_Period_Timer:TimerUDB:status_3\ ,
+        f0_blk_stat_comb => \Frame_Period_Timer:TimerUDB:status_2\ ,
+        chain_in => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry2\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u2\
+
+statusicell: Name =\Frame_Period_Timer:TimerUDB:rstSts:stsreg\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        status_3 => \Frame_Period_Timer:TimerUDB:status_3\ ,
+        status_2 => \Frame_Period_Timer:TimerUDB:status_2\ ,
+        status_0 => \Frame_Period_Timer:TimerUDB:status_tc\ ,
+        interrupt => Net_292 );
+    Properties:
+    {
+        cy_force_order = 1
+        cy_int_mask = "1111111"
+        cy_md_select = "0000011"
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+UDB [UDB=(1,1)] contents:
+LAB@[UDB=(1,1)][LB=0] #macrocells=2, #inputs=2, #pterms=2
+{
+    [McSlotId=0]:     MacroCell: Name=Net_322, Mode=(Combinatorial) @ [UDB=(1,1)][LB=0][MC=0]
+        Total # of inputs        : 1
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              !cydff_1
+        );
+        Output = Net_322 (fanout=4)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=1]: (empty)
+    [McSlotId=2]:     MacroCell: Name=\CMRA_RDY_TIMER:TimerUDB:status_tc\, Mode=(Combinatorial) @ [UDB=(1,1)][LB=0][MC=2]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              !cydff_1 * \CMRA_RDY_TIMER:TimerUDB:per_zero\
+        );
+        Output = \CMRA_RDY_TIMER:TimerUDB:status_tc\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=3]: (empty)
+}
+
+datapathcell: Name =\Frame_Period_Timer:TimerUDB:sT32:timerdp:u0\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_1 => \Frame_Period_Timer:TimerUDB:control_7\ ,
+        cs_addr_0 => \Frame_Period_Timer:TimerUDB:per_zero\ ,
+        chain_out => \Frame_Period_Timer:TimerUDB:sT32:timerdp:carry0\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111000000000000000000000001000000000000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Next in chain : \Frame_Period_Timer:TimerUDB:sT32:timerdp:u1\
+
+UDB [UDB=(1,2)] contents:
+LAB@[UDB=(1,2)][LB=0] #macrocells=4, #inputs=9, #pterms=4
+{
+    [McSlotId=0]:     MacroCell: Name=\Frame_Period_Timer:TimerUDB:status_tc\, Mode=(Combinatorial) @ [UDB=(1,2)][LB=0][MC=0]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Frame_Period_Timer:TimerUDB:control_7\ * 
+              \Frame_Period_Timer:TimerUDB:per_zero\
+        );
+        Output = \Frame_Period_Timer:TimerUDB:status_tc\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=1]:     MacroCell: Name=Net_40, Mode=(D-Register) @ [UDB=(1,2)][LB=0][MC=1]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Frame_Period_Timer:TimerUDB:control_7\ * 
+              \Frame_Period_Timer:TimerUDB:per_zero\
+        );
+        Output = Net_40 (fanout=3)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=2]:     MacroCell: Name=\Trigger_Count:CounterUDB:disable_run_i\, Mode=(D-Register) @ [UDB=(1,2)][LB=0][MC=2]
+        Total # of inputs        : 4
+        Total # of product terms : 2
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 2 pterms
+        (
+              !Net_40 * \Trigger_Count:CounterUDB:disable_run_i\
+            + !Net_40 * \Trigger_Count:CounterUDB:per_equal\ * 
+              !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = \Trigger_Count:CounterUDB:disable_run_i\ (fanout=2)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=3]:     MacroCell: Name=\Trigger_Count:CounterUDB:count_enable\, Mode=(Combinatorial) @ [UDB=(1,2)][LB=0][MC=3]
+        Total # of inputs        : 4
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:control_7\ * 
+              !\Trigger_Count:CounterUDB:disable_run_i\ * 
+              !\Trigger_Count:CounterUDB:count_stored_i\ * Net_295_local
+        );
+        Output = \Trigger_Count:CounterUDB:count_enable\ (fanout=1)
+        Properties               : 
+        {
+        }
+}
+
+LAB@[UDB=(1,2)][LB=1] #macrocells=1, #inputs=1, #pterms=1
+{
+    [McSlotId=0]:     MacroCell: Name=\Trigger_Count:CounterUDB:count_stored_i\, Mode=(D-Register) @ [UDB=(1,2)][LB=1][MC=0]
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              Net_295_local
+        );
+        Output = \Trigger_Count:CounterUDB:count_stored_i\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=1]: (empty)
+    [McSlotId=2]: (empty)
+    [McSlotId=3]: (empty)
+}
+
+datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u0\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_2 => Net_167 ,
+        cs_addr_1 => Net_322 ,
+        cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+        chain_out => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry0\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111000000000000000000000001000000000000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Next in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u1\
+
+controlcell: Name =\Trigger_Count:CounterUDB:sCTRLReg:ctrlreg\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        control_7 => \Trigger_Count:CounterUDB:control_7\ ,
+        control_6 => \Trigger_Count:CounterUDB:control_6\ ,
+        control_5 => \Trigger_Count:CounterUDB:control_5\ ,
+        control_4 => \Trigger_Count:CounterUDB:control_4\ ,
+        control_3 => \Trigger_Count:CounterUDB:control_3\ ,
+        control_2 => \Trigger_Count:CounterUDB:control_2\ ,
+        control_1 => \Trigger_Count:CounterUDB:control_1\ ,
+        control_0 => \Trigger_Count:CounterUDB:control_0\ );
+    Properties:
+    {
+        cy_ctrl_mode_0 = "11111111"
+        cy_ctrl_mode_1 = "00000000"
+        cy_ext_reset = 0
+        cy_force_order = 1
+        cy_init_value = "00000000"
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+UDB [UDB=(1,3)] contents:
+LAB@[UDB=(1,3)][LB=1] #macrocells=1, #inputs=1, #pterms=1
+{
+    [McSlotId=0]: (empty)
+    [McSlotId=1]: (empty)
+    [McSlotId=2]:     MacroCell: Name=\Trigger_Count:CounterUDB:overflow_reg_i\, Mode=(D-Register) @ [UDB=(1,3)][LB=1][MC=2]
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:per_equal\
+        );
+        Output = \Trigger_Count:CounterUDB:overflow_reg_i\ (fanout=3)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=3]: (empty)
+}
+
+datapathcell: Name =\CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u3\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_2 => Net_167 ,
+        cs_addr_1 => Net_322 ,
+        cs_addr_0 => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+        z0_comb => \CMRA_RDY_TIMER:TimerUDB:per_zero\ ,
+        f0_bus_stat_comb => \CMRA_RDY_TIMER:TimerUDB:status_3\ ,
+        f0_blk_stat_comb => \CMRA_RDY_TIMER:TimerUDB:status_2\ ,
+        chain_in => \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:carry2\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000000100000001000000010000000000000010000000000000001000000000000000100000000000000010000000000000001000000011111111000000001111111111111111100000110000000000000001000000110000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+    Previous in chain : \CMRA_RDY_TIMER:TimerUDB:sT32:timerdp:u2\
+
+statusicell: Name =\CMRA_RDY_TIMER:TimerUDB:rstSts:stsreg\
+    PORT MAP (
+        reset => Net_167 ,
+        clock => ClockBlock_BUS_CLK ,
+        status_3 => \CMRA_RDY_TIMER:TimerUDB:status_3\ ,
+        status_2 => \CMRA_RDY_TIMER:TimerUDB:status_2\ ,
+        status_0 => \CMRA_RDY_TIMER:TimerUDB:status_tc\ );
+    Properties:
+    {
+        cy_force_order = 1
+        cy_int_mask = "1111111"
+        cy_md_select = "0000011"
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+UDB [UDB=(1,4)] contents:
+LAB@[UDB=(1,4)][LB=0] #macrocells=2, #inputs=2, #pterms=2
+{
+    [McSlotId=0]:     MacroCell: Name=\Trigger_Count:CounterUDB:status_0\, Mode=(Combinatorial) @ [UDB=(1,4)][LB=0][MC=0]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:cmp_out_i\ * 
+              !\Trigger_Count:CounterUDB:prevCompare\
+        );
+        Output = \Trigger_Count:CounterUDB:status_0\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=1]:     MacroCell: Name=\Trigger_Count:CounterUDB:prevCompare\, Mode=(D-Register) @ [UDB=(1,4)][LB=0][MC=1]
+        Total # of inputs        : 1
+        Total # of product terms : 1
+        List of special equations: 
+            Clock  = (ClockBlock_BUS_CLK) => Global
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:cmp_out_i\
+        );
+        Output = \Trigger_Count:CounterUDB:prevCompare\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=2]: (empty)
+    [McSlotId=3]: (empty)
+}
+
+LAB@[UDB=(1,4)][LB=1] #macrocells=1, #inputs=2, #pterms=1
+{
+    [McSlotId=0]:     MacroCell: Name=\Trigger_Count:CounterUDB:overflow_status\, Mode=(Combinatorial) @ [UDB=(1,4)][LB=1][MC=0]
+        Total # of inputs        : 2
+        Total # of product terms : 1
+            Clock Enable: True
+        Main Equation            : 1 pterm
+        (
+              \Trigger_Count:CounterUDB:per_equal\ * 
+              !\Trigger_Count:CounterUDB:overflow_reg_i\
+        );
+        Output = \Trigger_Count:CounterUDB:overflow_status\ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=1]: (empty)
+    [McSlotId=2]: (empty)
+    [McSlotId=3]: (empty)
+}
+
+datapathcell: Name =\Trigger_Count:CounterUDB:sC8:counterdp:u0\
+    PORT MAP (
+        clock => ClockBlock_BUS_CLK ,
+        cs_addr_2 => __ONE__ ,
+        cs_addr_1 => \Trigger_Count:CounterUDB:count_enable\ ,
+        cs_addr_0 => Net_40 ,
+        ce0_comb => \Trigger_Count:CounterUDB:per_equal\ ,
+        z0_comb => \Trigger_Count:CounterUDB:status_1\ ,
+        cl1_comb => \Trigger_Count:CounterUDB:cmp_out_i\ ,
+        f0_bus_stat_comb => \Trigger_Count:CounterUDB:status_6\ ,
+        f0_blk_stat_comb => \Trigger_Count:CounterUDB:status_5\ );
+    Properties:
+    {
+        a0_init = "00000000"
+        a1_init = "00000000"
+        ce0_sync = 1
+        ce1_sync = 1
+        cl0_sync = 1
+        cl1_sync = 1
+        cmsb_sync = 1
+        co_msb_sync = 1
+        cy_dpconfig = "0000000001000000000000001000000001000000010000000000000010000000000000000100000010101000010100000010000001000000101010000101000011111111000000001111111111111111101000000000000000000001000000000000000000011000"
+        d0_init = "00000000"
+        d1_init = "00000000"
+        f0_blk_sync = 1
+        f0_bus_sync = 1
+        f1_blk_sync = 1
+        f1_bus_sync = 1
+        ff0_sync = 1
+        ff1_sync = 1
+        ov_msb_sync = 1
+        so_sync = 1
+        z0_sync = 1
+        z1_sync = 1
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+statusicell: Name =\Trigger_Count:CounterUDB:sSTSReg:stsreg\
+    PORT MAP (
+        reset => Net_40 ,
+        clock => ClockBlock_BUS_CLK ,
+        status_6 => \Trigger_Count:CounterUDB:status_6\ ,
+        status_5 => \Trigger_Count:CounterUDB:status_5\ ,
+        status_2 => \Trigger_Count:CounterUDB:overflow_status\ ,
+        status_1 => \Trigger_Count:CounterUDB:status_1\ ,
+        status_0 => \Trigger_Count:CounterUDB:status_0\ );
+    Properties:
+    {
+        cy_force_order = 1
+        cy_int_mask = "1111111"
+        cy_md_select = "0011111"
+    }
+    Clock Polarity: Active High
+    Clock Enable: True
+
+UDB [UDB=(1,5)] is empty.
+UDB [UDB=(2,0)] is empty.
+UDB [UDB=(2,1)] is empty.
+UDB [UDB=(2,2)] is empty.
+UDB [UDB=(2,3)] is empty.
+UDB [UDB=(2,4)] is empty.
+UDB [UDB=(2,5)] contents:
+LAB@[UDB=(2,5)][LB=0] #macrocells=1, #inputs=0, #pterms=0
+{
+    [McSlotId=0]: (empty)
+    [McSlotId=1]: (empty)
+    [McSlotId=2]:     MacroCell: Name=__ONE__, Mode=(Combinatorial) @ [UDB=(2,5)][LB=0][MC=2]
+        Total # of inputs        : 0
+        Total # of product terms : 0
+            Clock Enable: True
+        Main Equation            : 0 pterms
+        !(
+            0
+        );
+        Output = __ONE__ (fanout=1)
+        Properties               : 
+        {
+        }
+
+    [McSlotId=3]: (empty)
+}
+
+UDB [UDB=(3,0)] is empty.
+UDB [UDB=(3,1)] is empty.
+UDB [UDB=(3,2)] is empty.
+UDB [UDB=(3,3)] is empty.
+UDB [UDB=(3,4)] is empty.
+UDB [UDB=(3,5)] is empty.
+Intr container @ [IntrContainer=(0)]: 
+  Intr@ [IntrContainer=(0)][IntrId=(0)] 
+    interrupt: Name =READY_ISR
+        PORT MAP (
+            interrupt => cydff_1 );
+        Properties:
+        {
+            int_type = "00"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(1)] 
+    interrupt: Name =TRIG_ISR
+        PORT MAP (
+            interrupt => Net_292 );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(2)] 
+    interrupt: Name =\USBFS:ep_1\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_1\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(3)] 
+    interrupt: Name =\USBFS:ep_2\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_2\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(12)] 
+    interrupt: Name =\USBFS:dp_int\
+        PORT MAP (
+            interrupt => \USBFS:Net_1010\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(22)] 
+    interrupt: Name =\USBFS:arb_int\
+        PORT MAP (
+            interrupt => \USBFS:Net_1889\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(23)] 
+    interrupt: Name =\USBFS:bus_reset\
+        PORT MAP (
+            interrupt => \USBFS:Net_1876\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+  Intr@ [IntrContainer=(0)][IntrId=(24)] 
+    interrupt: Name =\USBFS:ep_0\
+        PORT MAP (
+            interrupt => \USBFS:ep_int_0\ );
+        Properties:
+        {
+            int_type = "10"
+            is_nmi = 0
+        }
+Drq container @ [DrqContainer=(0)]: 
+  Dma@ [DrqContainer=(0)][DrqId=(0)] 
+    drqcell: Name =\USBFS:ep1\
+        PORT MAP (
+            dmareq => \USBFS:dma_request_0\ ,
+            termin => \USBFS:dma_terminate\ ,
+            termout => \USBFS:Net_1495\ );
+        Properties:
+        {
+            drq_type = "10"
+            num_tds = 0
+        }
+  Dma@ [DrqContainer=(0)][DrqId=(1)] 
+    drqcell: Name =\USBFS:ep2\
+        PORT MAP (
+            dmareq => \USBFS:dma_request_1\ ,
+            termin => \USBFS:dma_terminate\ ,
+            termout => \USBFS:Net_1498\ );
+        Properties:
+        {
+            drq_type = "10"
+            num_tds = 0
+        }
+Port 0 contains the following IO cells:
+Port 1 contains the following IO cells:
+[IoId=4]: 
+Pin : Name = TRG_OUT(0)
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: True
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL, ROUTABLE
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => TRG_OUT(0)__PA ,
+        pin_input => Net_325 ,
+        pad => TRG_OUT(0)_PAD );
+    Properties:
+    {
+    }
+
+[IoId=5]: 
+Pin : Name = CMRA_RDY_IN(0)
+    Attributes:
+        In Group/Port: True
+        In Sync Option: NOSYNC
+        Out Sync Option: AUTO
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: HI_Z_DIGITAL
+        VTrip: CMOS
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: True
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL, ROUTABLE
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => CMRA_RDY_IN(0)__PA ,
+        fb => Net_113 ,
+        pad => CMRA_RDY_IN(0)_PAD );
+    Properties:
+    {
+    }
+
+Port 2 contains the following IO cells:
+[IoId=0]: 
+Pin : Name = \LCD_Char:LCDPort(0)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(0)\__PA ,
+        pad => \LCD_Char:LCDPort(0)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=1]: 
+Pin : Name = \LCD_Char:LCDPort(1)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(1)\__PA ,
+        pad => \LCD_Char:LCDPort(1)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=2]: 
+Pin : Name = \LCD_Char:LCDPort(2)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(2)\__PA ,
+        pad => \LCD_Char:LCDPort(2)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=3]: 
+Pin : Name = \LCD_Char:LCDPort(3)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(3)\__PA ,
+        pad => \LCD_Char:LCDPort(3)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=4]: 
+Pin : Name = \LCD_Char:LCDPort(4)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(4)\__PA ,
+        pad => \LCD_Char:LCDPort(4)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=5]: 
+Pin : Name = \LCD_Char:LCDPort(5)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(5)\__PA ,
+        pad => \LCD_Char:LCDPort(5)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=6]: 
+Pin : Name = \LCD_Char:LCDPort(6)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: NOSYNC
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: CMOS_OUT
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: False
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: DIGITAL
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \LCD_Char:LCDPort(6)\__PA ,
+        pad => \LCD_Char:LCDPort(6)_PAD\ );
+    Properties:
+    {
+    }
+
+Port 3 contains the following IO cells:
+Port 12 contains the following IO cells:
+Port 15 generates interrupt for logical port:
+    logicalport: Name =\USBFS:Dp\
+        PORT MAP (
+            in_clock_en => one ,
+            in_reset => zero ,
+            out_clock_en => one ,
+            out_reset => zero ,
+            interrupt => \USBFS:Net_1010\ ,
+            in_clock => ClockBlock_BUS_CLK );
+        Properties:
+        {
+            drive_mode = "000"
+            ibuf_enabled = "0"
+            id = "f87de44a-b6a5-4e65-943a-d331f174d302/618a72fc-5ddd-4df5-958f-a3d55102db42"
+            init_dr_st = "1"
+            input_buffer_sel = "00"
+            input_clk_en = 0
+            input_sync = "1"
+            input_sync_mode = "0"
+            intr_mode = "10"
+            invert_in_clock = 0
+            invert_in_clock_en = 0
+            invert_in_reset = 0
+            invert_out_clock = 0
+            invert_out_clock_en = 0
+            invert_out_reset = 0
+            io_voltage = ""
+            layout_mode = "CONTIGUOUS"
+            oe_conn = "0"
+            oe_reset = 0
+            oe_sync = "0"
+            output_clk_en = 0
+            output_clock_mode = "0"
+            output_conn = "0"
+            output_mode = "0"
+            output_reset = 0
+            output_sync = "0"
+            ovt_hyst_trim = "0"
+            ovt_needed = "0"
+            ovt_slew_control = "00"
+            pa_in_clock = -1
+            pa_in_clock_en = -1
+            pa_in_reset = -1
+            pa_out_clock = -1
+            pa_out_clock_en = -1
+            pa_out_reset = -1
+            pin_aliases = ""
+            pin_mode = "I"
+            por_state = 4
+            port_alias_group = ""
+            port_alias_required = 0
+            sio_group_cnt = 0
+            sio_hifreq = "00000000"
+            sio_hyst = "1"
+            sio_ibuf = "00000000"
+            sio_info = "00"
+            sio_obuf = "00000000"
+            sio_refsel = "00000000"
+            sio_vohsel = "00000000"
+            sio_vtrip = "00000000"
+            slew_rate = "0"
+            spanning = 0
+            sw_only = 0
+            use_annotation = "0"
+            vtrip = "00"
+            width = 1
+        }
+    and contains the following IO cells:
+[IoId=6]: 
+Pin : Name = \USBFS:Dp(0)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: SYNC
+        Out Sync Option: AUTO
+        Interrupt generated: True
+        Interrupt mode: FALLING
+        Drive mode: HI_Z_ANALOG
+        VTrip: CMOS
+        Slew: FAST
+        Input Sync needed: True
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: False
+        Is OE Registered: False
+        Uses Analog: True
+        Can contain Digital: True
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: USB_D_PLUS
+        Initial Value: 1
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \USBFS:Dp(0)\__PA ,
+        analog_term => \USBFS:Net_1000\ ,
+        pad => \USBFS:Dp(0)_PAD\ );
+    Properties:
+    {
+    }
+
+[IoId=7]: 
+Pin : Name = \USBFS:Dm(0)\
+    Attributes:
+        In Group/Port: True
+        In Sync Option: AUTO
+        Out Sync Option: AUTO
+        Interrupt generated: False
+        Interrupt mode: NONE
+        Drive mode: HI_Z_ANALOG
+        VTrip: EITHER
+        Slew: FAST
+        Input Sync needed: False
+        Output Sync needed: False
+        SC shield enabled: False
+        POR State: ANY
+        LCD Mode: COMMON
+        Register Mode: RegComb
+        CaSense Mode: NEITHER
+        Treat as pin: True
+        Is OE Registered: False
+        Uses Analog: True
+        Can contain Digital: False
+        Is SIO: False
+        SIO Output Buf: NONREGULATED
+        SIO Input Buf: SINGLE_ENDED
+        SIO HiFreq: LOW
+        SIO Hyst: DISABLED
+        SIO Vtrip: MULTIPLIER_0_5
+        SIO Multiplier Index: 0
+        SIO RefSel: VCC_IO
+        Required Capabilities: USB_D_MINUS
+        Initial Value: 0
+        IO Voltage: 0
+    PORT MAP (
+        pa_out => \USBFS:Dm(0)\__PA ,
+        analog_term => \USBFS:Net_597\ ,
+        pad => \USBFS:Dm(0)_PAD\ );
+    Properties:
+    {
+    }
+
+ARM group 0: empty
+CAN group 0: empty
+Cache group 0: empty
+CapSense group 0: empty
+Clock group 0: 
+    Clock Block @ F(Clock,0): 
+    clockblockcell: Name =ClockBlock
+        PORT MAP (
+            imo => ClockBlock_IMO ,
+            pllout => ClockBlock_PLL_OUT ,
+            ilo => ClockBlock_ILO ,
+            clk_100k => ClockBlock_100k ,
+            clk_1k => ClockBlock_1k ,
+            clk_32k => ClockBlock_32k ,
+            xtal => ClockBlock_XTAL ,
+            clk_32k_xtal => ClockBlock_XTAL_32KHZ ,
+            clk_sync => ClockBlock_MASTER_CLK ,
+            clk_bus_glb => ClockBlock_BUS_CLK ,
+            clk_bus => ClockBlock_BUS_CLK_local ,
+            dclk_glb_0 => Net_295 ,
+            dclk_0 => Net_295_local );
+        Properties:
+        {
+        }
+Comparator group 0: empty
+DFB group 0: empty
+DSM group 0: empty
+Decimator group 0: empty
+EMIF group 0: empty
+I2C group 0: empty
+LCD group 0: empty
+LVD group 0: empty
+PICU group 0: empty
+PM group 0: empty
+SC group 0: empty
+SPC group 0: empty
+Timer group 0: empty
+USB group 0: 
+    USB Block @ F(USB,0): 
+    usbcell: Name =\USBFS:USB\
+        PORT MAP (
+            dp => \USBFS:Net_1000\ ,
+            dm => \USBFS:Net_597\ ,
+            sof_int => Net_373 ,
+            arb_int => \USBFS:Net_1889\ ,
+            usb_int => \USBFS:Net_1876\ ,
+            ept_int_8 => \USBFS:ep_int_8\ ,
+            ept_int_7 => \USBFS:ep_int_7\ ,
+            ept_int_6 => \USBFS:ep_int_6\ ,
+            ept_int_5 => \USBFS:ep_int_5\ ,
+            ept_int_4 => \USBFS:ep_int_4\ ,
+            ept_int_3 => \USBFS:ep_int_3\ ,
+            ept_int_2 => \USBFS:ep_int_2\ ,
+            ept_int_1 => \USBFS:ep_int_1\ ,
+            ept_int_0 => \USBFS:ep_int_0\ ,
+            ord_int => \USBFS:Net_95\ ,
+            dma_req_7 => \USBFS:dma_request_7\ ,
+            dma_req_6 => \USBFS:dma_request_6\ ,
+            dma_req_5 => \USBFS:dma_request_5\ ,
+            dma_req_4 => \USBFS:dma_request_4\ ,
+            dma_req_3 => \USBFS:dma_request_3\ ,
+            dma_req_2 => \USBFS:dma_request_2\ ,
+            dma_req_1 => \USBFS:dma_request_1\ ,
+            dma_req_0 => \USBFS:dma_request_0\ ,
+            dma_termin => \USBFS:dma_terminate\ );
+        Properties:
+        {
+            cy_registers = ""
+        }
+VIDAC group 0: empty
+OpAmp group 0: empty
+CsAbuf group 0: empty
+Vref group 0: empty
+LPF group 0: empty
+SAR group 0: empty
+ANAIF group 0: empty
+PHUB group 0: empty
+</CYPRESSTAG>
+<CYPRESSTAG name="Port Configuration Details">
+
+------------------------------------------------------------
+Port Configuration report
+------------------------------------------------------------
+     |     |       | Interrupt |                  |                       | 
+Port | Pin | Fixed |      Type |       Drive Mode |                  Name | Connections
+-----+-----+-------+-----------+------------------+-----------------------+-------------------------
+   1 |   4 |     * |      NONE |         CMOS_OUT |            TRG_OUT(0) | In(Net_325)
+     |   5 |     * |      NONE |     HI_Z_DIGITAL |        CMRA_RDY_IN(0) | FB(Net_113)
+-----+-----+-------+-----------+------------------+-----------------------+-------------------------
+   2 |   0 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(0)\ | 
+     |   1 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(1)\ | 
+     |   2 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(2)\ | 
+     |   3 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(3)\ | 
+     |   4 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(4)\ | 
+     |   5 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(5)\ | 
+     |   6 |     * |      NONE |         CMOS_OUT | \LCD_Char:LCDPort(6)\ | 
+-----+-----+-------+-----------+------------------+-----------------------+-------------------------
+  15 |   6 |       |   FALLING |      HI_Z_ANALOG |         \USBFS:Dp(0)\ | Analog(\USBFS:Net_1000\)
+     |   7 |       |      NONE |      HI_Z_ANALOG |         \USBFS:Dm(0)\ | Analog(\USBFS:Net_597\)
+----------------------------------------------------------------------------------------------------
+</CYPRESSTAG>
+</CYPRESSTAG>
+</CYPRESSTAG>
+Digital component placer commit/Report: Elapsed time ==> 0s.055ms
+Digital Placement phase: Elapsed time ==> 1s.151ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Digital Routing">
+"C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\bin/sjrouter.exe" --xml-path "C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\dev\psoc5/psoc5lp/route_arch-rrg.cydata" --vh2-path "Camera Trigger_r.vh2" --pcf-path "Camera Trigger.pco" --des-name "Camera Trigger" --dsf-path "Camera Trigger.dsf" --sdc-path "Camera Trigger.sdc" --lib-path "Camera Trigger_r.lib"
+Routing successful.
+Digital Routing phase: Elapsed time ==> 1s.361ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Bitstream Generation">
+Bitstream Generation phase: Elapsed time ==> 0s.181ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Bitstream Verification">
+Bitstream Verification phase: Elapsed time ==> 0s.030ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Static timing analysis">
+Warning: sta.M0021: Camera Trigger_timing.html: Warning-1350: Asynchronous path(s) exist from "Clock_2(routed)" to "CyBUS_CLK". See the timing report for details. (File=C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger_timing.html)
+Timing report is in Camera Trigger_timing.html.
+Static timing analysis phase: Elapsed time ==> 0s.291ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Data reporting">
+Data reporting phase: Elapsed time ==> 0s.000ms
+</CYPRESSTAG>
+<CYPRESSTAG name="Database update...">
+Design database save phase: Elapsed time ==> 0s.208ms
+</CYPRESSTAG>
+cydsfit: Elapsed time ==> 3s.746ms
+</CYPRESSTAG>
+Fitter phase: Elapsed time ==> 3s.747ms
+API generation phase: Elapsed time ==> 1s.559ms
+Dependency generation phase: Elapsed time ==> 0s.017ms
+Cleanup phase: Elapsed time ==> 0s.000ms
