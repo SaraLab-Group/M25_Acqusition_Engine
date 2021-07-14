@@ -66,23 +66,32 @@ struct usb_data{
     uint16 flags;
     uint16 fps;
     uint32 time_waiting; // Currently Time between not ready and ready
+    uint64 count;
 };
 
 uint32 set_fps();
 
 struct usb_data incoming;
 struct usb_data outgoing;
-
-volatile uint32 time_til_ready = 0;
+volatile uint8 to_send = 0;
+volatile uint8 recieved = 0;
+volatile uint8 lcd_draw = 0;
+volatile uint32 time_btwn_trig = 0;
 volatile double time_sec = 0;
+volatile uint16 counter = 0;
 
 // This just grabs the counter time until ready value in clock ticks
-CY_ISR(CMRA_RDY_ISR){
-    time_til_ready = /*MAX_32BIT -*/ Frame_Period_Timer_ReadCounter();
-    time_sec = time_til_ready * TICK_PERIOD;
+CY_ISR(PERIOD_ISR){
+    time_btwn_trig = /*MAX_32BIT -*/ Frame_Period_Timer_ReadCounter();
+    time_sec = time_btwn_trig * TICK_PERIOD;
     Frame_Period_Timer_ReadStatusRegister();
     RESET_RDY_TIMER_Write(REG_ON);
     RESET_RDY_TIMER_Write(REG_OFF);
+    to_send = 1;
+    counter++;
+//    if(!(counter % 100)){
+//        lcd_draw = 1;
+//    }
 }
 
 /*CY_ISR(TRIG_ISR_BOD){
@@ -93,13 +102,15 @@ int main(void)
 {
     uint16 length;
     incoming.flags = outgoing.flags = 0;
+    incoming.fps = outgoing.fps = 100;
+    
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     Trigger_Count_Start(); // Counts how many times a capture event has occured.
     Frame_Period_Timer_Start(); // Main Capture Rate
-    CMRA_RDY_TIMER_Start(); //Counting Time Camera isn't Ready
-    READY_ISR_StartEx(CMRA_RDY_ISR);
+    TRIG_PERIOD_Start(); //Counting Time Camera isn't Ready
+    PERIOD_ISR_StartEx(PERIOD_ISR);
     //TRIG_ISR_StartEx(TRIG_ISR_BOD);
     LCD_Char_Start();
     
@@ -107,7 +118,7 @@ int main(void)
     uint32 count = 0;
     char msg[16];
     char msg2[16];
-    sprintf(msg2, "%lu", time_til_ready);
+    sprintf(msg2, "%lu", time_btwn_trig);
     sprintf(msg, "%lu", count);
     
     char bfr[] = "before";
@@ -134,7 +145,7 @@ int main(void)
     
     LCD_Char_ClearDisplay();
     LCD_Char_Position(1u,0u);
-    LCD_Char_PrintString(aftr);
+    LCD_Char_PrintString("100FPS");
     
     CyDelay(1000);
     
@@ -167,7 +178,17 @@ int main(void)
         #if (USBFS_16BITS_EP_ACCESS_ENABLE)
             USBFS_ReadOutEP16(OUT_EP_NUM, buffer, length);
         #else
-            USBFS_ReadOutEP(OUT_EP_NUM, buffer, length);
+            USBFS_ReadOutEP(OUT_EP_NUM, (uint8*)&incoming, sizeof(struct usb_data));
+            if(incoming.flags & CHANGE_FPS){
+                uint32 new_period = set_fps();
+                Frame_Period_Timer_WritePeriod(new_period);
+                outgoing.fps = incoming.fps;
+                incoming.flags &= ~(CHANGE_FPS);
+                
+                sprintf(msg, "fps: %u", outgoing.fps);
+                LCD_Char_ClearDisplay();
+                LCD_Char_PrintString(msg);
+            }
         #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
             /* Wait until DMA completes copying data from OUT endpoint buffer. */
@@ -182,27 +203,33 @@ int main(void)
             while (USBFS_IN_BUFFER_EMPTY != USBFS_GetEPState(IN_EP_NUM))
             {
             }
-
+        }
         /* Trigger DMA to copy data into IN endpoint buffer.
         * After data has been copied, IN endpoint is ready to be read by the
         * host.
         */
+        if(to_send){
         #if (USBFS_16BITS_EP_ACCESS_ENABLE)
             USBFS_LoadInEP16(IN_EP_NUM, buffer, length);
         #else
-            USBFS_LoadInEP(IN_EP_NUM, buffer, length);
+            outgoing.time_waiting = time_btwn_trig;
+            USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
         #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
+            to_send = !to_send;
         }
         
-        LCD_Char_PrintString(msg);
-        LCD_Char_Position(0u, 0u);
-        LCD_Char_PrintString(msg2);
-        count++;
-        sprintf(msg2, "%lu", time_til_ready);
-        sprintf(msg, "%lu", count);
-        CyDelay(1000u);
-        LCD_Char_ClearDisplay();
-        LCD_Char_Position(1u,0u);
+//        if(lcd_draw){
+//            LCD_Char_PrintString(msg);
+//            LCD_Char_Position(0u, 0u);
+//            LCD_Char_PrintString(msg2);
+//            count++;
+//            sprintf(msg2, "%lu", time_til_ready);
+//            sprintf(msg, "%lu", count);
+//            //CyDelay(1000u);
+//            LCD_Char_ClearDisplay();
+//            LCD_Char_Position(1u,0u);
+//            lcd_draw = 0;
+//        }
     }
     
 }

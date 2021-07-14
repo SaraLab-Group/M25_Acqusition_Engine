@@ -28,7 +28,7 @@
       </registers>
     </peripheral>
     <peripheral>
-      <name>CMRA_RDY_TIMER</name>
+      <name>TRIG_PERIOD</name>
       <description>No description available</description>
       <baseAddress>0x0</baseAddress>
       <addressBlock>
@@ -38,7 +38,7 @@
       </addressBlock>
       <registers>
         <register>
-          <name>CMRA_RDY_TIMER_COUNTER</name>
+          <name>TRIG_PERIOD_COUNTER</name>
           <description>UDB.A0 - Current Down Counter Value</description>
           <addressOffset>0x40006408</addressOffset>
           <size>32</size>
@@ -47,7 +47,7 @@
           <resetMask>0</resetMask>
         </register>
         <register>
-          <name>CMRA_RDY_TIMER_PERIOD</name>
+          <name>TRIG_PERIOD_PERIOD</name>
           <description>UDB.D0 - Assigned Period</description>
           <addressOffset>0x40006428</addressOffset>
           <size>32</size>
@@ -56,7 +56,7 @@
           <resetMask>0</resetMask>
         </register>
         <register>
-          <name>CMRA_RDY_TIMER_STATUS_MASK</name>
+          <name>TRIG_PERIOD_STATUS_MASK</name>
           <description>UDB Status bits Interrupt Mask Enable Register</description>
           <addressOffset>0x4000648B</addressOffset>
           <size>8</size>
@@ -95,7 +95,7 @@
           </fields>
         </register>
         <register>
-          <name>CMRA_RDY_TIMER_STATUS_AUX_CTRL</name>
+          <name>TRIG_PERIOD_STATUS_AUX_CTRL</name>
           <description>UDB Auxilliary Control Register</description>
           <addressOffset>0x4000649B</addressOffset>
           <size>8</size>
@@ -1986,7 +1986,7 @@
         <register>
           <name>Frame_Period_Timer_Control_Reg</name>
           <description>UDB Control Register - Assigned Control Register Value</description>
-          <addressOffset>0x40006579</addressOffset>
+          <addressOffset>0x40006578</addressOffset>
           <size>8</size>
           <access>read-write</access>
           <resetValue>0</resetValue>
