@@ -1,5 +1,6 @@
 #include <lusb0_usb.h>
 #include <stdio.h>
+#include <cstdint>
 
 // Enables this example to work with a device running the
 // libusb-win32 PIC Benchmark Firmware.
@@ -44,6 +45,28 @@
 
 //////////////////////////////////////////////////////////////////////////////
 usb_dev_handle* open_dev(void);
+
+/* Stuff to test our code This is the struct sent into our Psoc 5LP */
+
+#define CHANGE_FPS 0x1
+#define DROPPED_FRAME 0x2
+#define SET_RTC 0x4
+#define ACK_CMD 0x8
+#define START_COUNT 0x10
+#define COUNTING 0x20
+#define DEFAULT_FPS (100u)
+
+typedef struct usb_data {
+    uint16_t flags;
+    uint16_t fps;
+    uint32_t time_waiting; // Currently Time between not ready and ready
+    uint64_t count;
+};
+
+usb_data incoming, outgoing;  // For Receiving and sending over USB
+
+uint8_t send_data = 1; // Set to send a command to the PSOC
+
 
 static int transfer_bulk_async(usb_dev_handle* dev,
     int ep,
@@ -119,60 +142,74 @@ int main(void)
     }
 #endif
 
-#ifdef TEST_BULK_WRITE
+//#ifdef TEST_BULK_WRITE
 
-#ifdef BENCHMARK_DEVICE
-    ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
-        14, /* set/get test */
-        2,  /* test type    */
-        MY_INTF,  /* interface id */
-        tmp, 1, 1000);
-#endif
+//#ifdef BENCHMARK_DEVICE
+//    ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+//        14, /* set/get test */
+//        2,  /* test type    */
+//        MY_INTF,  /* interface id */
+//        tmp, 1, 1000);
+//#endif
 
-#ifdef TEST_ASYNC
-    // Running an async write test
-    ret = transfer_bulk_async(dev, EP_OUT, tmp, sizeof(tmp), 5000);
-#else
-    // Running a sync write test
-    ret = usb_bulk_write(dev, EP_OUT, tmp, sizeof(tmp), 5000);
-#endif
-    if (ret < 0)
-    {
-        printf("error writing:\n%s\n", usb_strerror());
+//#ifdef TEST_ASYNC
+//    // Running an async write test
+//    ret = transfer_bulk_async(dev, EP_OUT, tmp, sizeof(tmp), 5000);
+//#else
+
+    /* This is just a hard coded write test for sending frame rate change instruction to PSOC */
+    outgoing.flags = 0;
+    outgoing.flags |= CHANGE_FPS;
+    outgoing.fps = 60;
+    /*****************************************************************************************/
+    while (1) {
+        // Running a sync write test
+        if (send_data) {
+            ret = usb_bulk_write(dev, EP_OUT, (char*)&outgoing, sizeof(usb_data), 5000);
+            //#endif
+            if (ret < 0)
+            {
+                printf("error writing:\n%s\n", usb_strerror());
+            }
+            else
+            {
+                printf("success: bulk write %d bytes\n", ret);
+            }
+            outgoing.flags &= ~(CHANGE_FPS);
+            send_data = 0;
+        }
+//#endif
+
+//#ifdef TEST_BULK_READ
+
+//#ifdef BENCHMARK_DEVICE
+//        ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+//            14, /* set/get test */
+//            1,  /* test type    */
+//            MY_INTF,  /* interface id */
+//            tmp, 1, 1000);
+//#endif
+
+//#ifdef TEST_ASYNC
+//        // Running an async read test
+//        ret = transfer_bulk_async(dev, EP_IN, tmp, sizeof(tmp), 5000);
+//#else
+        // Running a sync read test
+        ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)&incoming, sizeof(usb_data), 0);
+//#endif
+        if (ret < 0)
+        {
+            printf("error reading:\n%s\n", usb_strerror());
+        }
+        else if(ret > 0)
+        {
+            printf("success: bulk read %d bytes\n", ret);
+            printf("flags: %u\n", incoming.flags);
+            printf("fps: %u\n", incoming.fps);
+            printf("time_waiting: %u\n", incoming.time_waiting);
+        }
+//#endif
     }
-    else
-    {
-        printf("success: bulk write %d bytes\n", ret);
-    }
-#endif
-
-#ifdef TEST_BULK_READ
-
-#ifdef BENCHMARK_DEVICE
-    ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
-        14, /* set/get test */
-        1,  /* test type    */
-        MY_INTF,  /* interface id */
-        tmp, 1, 1000);
-#endif
-
-#ifdef TEST_ASYNC
-    // Running an async read test
-    ret = transfer_bulk_async(dev, EP_IN, tmp, sizeof(tmp), 5000);
-#else
-    // Running a sync read test
-    ret = usb_bulk_read(dev, EP_IN|0x80, tmp, sizeof(tmp), 5000);
-#endif
-    if (ret < 0)
-    {
-        printf("error reading:\n%s\n", usb_strerror());
-    }
-    else
-    {
-        printf("success: bulk read %d bytes\n", ret);
-    }
-#endif
-
 #ifdef TEST_CLAIM_INTERFACE
     usb_release_interface(dev, 0);
 #endif
