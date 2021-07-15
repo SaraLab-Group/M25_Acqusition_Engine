@@ -29,7 +29,7 @@ image event handlers. Please note that this is not shown in this example.
 
 #include <thread>         // std::this_thread::sleep_for 
 #include <chrono>         // std::chrono::seconds
-#include <condition_variable>
+#include <condition_variable> // For Waking Write Thread
 #include <barrier>
 #include <vector>
 #include <cstdlib>
@@ -44,12 +44,14 @@ image event handlers. Please note that this is not shown in this example.
 #include <algorithm>
 #include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
 
-#include <boost/iostreams/device/mapped_file.hpp>
+//#include <boost/iostreams/device/mapped_file.hpp>
 //#include <filesystem>
 
 #ifndef _WIN32
 #include <pthread.h>
 #endif
+
+#include "USB_THREAD.h" // For USB function pointer used for threading.
 
 // Namespace for using pylon objects.
 using namespace Pylon;
@@ -540,42 +542,6 @@ void SetPixelFormat(INodeMap& nodemap, String_t format) {
 	}
 }
 
-// No mystery threads thank you
-
-//bool cameraReady(CInstantCameraArray& cameras,bool flag) {
-//	INodeMap& nodemap = cameras[0].GetNodeMap();
-//	INodeMap& nodemap2 = cameras[1].GetNodeMap();
-//	bool status = 0;
-//	//Find if all the cameras are ready
-//	try {
-//		while (!flag) {
-//			flag = cameras[0].CanWaitForFrameTriggerReady() & cameras[1].CanWaitForFrameTriggerReady();
-//			//CBooleanPtr(nodemap.GetNode("UserOutputValue"))->SetValue(false);
-//			//CBooleanPtr(nodemap2.GetNode("UserOutputValue"))->SetValue(false);
-//		}
-//		status = flag;
-//		if (flag && status) {
-//			CBooleanPtr(nodemap.GetNode("UserOutputValue"))->SetValue(true);
-//			CBooleanPtr(nodemap2.GetNode("UserOutputValue"))->SetValue(true);
-//			sleep(1);
-//			//CBooleanPtr(nodemap.GetNode("UserOutputValue"))->SetValue(false);
-//			//CBooleanPtr(nodemap2.GetNode("UserOutputValue"))->SetValue(false);
-//			//sleep(1);
-//		}
-//		flag = 0;
-//		return status;
-//	}
-//	catch (const GenericException &e)
-//	{
-//		// Error handling.
-//		cerr << "An exception occurred." << endl
-//			<< e.GetDescription() << endl;
-//		// Remove left over characters from input buffer.
-//		cin.ignore(cin.rdbuf()->in_avail());
-//	}
-//}
-//
-// 
 
 // variables for scan opt
 uint32_t seconds = 0;
@@ -649,6 +615,10 @@ int scan_opts(int argc, char** argv) {
 				}
 				else {
 					std::cout << "bitDepth: " << (int)bitDepth << std::endl;
+					if (bitDepth > 8 && bitDepth < 16) {
+						bitDepth = 16;
+						std::cout << "Requires " << (int)bitDepth << " bpp of space." << std::endl;
+					}
 				}
 			}
 			else {
@@ -661,10 +631,16 @@ int scan_opts(int argc, char** argv) {
 
 }
 
+// Some More Globals to go with main
+
+USB_THD_DATA usb_thread_data;
+
 int main(int argc, char* argv[])
 {
 	// The exit code of the sample application.
 	int exitCode = 0;
+	usb_thread_data.flags = 0;
+
 	if (argc < 2) {
 		std::cout << "Usage: " << argv[0] << " -s <seconds>" << std::endl;
 		std::cout << "Must at least use whole second intervals." << std::endl;
@@ -682,6 +658,11 @@ int main(int argc, char* argv[])
 		//return 0; // Just testing
 	}
 
+	usb_thread_data.flags |= CHANGE_FPS;
+	usb_thread_data.fps = fps;
+
+	std::thread USB_THD_OBJ(USB_THREAD, (void*)&usb_thread_data);
+
 	// Before using any pylon methods, the pylon runtime must be initialized. 
 	PylonInitialize();
 
@@ -691,7 +672,7 @@ int main(int argc, char* argv[])
 
 	// Want to create an offset for the cameras for array arithmatic here
 	// Once Pycro and Micro Manager TCP IP is implemented we will change this to be user set
-	uint64_t image_size = PIX_OVER_8 * EIGHT_BIT;
+	uint64_t image_size = ((horz * vert) / 8)*bitDepth;
 	
 	// Nice day to try some code.
 	try
@@ -730,21 +711,15 @@ int main(int argc, char* argv[])
 		//for (size_t i = 0; i < cameras.GetSize(); ++i) /* Why the pre-increment? */
 		for (unsigned int i = 0; i < total_cams; i++)
 		{
-			//cameras[i].Attach(tlFactory.CreateDevice(devices[i]));
 			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
 			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
 
-			//INodeMap& nodemap = cameras[i].GetNodeMap();
 			INodeMap& nodemap = pcam[i]->GetNodeMap();
-			//CInstantCamera& pcam = cameras.operator[](i);
-			//cout << "devices: " << devices.size() << std::endl << std::endl;
-			//cameras[i].RegisterConfiguration(new CSampleCameraEventHandler, RegistrationMode_Append, Cleanup_Delete);
+			
 			//pcam[i].RegisterImageEventHandler(new CSampleImageEventHandler, RegistrationMode_Append, Cleanup_Delete); /* Just say no to their threaded stuff */
 			pcam[i]->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
 
 			//pcam[i]->GrabCameraEvents = true; /* Not sure we need this for our method? */
-
-			//pcam.RegisterCameraEventHandler(new CSampleCameraEventHandler, "FrameStart", eMyEventFrameStart, RegistrationMode_Append, Cleanup_Delete);
 
 			if (!IsAvailable(nodemap.GetNode("EventSelector"))) {
 				throw RUNTIME_EXCEPTION("The device doesn't support events.");
@@ -810,7 +785,7 @@ int main(int argc, char* argv[])
 		// may or may not be byte aligned.
 
 		uint64_t frame_size = image_size * total_cams;
-		uint64_t data_size = frame_size * 100;
+		uint64_t data_size = frame_size * fps;
 		uint64_t buff_size = data_size;
 
 	    // Just make sure the buffer is sector aligned
@@ -853,13 +828,31 @@ int main(int argc, char* argv[])
 		// This is the magical mythical buffer swap
 		uint32_t swap_counter = 0;
 		uint8_t toggle = 0;
-
+		uint8_t begin_writing = 0;
+		uint8_t pre_write = 0;
+		uint32_t swap_count = 0;
 		auto buffer_swap = [&]() noexcept {
-			// Currently Swaps Buffer every 100 Frames
+			// Currently Swaps Buffer every fps Frames
 			//std::cout << "Completed Cycle: " << std::endl;
-			if (swap_counter >= 99) {
+			if (pre_write > 1) {
+				if (frame_count == 0) {
+					usb_thread_data.flags |= START_COUNT;
+				}
+				if (!begin_writing && frame_count == fps - 1) {
+					begin_writing = 1;
+				}
+				frame_count++;
+			}
+			
+
+			if (frame_count == frames) {
+				capture = false;
+				usb_thread_data.flags |= STOP_COUNT;
+			}
+
+			if (swap_counter >= fps - 1) {
 				
-				std::cout << "Swapping Buffers" << std::endl;
+				std::cout << "Swapping Count: " << swap_count++ << std::endl;
 				if (toggle) {
 					in_buff = head_buff1;
 					out_buff = head_buff2;
@@ -873,17 +866,22 @@ int main(int argc, char* argv[])
 				// Write Thread Starts off Sleeping
 				// Waiting for this function to wake it
 				swap_counter = 0;
-				cnt_v.notify_one(); // Wake me up inside
+				// Allow Buffer to fill twice before Collecting data.
+				// This will allow both buffers to be initialized
+				// Hopefully reducing caching latency.
+
+				if (begin_writing) {
+					cnt_v.notify_one(); // Wake me up inside
+				}
+				else {
+					pre_write++;
+				}
 			}
 			else {
 				in_buff += frame_size;
 				swap_counter++;
 			}
-			
-			frame_count++;
-			if (frame_count == frames) {
-				capture = false;
-			}
+
 		};
 
 		// This Synchronization primitive makes sure all of the cams complete before starting again
@@ -994,7 +992,7 @@ int main(int argc, char* argv[])
 			//std::cout << "size read: " << outNumberofBytes << std::endl;
 
 			// Middle Loop which frame index are we readng from the chunk?
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < fps; j++) {
 				std::cout << ".";
 
 				// Inner Loop Which Camera are we reading from the chunk
@@ -1004,10 +1002,10 @@ int main(int argc, char* argv[])
 					/*if (*/_mkdir(serials[k].c_str());/*) {
 						std::cout << "but why can't I write: " << std::endl;
 					}*/
-					std::string filename = serials[k] + "\\image" + std::to_string(j + i*100) + ".tif";
+					std::string filename = serials[k] + "\\image" + std::to_string(j + i*fps) + ".tif";
 
 					CPylonImage srcImage;
-					srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono8, 1920, 1200, 0);
+					srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
 					if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
 						CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
 					}
@@ -1022,6 +1020,8 @@ int main(int argc, char* argv[])
 		// Free These Aligned Buffers PLEASE!
 		_aligned_free(buff1);
 		_aligned_free(buff2);
+		usb_thread_data.flags |= EXIT_THREAD;
+		USB_THD_OBJ.join();
 		//auto start = chrono::steady_clock::now();
 		//cout << "Before FileName" << endl;
 		//FileName << strDirectryName << "MyBigFatGreekWedding" << ".bin";
@@ -1047,6 +1047,8 @@ int main(int argc, char* argv[])
 		cerr << "An exception occurred." << endl
 			<< e.GetDescription() << endl;
 		exitCode = 1;
+		usb_thread_data.flags |= EXIT_THREAD;
+		USB_THD_OBJ.join();
 	}
 
 	// Comment the following two lines to disable waiting on exit.
@@ -1055,6 +1057,7 @@ int main(int argc, char* argv[])
 
 	// Releases all pylon resources. 
 	PylonTerminate();
+	
 
 	return exitCode;
 }
