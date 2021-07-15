@@ -60,6 +60,7 @@
 #define ACK_CMD 0x8
 #define START_COUNT 0x10
 #define COUNTING 0x20
+#define STOP_COUNT 0x40
 #define DEFAULT_FPS (100u)
 
 struct usb_data{
@@ -74,6 +75,7 @@ uint32 set_fps();
 struct usb_data incoming;
 struct usb_data outgoing;
 volatile uint8 to_send = 0;
+uint8 send_count = 0;
 volatile uint8 recieved = 0;
 volatile uint8 lcd_draw = 0;
 volatile uint32 time_btwn_trig = 0;
@@ -100,7 +102,7 @@ CY_ISR(PERIOD_ISR){
 
 int main(void)
 {
-    uint16 length;
+    //uint16 length;
     incoming.flags = outgoing.flags = 0;
     incoming.fps = outgoing.fps = 100;
     
@@ -172,7 +174,7 @@ int main(void)
         if (USBFS_OUT_BUFFER_FULL == USBFS_GetEPState(OUT_EP_NUM))
         {
             /* Read number of received data bytes. */
-            length = USBFS_GetEPCount(OUT_EP_NUM);
+            //length = USBFS_GetEPCount(OUT_EP_NUM);
 
             /* Trigger DMA to copy data from OUT endpoint buffer. */
         #if (USBFS_16BITS_EP_ACCESS_ENABLE)
@@ -188,6 +190,13 @@ int main(void)
                 sprintf(msg, "fps: %u", outgoing.fps);
                 LCD_Char_ClearDisplay();
                 LCD_Char_PrintString(msg);
+            } else if(incoming.flags & START_COUNT){
+                counter = 0;
+                send_count = 1;
+                incoming.flags &= ~(START_COUNT);
+            } else if(incoming.flags & STOP_COUNT){
+                send_count = 0;
+                incoming.flags &= ~(STOP_COUNT);
             }
         #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
@@ -208,7 +217,7 @@ int main(void)
         * After data has been copied, IN endpoint is ready to be read by the
         * host.
         */
-        if(to_send){
+        if(to_send & send_count){
         #if (USBFS_16BITS_EP_ACCESS_ENABLE)
             USBFS_LoadInEP16(IN_EP_NUM, buffer, length);
         #else

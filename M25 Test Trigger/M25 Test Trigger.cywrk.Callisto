@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="M25 Test Trigger\Camera Trigger\TopDesign">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="M25 Test Trigger\Camera Trigger\Source Files\main.c">
 <ExpandedNodeIds>
 <v>M25 Test Trigger</v>
 <v>M25 Test Trigger\Camera Trigger</v>
@@ -171,6 +171,60 @@
 <VisibleNodeIds>
 <v>M25 Test Trigger</v>
 <v>M25 Test Trigger\Camera Trigger</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Clock_2.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Cm3Start.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CMRA_RDY_IN.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\cy_em_eeprom.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CyBootAsmGnu.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CyDmac.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\cyfitter_cfg.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CyFlash.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CyLib.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\cymetadata.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\cyPm.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\CySpc.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\cyutils.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Frame_Period_Timer.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Frame_Period_Timer_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_LCDPort.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\main.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PERIOD_ISR.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\TRG_OUT.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\TRIG_ISR.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\TRIG_PERIOD.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\TRIG_PERIOD_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Trigger_Count.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Trigger_Count_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_audio.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_boot.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_cdc.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_cls.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_descr.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_Dm.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_Dp.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_drv.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_ep1_dma.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_ep2_dma.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_episr.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_hid.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_midi.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_msc.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_pm.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_std.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\USBFS_vnd.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Camera Trigger.elf</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Camera Trigger.hex</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Camera Trigger.map</v>
+<v>M25 Test Trigger\Camera Trigger\Camera Trigger.gpdsc</v>
 <v>M25 Test Trigger\Camera Trigger\Camera Trigger.rpt</v>
 <v>M25 Test Trigger\Camera Trigger\Camera Trigger_timing.html</v>
 </VisibleNodeIds>
@@ -238,14 +292,16 @@
 </userData>
 </CyGuid_fdba8dfd-b15b-4469-9bbb-9e40c3e70997>
 <Unloaded />
-<OpenDocs />
+<OpenDocs>
+<name v=".\Camera Trigger.cydsn\main.c" />
+</OpenDocs>
 <OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
 
   Actipro Docking/MDI for WinForms
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="2333, 1071" SelectedTabbedMdiWindow="dcfecdc7-df7b-443b-aa22-5353a2073ce2"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="dcfecdc7-df7b-443b-aa22-5353a2073ce2" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="2079, 1071" SelectedTabbedMdiWindow="8d6b8fed-4509-42a7-8ab9-33d1b47a9e1b"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="dcfecdc7-df7b-443b-aa22-5353a2073ce2" /><DocumentWindow Key="C:\Users\Callisto\Documents\abajor\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="8d6b8fed-4509-42a7-8ab9-33d1b47a9e1b" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="Debug" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>
