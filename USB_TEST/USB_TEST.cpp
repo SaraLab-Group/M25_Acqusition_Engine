@@ -160,7 +160,7 @@ int main(void)
     /* This is just a hard coded write test for sending frame rate change instruction to PSOC */
     outgoing.flags = 0;
     outgoing.flags |= CHANGE_FPS;
-    outgoing.fps = 60;
+    outgoing.fps = 100;
     /*****************************************************************************************/
     while (1) {
         // Running a sync write test
