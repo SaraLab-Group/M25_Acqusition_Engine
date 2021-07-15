@@ -20,9 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\baslercam\main.cpp" />
+    <ClCompile Include="..\src\baslercam\USB_THREAD.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\Program Files\Boost\boost_1_66_0\boost\iostreams\device\mapped_file.hpp" />
+    <ClInclude Include="..\src\baslercam\USB_THREAD.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -71,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(PYLON_DEV_DIR)\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Boost\boost_1_66_0\stage\lib;$(PYLON_DEV_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\libusb-win32-bin-1.2.6.0\libusb-win32-bin-1.2.6.0\lib\msvc_x64;C:\Program Files\Boost\boost_1_66_0\stage\lib;$(PYLON_DEV_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(PYLON_DEV_DIR)\include;$(IncludePath)</IncludePath>
@@ -87,13 +88,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <AdditionalIncludeDirectories>C:\Program Files\Boost\boost_1_66_0;$(PYLON_DEV_DIR)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\libusb-win32-bin-1.2.6.0\libusb-win32-bin-1.2.6.0\include;C:\Program Files\Boost\boost_1_66_0;$(PYLON_DEV_DIR)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(PYLON_DEV_DIR)\lib\x64;$(PYLON_LINK64);$(PYLON_DEV_DIR)\lib\Win32</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\libusb-win32-bin-1.2.6.0\libusb-win32-bin-1.2.6.0\lib\msvc_x64\libusb.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
