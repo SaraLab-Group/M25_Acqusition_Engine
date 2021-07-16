@@ -143,10 +143,23 @@ typedef struct write_data {
 // Namespace for using cout.
 using namespace std;
 
+// variables for scan opt
+const uint32_t horz_max = 1920;
+const uint32_t vert_max = 1200;
+uint32_t seconds = 0;
+uint32_t horz = horz_max;
+uint32_t vert = vert_max;
+uint32_t horz_off_set = 0;
+uint32_t vert_off_set = 0;
+uint8_t bitDepth = 8;
+uint8_t fps = 100;
 
 
 
 double old = 0.0; //variable to test trigger delay
+
+//A prototype
+void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
 
 //Directory name images to be saved.
 // Should probably be set from pycro or micro manager.
@@ -464,6 +477,20 @@ public:
 		CEnumerationPtr(nodemap.GetNode("UserOutputSelector"))->FromString("UserOutput2");
 		CBooleanPtr(nodemap.GetNode("UserOutputValue"))->SetValue(true);
 		CFloatPtr(nodemap.GetNode("LineMinimumOutputPulseWidth"))->SetValue(100.0);  //microseconds
+		// Setting the image Resolution
+		CIntegerPtr(nodemap.GetNode("Width"))->SetValue(horz);
+		CIntegerPtr(nodemap.GetNode("Height"))->SetValue(vert);
+		// Centering image
+		CBooleanPtr(nodemap.GetNode("CenterX"))->SetValue(true);
+		CBooleanPtr(nodemap.GetNode("CenterY"))->SetValue(true);
+
+
+		if (bitDepth > 8) {
+			SetPixelFormat_unofficial(nodemap, "Mono12");
+		}
+		else {
+			SetPixelFormat_unofficial(nodemap, "Mono8");
+		}
 
 		// Set the User Output Value for the User Output 1 signal to true.
 		// Because User Output 1 is set as the source signal for Line 2,
@@ -532,23 +559,22 @@ public:
 //Enumeration used for distinguishing different events.
 /* I think the Enum got moved earlier */
 
-void SetPixelFormat(INodeMap& nodemap, String_t format) {
+void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 	CEnumParameter pixelFormat(nodemap, "PixelFormat");
 	String_t oldPixelFormat = pixelFormat.GetValue();
-	cout << "Old PixelFormat : " << oldPixelFormat << endl;
+	std::cout << "Old PixelFormat : " << oldPixelFormat << std::endl;
 	if (pixelFormat.CanSetValue(format)) {
 		pixelFormat.SetValue(format);
-		cout << "New Pixel FOrmat " << pixelFormat.GetValue() << endl;
+		std::cout << "New Pixel Format " << pixelFormat.GetValue() << std::endl;
 	}
+	else {
+		std::cout << "Can't set format!" << std::endl;
+	}
+
+	//sleep(2);
 }
 
 
-// variables for scan opt
-uint32_t seconds = 0;
-uint32_t horz = 1920;
-uint32_t vert = 1200;
-uint8_t bitDepth = 8;
-uint8_t fps = 100;
 
 // Lets See if I can reuse this old code for arg parsing
 int scan_opts(int argc, char** argv) {
@@ -575,6 +601,7 @@ int scan_opts(int argc, char** argv) {
 		else if (!opts[i].compare("-horz")) {
 			if (argc > (i)) {
 				horz = atoi(opts[i + 1].c_str());
+				horz_off_set = (horz_max - horz) / 2 + 8;
 				i++;
 				std::cout << "horz: " << (int)horz << std::endl;
 			}
@@ -586,6 +613,7 @@ int scan_opts(int argc, char** argv) {
 		else if (!opts[i].compare("-vert")) {
 			if (argc > (i)) {
 				vert = atoi(opts[i + 1].c_str());
+				vert_off_set = (vert_max - vert) / 2 + 8;
 				i++;
 				std::cout << "vert: " << (int)vert << std::endl;
 			}
@@ -615,7 +643,7 @@ int scan_opts(int argc, char** argv) {
 				}
 				else {
 					std::cout << "bitDepth: " << (int)bitDepth << std::endl;
-					if (bitDepth > 8 && bitDepth < 16) {
+					if (bitDepth > 8) {
 						bitDepth = 16;
 						std::cout << "Requires " << (int)bitDepth << " bpp of space." << std::endl;
 					}
@@ -645,9 +673,9 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: " << argv[0] << " -s <seconds>" << std::endl;
 		std::cout << "Must at least use whole second intervals." << std::endl;
 		std::cout << "Other Flags:" << std::endl;
-		std::cout << "Capture Area: -horz <pixels> -vert <pixels>: (Default 1920 X 1200)" << std::endl;
-		std::cout << "Frame Rate: -f <fps>: (Default 100 NOT YET IMPLEMENTED)" << std::endl;
-		std::cout << "Bit Depth: -bpp <bits>: (Default 8bits, can operate at 10bits and 12bits But both alternatives require 16bpp storage)" << std::endl;
+		std::cout << "Capture Area: -horz <pixels> -vert <pixels> (Default 1920 X 1200)" << std::endl;
+		std::cout << "Frame Rate: -f <fps>" << std::endl;
+		std::cout << "Bit Depth: -bpp <bits> (Default 8bits and supports 12bits but requires 16bpp storage)" << std::endl;
 		return exitCode;
 	}
 	else {
@@ -729,11 +757,15 @@ int main(int argc, char* argv[])
 			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
 			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("FrameStartWait");
 			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
+			
 			serials.push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
 			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
 			cam_dat[i].number = i;
 			cam_dat[i].offset = i * image_size;
 			cam_dat[i].camPtr = pcam[i];
+			// Moved this out of the thread initilization stuff
+			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
+			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 		}
 
 
@@ -895,8 +927,8 @@ int main(int argc, char* argv[])
 		// This is the begining fo my lambda function for the camera capture threads.
 		auto cam_thd = [&](cam_data* cam) {
 			
-			cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
-			cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+			//cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
+			//cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 
 			CGrabResultPtr ptrGrabResult;
 			//Find if all the cameras are ready
@@ -1005,7 +1037,12 @@ int main(int argc, char* argv[])
 					std::string filename = serials[k] + "\\image" + std::to_string(j + i*fps) + ".tif";
 
 					CPylonImage srcImage;
-					srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
+					if(bitDepth > 8){
+						srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono16, horz, vert, 0);
+					}
+					else {
+						srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
+					}
 					if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
 						CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
 					}
