@@ -73,9 +73,9 @@ struct usb_data{
 uint32 set_fps();
 
 struct usb_data incoming;
-struct usb_data outgoing;
+volatile struct usb_data outgoing;
 volatile uint8 to_send = 0;
-uint8 send_count = 0;
+volatile uint8 send_count = 0;
 volatile uint8 recieved = 0;
 volatile uint8 lcd_draw = 0;
 volatile uint32 time_btwn_trig = 0;
@@ -89,8 +89,11 @@ CY_ISR(PERIOD_ISR){
     Frame_Period_Timer_ReadStatusRegister();
     RESET_RDY_TIMER_Write(REG_ON);
     RESET_RDY_TIMER_Write(REG_OFF);
-    to_send = 1;
-    counter++;
+    
+    //if(send_count){
+        to_send = 1;
+        outgoing.count++;
+    //}
 //    if(!(counter % 100)){
 //        lcd_draw = 1;
 //    }
@@ -105,6 +108,7 @@ int main(void)
     //uint16 length;
     incoming.flags = outgoing.flags = 0;
     incoming.fps = outgoing.fps = 100;
+    outgoing.count = 0;
     
     CyGlobalIntEnable; /* Enable global interrupts. */
 
@@ -124,7 +128,7 @@ int main(void)
     sprintf(msg, "%lu", count);
     
     char bfr[] = "before";
-    char aftr[] = "after";
+    //char aftr[] = "after";
     
     // Currently just sleeps for 1sec and counts up
     LCD_Char_ClearDisplay();
@@ -191,8 +195,9 @@ int main(void)
                 LCD_Char_ClearDisplay();
                 LCD_Char_PrintString(msg);
             } else if(incoming.flags & START_COUNT){
-                counter = 0;
+                outgoing.count = 0;
                 send_count = 1;
+                outgoing.flags = START_COUNT;
                 incoming.flags &= ~(START_COUNT);
             } else if(incoming.flags & STOP_COUNT){
                 send_count = 0;
@@ -217,14 +222,14 @@ int main(void)
         * After data has been copied, IN endpoint is ready to be read by the
         * host.
         */
-        if(to_send & send_count){
+        if(send_count){
         #if (USBFS_16BITS_EP_ACCESS_ENABLE)
             USBFS_LoadInEP16(IN_EP_NUM, buffer, length);
         #else
             outgoing.time_waiting = time_btwn_trig;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
         #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
-            to_send = !to_send;
+            to_send = 0;
         }
         
 //        if(lcd_draw){
