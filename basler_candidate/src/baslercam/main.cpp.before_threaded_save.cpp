@@ -177,9 +177,6 @@ string  strDirectryName = "D:\\Ant1 Test\\binaries";
 // From Basler Fast Write Example Not currently used;
 string  strMetaFileName = "Meta.txt";
 
-// why won't you work?
-string tiff_dir = "E:\\Ant1 Test\\";
-
 // From Basler Sample Code for fast binary writes;
 void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
 {
@@ -1050,108 +1047,10 @@ int main(int argc, char* argv[])
 		// to boost the write throughput more. It should be noted that we are currently unable to 
 		// Write to USB external drives for some odd reason.
 
-		// I'm reusing the Barrier Mutex concept from earlier
-
-		/* This is the end condition lamda for the barrier mutex it load the Chunk to be 
-		    Split into individual tif files by the worker threads. */
-
-		uint8_t write_files = 1;
-		uint32_t chunk_number = 0;
-		uint8_t save_threads = 10;
-
-		std::vector<uint8_t> thread_row;
-		
-		for (int i = 0; i < save_threads; i++) {
-			uint8_t row = i;
-			thread_row.push_back(row);
-		}
-
-		auto completion_condition = [&]() noexcept {
-			//std::cout << "completion has happened" << std::endl;
-			for (int i = 0; i < save_threads; i++) {
-				thread_row[i] += save_threads;
-			}
-			if (thread_row[1] > fps) {
-				chunk_number++;
-				if (chunk_number > binary_chunks - 1) {
-					// Don't read more files
-					write_files = 0;
-				}
-				else {
-					std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(chunk_number) + ".bin";
-					uint64_t outNumberofBytes;
-					//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
-					readFile(Filename.c_str(), &outNumberofBytes, buff1);
-					for (int i = 0; i < save_threads; i++) {
-						thread_row[i] = i;
-					}
-				}
-			}
-
-		};
-
-		std::barrier sync_point2(2, completion_condition);
-
-		// re using cam_data out of convinience
-
-		auto save_img = [&](cam_data* cam) {
-
-			
-			while (write_files) {
-				for (int i = 0; i < total_cams; i++) {
-					//std::cout << "row: " << *row << std::endl;
-					_mkdir(serials[i].c_str()); //make the dir
-					std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
-
-					CPylonImage srcImage;
-					if (bitDepth > 8) {
-						srcImage.AttachUserBuffer((void*)(buff1 + (i * image_size) + (thread_row[cam->number] * frame_size)), image_size, PixelType_Mono16, horz, vert, 0);
-					}
-					else {
-						srcImage.AttachUserBuffer((void*)(buff1 + (i * image_size) + (thread_row[cam->number] * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
-					}
-					if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
-					    // Making Write Atomic Just in case.
-						// Reusing the Mutext from earlier.
-						//std::unique_lock<std::mutex> lck(lk);
-						CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
-						//lck.unlock();
-					}
-					else {
-						std::cout << "not a tiff needs conversion" << std::endl;
-					}
-				}
-				std::cout << ".";
-			    sync_point2.arrive_and_wait();
-			}
-		};
-
-
-		/* Load First Buffer Before Starting Threads */
-		/* chunk_number should already be set to 0 */
-
-		std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(chunk_number) + ".bin";
-		uint64_t outNumberofBytes;
-		//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
-		readFile(Filename.c_str(), &outNumberofBytes, buff1);
-
-		threads.clear();// purge old threads
-
-		// Being Lazy and recycling the same syntax
-		for (int i = 0; i < save_threads; i++) {
-			threads.emplace_back(save_img, &cam_dat[i]);
-		}
-
-		// Join the Threads. This should block until write done
-		for (auto& thread : threads) {
-			thread.join();
-		}
-
-
 		// This is tripple Nested... Is there a better way to do this?
 
 		// Outer loop which CHUNK are we reading
-		/*for (int i = 0; i < binary_chunks; i++) {
+		for (int i = 0; i < binary_chunks; i++) {
 			std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(i) + ".bin";
 			uint64_t outNumberofBytes;
 			//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
@@ -1161,15 +1060,15 @@ int main(int argc, char* argv[])
 			// Middle Loop which frame index are we readng from the chunk?
 			for (int j = 0; j < fps; j++) {
 				std::cout << ".";
-				
+
 				// Inner Loop Which Camera are we reading from the chunk
 				for (int k = 0; k < total_cams; k++) {
-				*/	//std::string Dir = "camera" + std::to_string(k);
+					//std::string Dir = "camera" + std::to_string(k);
 					//std::string tiff_folders = "\\.\PhysicalDrive1\\Ant1 Test\\" + serials[k];
-					/*if (*//*_mkdir(serials[k].c_str());*//*) {
+					/*if (*/_mkdir(serials[k].c_str());/*) {
 						std::cout << "but why can't I write: " << std::endl;
 					}*/
-					/*std::string filename = serials[k] + "\\image" + std::to_string(j + i*fps) + ".tif";
+					std::string filename = serials[k] + "\\image" + std::to_string(j + i*fps) + ".tif";
 
 					CPylonImage srcImage;
 					if(bitDepth > 8){
@@ -1184,12 +1083,12 @@ int main(int argc, char* argv[])
 					else {
 						std::cout << "not a tiff needs conversion" << std::endl;
 					}
-					*//*if ((events[k][j].missed_frame_count - events[k][0].missed_frame_count)) {
+					/*if ((events[k][j].missed_frame_count - events[k][0].missed_frame_count)) {
 						std::cout << "Missed Frame Count cam: " << serials[k] << " = " << events[k][j].missed_frame_count - events[k][0].missed_frame_count << std::endl;
 					}*/
-				/*}
+				}
 			}
-		}*/
+		}
 
 		std::cout << std::endl << "Finished Converting to tif" << std::endl;
 
