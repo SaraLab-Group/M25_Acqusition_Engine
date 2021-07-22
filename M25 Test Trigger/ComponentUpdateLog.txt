@@ -1,6 +1,0 @@
-Last Modified Date & Time: 07/15/2021 20:02:46
-
-Camera Trigger: Camera Trigger.cydwr
-	cy_boot [v6.10] to [v5.82]
-
-
