@@ -173,12 +173,12 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
 
 //Directory name images to be saved.
 // Should probably be set from pycro or micro manager.
-string  strDirectryName = "D:\\Ant1 Test\\binaries";
+string  strDirectryName = "D:\\Ant1 Test";//\\binaries";
 // From Basler Fast Write Example Not currently used;
 string  strMetaFileName = "Meta.txt";
 
 // why won't you work?
-string tiff_dir = "E:\\Ant1 Test\\";
+string tiff_dir = "D:\\Ant1 Test";// \\Tiff";
 
 // From Basler Sample Code for fast binary writes;
 void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
@@ -304,17 +304,105 @@ void saveBigBuffer(const char* FileName, uint8_t* buffer, uint8_t cam_count, uin
 /* This little function is for the convert Binary to tif phase*/
 void readFile(const char* fileName, uint64_t* outNumberofBytes, uint8_t* chunk)
 {   // [out] char* buffer
+	//std::cout << "trying to read: " << fileName << std::endl;
 	ifstream fs(fileName, std::ifstream::binary);
 	fs.seekg(0, fs.end);
-	uint64_t size = fs.tellg();
-	fs.seekg(0);
+	long long int size = fs.tellg();
+	fs.seekg(0, fs.beg);
+	//fs.read((char*)chunk, size);
 	//char* bufferTemp = new char[size];
 	// allocate memory for file content
-	fs.read((char*)chunk, size);
+	/*if (fs)
+		std::cout << "all characters read successfully.";
+	else
+		std::cout << "error: only " << fs.gcount() << " could be read" << std::endl;
+	std::cout << "size: " << size << std::endl;*/
 	//buffer->push_back(bufferTemp);
 	//returning the file size, needed for converting the buffer into an Pylon image into a bitmap
 	*outNumberofBytes = size;
 	fs.close();
+
+	/*HFILE OpenFile(
+		LPCSTR     lpFileName,
+		LPOFSTRUCT lpReOpenBuff,
+		UINT       uStyle
+	);*/
+
+	HANDLE hFile = INVALID_HANDLE_VALUE;
+	LPOFSTRUCT lpReOpenBuff;
+
+	DWORD dwBytesToRead = (DWORD)MAX_ALIGNED_WRITE;//sizeof(frame_buffer) * c_countOfImagesToGrab;
+	if (size < dwBytesToRead) {
+		dwBytesToRead = (DWORD)size;//sizeof(frame_buffer) * c_countOfImagesToGrab;
+	}
+
+	hFile = CreateFile(fileName,                // name of the read
+		GENERIC_READ,          // open for reading
+		0,                      // do not share
+		NULL,                   // default security
+		OPEN_EXISTING,             // open existing file only
+		FILE_FLAG_NO_BUFFERING,  // nobuffer
+		NULL);                  // no attr. template
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		//DisplayError(TEXT("CreateFile"));
+		//_tprintf(TEXT("Terminal failure: Unable to open file \"%s\" for write.\n"), argv[1]);
+		//return;
+		std::cout << "Awe Shucks Failed to open file" << std::endl;
+	}
+
+	uint8_t* pImageBuffer = (uint8_t*)chunk;
+	uint64_t bytes_read = 0;
+
+	DWORD dwBytesRead = 0;
+	BOOL bErrorFlag = FALSE;
+
+	//printf("Writing %d bytes to %s.\n", dwBytesToWrite, FileName);
+	while (bytes_read < size) {
+		bErrorFlag = ReadFile(
+			hFile,           // open file handle
+			pImageBuffer,      // start of data to write
+			dwBytesToRead,  // number of bytes to write
+			&dwBytesRead, // number of bytes that were written
+			NULL);            // no overlapped structure
+
+		if (FALSE == bErrorFlag)
+		{
+			//DisplayError(TEXT("WriteFile"));
+			printf("Terminal failure: Unable to write to file.\n");
+		}
+		else
+		{
+			if (dwBytesRead != dwBytesToRead)
+			{
+				// This is an error because a synchronous write that results in
+				// success (WriteFile returns TRUE) should write all data as
+				// requested. This would not necessarily be the case for
+				// asynchronous writes.
+				printf("Error: dwBytesWritten != dwBytesToWrite\n");
+			}
+			// Nothing to see here
+			/*else
+			{
+				pImageBuffer += FS_BUF_SIZE;
+				bytes_written += FS_BUF_SIZE;
+				//printf("Wrote %d bytes to %s successfully.\n", dwBytesWritten, FileName);
+			}*/
+			bytes_read += dwBytesRead;
+			std::cout << "^";
+			if (size - bytes_read < dwBytesToRead) {
+				dwBytesToRead = size - bytes_read;
+			}
+		}
+	}
+	// Sanity Check
+	//std::cout << "BytesRead: " << bytes_read << std::endl;
+	//std::cout << "file_size: " << size << std::endl;
+
+	CloseHandle(hFile);
+
+
 }
 
 
@@ -601,7 +689,7 @@ int scan_opts(int argc, char** argv) {
 
 	for (int i = 0; i < opts.size(); i++) {
 		if (!opts[i].compare("-s")) {
-			if (argc > (i)) {
+			if (argc > (i) && opts[i + 1].c_str()[0] != '-') {
 				seconds = atoi(opts[i + 1].c_str());
 				i++;
 				std::cout << "seconds: " << seconds << std::endl;
@@ -612,7 +700,7 @@ int scan_opts(int argc, char** argv) {
 			}
 		}
 		else if (!opts[i].compare("-horz")) {
-			if (argc > (i)) {
+			if (argc > (i) && opts[i + 1].c_str()[0] != '-') {
 				horz = atoi(opts[i + 1].c_str());
 				horz_off_set = (horz_max - horz) / 2 + 8;
 				i++;
@@ -624,7 +712,7 @@ int scan_opts(int argc, char** argv) {
 			}
 		}
 		else if (!opts[i].compare("-vert")) {
-			if (argc > (i)) {
+			if (argc > (i) && opts[i + 1].c_str()[0] != '-') {
 				vert = atoi(opts[i + 1].c_str());
 				vert_off_set = (vert_max - vert) / 2 + 8;
 				i++;
@@ -636,7 +724,7 @@ int scan_opts(int argc, char** argv) {
 			}
 		}
 		else if (!opts[i].compare("-f")) {
-			if (argc > (i)) {
+			if (argc > (i) && opts[i + 1].c_str()[0] != '-') {
 				fps = atoi(opts[i + 1].c_str());
 				i++;
 				std::cout << "fps: " << (int)fps << std::endl;
@@ -647,7 +735,7 @@ int scan_opts(int argc, char** argv) {
 			}
 		}
 		else if (!opts[i].compare("-bpp")) {
-			if (argc >= (i)) {
+			if (argc >= (i) && opts[i + 1].c_str()[0] != '-') {
 				bitDepth = atoi(opts[i + 1].c_str());
 				i++;
 				if (bitDepth > 12 || bitDepth < 8 || bitDepth & 0x1) {
@@ -668,7 +756,7 @@ int scan_opts(int argc, char** argv) {
 			}
 		}
 		else if (!opts[i].compare("-exp")) {
-			if (argc >= (i)) {
+			if (argc >= (i) && opts[i + 1].c_str()[0] != '-') {
 				exposure = atoi(opts[i + 1].c_str());
 				i++;
 				std::cout << "exposure time: " << (int)exposure << "us" << std::endl;
@@ -769,7 +857,7 @@ int main(int argc, char* argv[])
 			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
 
 			INodeMap& nodemap = pcam[i]->GetNodeMap();
-			
+
 			//pcam[i].RegisterImageEventHandler(new CSampleImageEventHandler, RegistrationMode_Append, Cleanup_Delete); /* Just say no to their threaded stuff */
 			pcam[i]->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
 
@@ -783,7 +871,7 @@ int main(int argc, char* argv[])
 			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
 			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("FrameStartWait");
 			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
-			
+
 			serials.push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
 			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
 			cam_dat[i].number = i;
@@ -821,7 +909,21 @@ int main(int argc, char* argv[])
 
 		// Should this be monitored in Write Thread?
 		uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
+
+		// Create the Write Directory "Root"
 		_mkdir(strDirectryName.c_str());
+
+		//append path for destination folder
+		strDirectryName += "\\binaries";
+
+		_mkdir(tiff_dir.c_str());
+
+		tiff_dir += "\\tiff";
+
+		// create subfolders
+		_mkdir(strDirectryName.c_str());
+		_mkdir(tiff_dir.c_str());
+
 		/**************************************************/
 		/* To be put into the body of the capture threads */
 		/**************************************************/
@@ -846,7 +948,7 @@ int main(int argc, char* argv[])
 		uint64_t data_size = frame_size * fps;
 		uint64_t buff_size = data_size;
 
-	    // Just make sure the buffer is sector aligned
+		// Just make sure the buffer is sector aligned
 		// Any "Slack" will go unused and be no more than
 		// 511 Bytes
 
@@ -855,7 +957,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Allocate Aligned buffers
-	    // lets dynamically allocate buffers through testing with windows SDK
+		// lets dynamically allocate buffers through testing with windows SDK
 		// It was revealed that our NVM uses 512B sectors; therfore, we must
 		// allign our data to be written to 512B sectors to do so we can use
 		// _aligned_malloc( size_wanted, alignment)
@@ -903,15 +1005,16 @@ int main(int argc, char* argv[])
 				}
 				frame_count++;
 			}
-			
+
 
 			if (frame_count == frames) {
 				capture = false;
 				usb_thread_data.flags |= STOP_COUNT;
+				//cnt_v.notify_one(); // Wake me up inside
 			}
 
 			if (swap_counter >= fps - 1) {
-				
+
 				std::cout << "Swapping Count: " << swap_count++ << std::endl;
 				if (toggle) {
 					in_buff = head_buff1;
@@ -954,7 +1057,7 @@ int main(int argc, char* argv[])
 
 		// This is the begining fo my lambda function for the camera capture threads.
 		auto cam_thd = [&](cam_data* cam) {
-			
+
 			//cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			//cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 
@@ -969,7 +1072,7 @@ int main(int argc, char* argv[])
 
 				// Image grabbed successfully?
 				if (ptrGrabResult->GrabSucceeded())
-				{	
+				{
 					// A little Pointer Arithmatic never hurt anybody
 					memcpy((void*)(in_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
 					if (pre_write > 1) {
@@ -980,7 +1083,7 @@ int main(int argc, char* argv[])
 						thd_event.time_stamp = ptrGrabResult->GetTimeStamp() / 1.0;
 						events[cam->number].push_back(thd_event);
 					}
-					
+
 					// Hurry up and wait
 					sync_point.arrive_and_wait();
 				}
@@ -995,8 +1098,9 @@ int main(int argc, char* argv[])
 				//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
 
 				//std::cout << "Taken Time for saving image to ram: " << (int)cam->number << " " << elapsed << "us" << endl;
-				
+
 			}
+			//std::cout << "thd: " << (int)cam->number << " joining" << std::endl;
 		};
 
 		// struct for write thread;
@@ -1007,13 +1111,17 @@ int main(int argc, char* argv[])
 
 		// Write Thread "Lamda Function"
 		auto write_thrd = [&](write_data* ftw) {
-			
-			while (write_count < binary_chunks)  {
+
+			while (write_count < binary_chunks) {
 				// Takes the lock then decides to take a nap
 				// Until the buffer is ready to write
-				std::unique_lock<std::mutex> lck(lk);
-				cnt_v.wait(lck);
-				
+				//std::cout << "grabbing lock, write_count: " << (int)write_count << std::endl;
+				if (capture) {
+					std::unique_lock<std::mutex> lck(lk);
+					cnt_v.wait(lck);
+				}
+				//std::cout << "Past Lock" << std::endl;
+
 				//auto start = chrono::steady_clock::now();
 				std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
 				saveBigBuffer(Filename.c_str(), out_buff, ftw->cam_count, buff_size);
@@ -1023,6 +1131,7 @@ int main(int argc, char* argv[])
 
 				//std::cout << "Taken Time for writing frame:" << write_count << " " << elapsed << "us" << endl;
 			}
+			//std::cout << "Write thd joining" << std::endl;
 		};
 
 		std::cout << "Building Threads: " << std::endl;
@@ -1034,16 +1143,25 @@ int main(int argc, char* argv[])
 		threads.emplace_back(write_thrd, &mr_write);
 		auto start = chrono::steady_clock::now();
 		// Join the Threads. This should block until capture done
-		for (auto& thread: threads) {
+		for (auto& thread : threads) {
 			thread.join();
 		}
 
 		auto end = chrono::steady_clock::now();
 		long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
 		std::cout << "Total Time: " << elapsed << "us" << endl;
-		
+		std::cout << "Total Time Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
+
 
 		std::cout << "Image Aquisition Finished" << std::endl;
+
+		// Sanity Check
+		//uint32_t val = 255;
+		
+		/*for (int i = 0; i < buff_size; i++) {
+			buff1[i] = 255;
+		}*/
+	  
 
 		std::cout << "Converting images to tif" << std::endl;
 		// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
@@ -1057,12 +1175,12 @@ int main(int argc, char* argv[])
 
 		uint8_t write_files = 1;
 		uint32_t chunk_number = 0;
-		uint8_t save_threads = 10;
+		uint16_t save_threads = 10;
 
 		std::vector<uint8_t> thread_row;
 		
 		for (int i = 0; i < save_threads; i++) {
-			uint8_t row = i;
+			uint16_t row = i;
 			thread_row.push_back(row);
 		}
 
@@ -1071,14 +1189,16 @@ int main(int argc, char* argv[])
 			for (int i = 0; i < save_threads; i++) {
 				thread_row[i] += save_threads;
 			}
-			if (thread_row[1] > fps) {
+			if (thread_row[save_threads - 1] > fps) {
 				chunk_number++;
+				//std::cout << " " << chunk_number << " ";
 				if (chunk_number > binary_chunks - 1) {
 					// Don't read more files
 					write_files = 0;
+					//std::cout << "^";
 				}
 				else {
-					std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(chunk_number) + ".bin";
+					std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 					uint64_t outNumberofBytes;
 					//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 					readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1090,7 +1210,7 @@ int main(int argc, char* argv[])
 
 		};
 
-		std::barrier sync_point2(2, completion_condition);
+		std::barrier sync_point2(save_threads, completion_condition);
 
 		// re using cam_data out of convinience
 
@@ -1099,9 +1219,10 @@ int main(int argc, char* argv[])
 			
 			while (write_files) {
 				for (int i = 0; i < total_cams; i++) {
-					//std::cout << "row: " << *row << std::endl;
-					_mkdir(serials[i].c_str()); //make the dir
-					std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+					std::string tiff_path = tiff_dir + "\\" + serials[i];
+					_mkdir(tiff_path.c_str()); //make the dir
+					std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+					//std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
 
 					CPylonImage srcImage;
 					if (bitDepth > 8) {
@@ -1121,16 +1242,19 @@ int main(int argc, char* argv[])
 						std::cout << "not a tiff needs conversion" << std::endl;
 					}
 				}
-				std::cout << ".";
+				std::cout << '.';
 			    sync_point2.arrive_and_wait();
 			}
+			//std::cout << "thread: " << (int)cam->number << " exiting." << std::endl;
 		};
 
 
 		/* Load First Buffer Before Starting Threads */
 		/* chunk_number should already be set to 0 */
 
-		std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(chunk_number) + ".bin";
+		start = chrono::steady_clock::now();
+
+		std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 		uint64_t outNumberofBytes;
 		//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 		readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1146,6 +1270,11 @@ int main(int argc, char* argv[])
 		for (auto& thread : threads) {
 			thread.join();
 		}
+		end = chrono::steady_clock::now();
+		elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+		std::cout << std::endl;
+		std::cout << "Total Time To Write Tiff: " << elapsed << "us" << std::endl;
+		std::cout << "Total Time To Write in Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
 
 
 		// This is tripple Nested... Is there a better way to do this?
