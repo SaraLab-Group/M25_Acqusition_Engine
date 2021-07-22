@@ -124,17 +124,17 @@ int main(void)
     uint32 count = 0;
     char msg[16];
     char msg2[16];
-    sprintf(msg2, "%lu", time_btwn_trig);
-    sprintf(msg, "%lu", count);
+    sprintf(msg2, "Count Stopped");
+    sprintf(msg, "fps: %u", incoming.fps);
     
-    char bfr[] = "before";
+    //char bfr[] = "before";
     //char aftr[] = "after";
     
     // Currently just sleeps for 1sec and counts up
     LCD_Char_ClearDisplay();
     LCD_Char_Position(1u,0u);
     
-    LCD_Char_PrintString(bfr);
+    LCD_Char_PrintString(msg2);
     LCD_Char_Position(0u, 0u);
     
     /* Start USBFS operation with 5V operation. */
@@ -150,8 +150,10 @@ int main(void)
     USBFS_EnableOutEP(OUT_EP_NUM);
     
     LCD_Char_ClearDisplay();
+    LCD_Char_Position(0u,0u);
+    LCD_Char_PrintString(msg);
     LCD_Char_Position(1u,0u);
-    LCD_Char_PrintString("100FPS");
+    LCD_Char_PrintString(msg2);
     
     CyDelay(1000);
     
@@ -181,9 +183,7 @@ int main(void)
             //length = USBFS_GetEPCount(OUT_EP_NUM);
 
             /* Trigger DMA to copy data from OUT endpoint buffer. */
-        #if (USBFS_16BITS_EP_ACCESS_ENABLE)
-            USBFS_ReadOutEP16(OUT_EP_NUM, buffer, length);
-        #else
+
             USBFS_ReadOutEP(OUT_EP_NUM, (uint8*)&incoming, sizeof(struct usb_data));
             if(incoming.flags & CHANGE_FPS){
                 uint32 new_period = set_fps();
@@ -192,18 +192,36 @@ int main(void)
                 incoming.flags &= ~(CHANGE_FPS);
                 
                 sprintf(msg, "fps: %u", outgoing.fps);
-                LCD_Char_ClearDisplay();
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
+             
             } else if(incoming.flags & START_COUNT){
                 outgoing.count = 0;
                 send_count = 1;
-                outgoing.flags = START_COUNT;
+                outgoing.flags |= START_COUNT;
                 incoming.flags &= ~(START_COUNT);
+                sprintf(msg2, "Count Started");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
+                
             } else if(incoming.flags & STOP_COUNT){
                 send_count = 0;
                 incoming.flags &= ~(STOP_COUNT);
+                outgoing.flags &= ~(START_COUNT);
+                sprintf(msg2, "Count Stopped");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
             }
-        #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
+            /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
             /* Wait until DMA completes copying data from OUT endpoint buffer. */
             while (USBFS_OUT_BUFFER_FULL == USBFS_GetEPState(OUT_EP_NUM))
@@ -222,13 +240,11 @@ int main(void)
         * After data has been copied, IN endpoint is ready to be read by the
         * host.
         */
-        if(send_count){
-        #if (USBFS_16BITS_EP_ACCESS_ENABLE)
-            USBFS_LoadInEP16(IN_EP_NUM, buffer, length);
-        #else
+        if(to_send){
+
             outgoing.time_waiting = time_btwn_trig;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
-        #endif /* (USBFS_GEN_16BITS_EP_ACCESS) */
+            /* (USBFS_GEN_16BITS_EP_ACCESS) */
             to_send = 0;
         }
         
