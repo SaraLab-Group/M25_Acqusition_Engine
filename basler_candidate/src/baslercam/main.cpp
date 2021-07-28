@@ -53,6 +53,9 @@ image event handlers. Please note that this is not shown in this example.
 
 #include "USB_THREAD.h" // For USB function pointer used for threading.
 
+// comment this out to test just aquisition but not convert binary chunks to TIFF
+//#define CONVERT_TIFF
+
 // Namespace for using pylon objects.
 using namespace Pylon;
 using namespace GenApi;
@@ -983,6 +986,7 @@ int main(int argc, char* argv[])
 		// Some Mutex stuff
 		std::condition_variable cnt_v; // For sleeping and waking write
 		std::mutex lk; // Requred for the condition_variable to sleep.
+		std::mutex ded; // Prevent Write getting behind
 
 
 		// This is the magical mythical buffer swap
@@ -1034,7 +1038,10 @@ int main(int argc, char* argv[])
 				// Hopefully reducing caching latency.
 
 				if (begin_writing) {
+					std::unique_lock<std::mutex> mtx(ded); // Really this lock blocks from moving forward until the write thread is ready to be woken.
+					//mtx.lock();
 					cnt_v.notify_one(); // Wake me up inside
+					mtx.unlock(); // unlunk
 				}
 				else {
 					pre_write++;
@@ -1111,14 +1118,22 @@ int main(int argc, char* argv[])
 
 		// Write Thread "Lamda Function"
 		auto write_thrd = [&](write_data* ftw) {
-
+			// This Mutex is for preventing the write thread from getting 
+			// behind the Read Threads and miss it's wake signal from
+			// The Barier Completion function
+			std::unique_lock<std::mutex> mtx(ded);
+			
 			while (write_count < binary_chunks) {
 				// Takes the lock then decides to take a nap
 				// Until the buffer is ready to write
-				//std::cout << "grabbing lock, write_count: " << (int)write_count << std::endl;
+		
+				// This if statement is a crutch to prevent an early attempt to wake the thread
+				// on the last write call.
 				if (capture) {
-					std::unique_lock<std::mutex> lck(lk);
-					cnt_v.wait(lck);
+					std::unique_lock<std::mutex> lck(lk); // lock for control signal.
+					mtx.unlock(); // ded mutex
+					cnt_v.wait(lck); // Woken by Barrier Completion
+					mtx.lock(); // ded mutex
 				}
 				//std::cout << "Past Lock" << std::endl;
 
@@ -1162,7 +1177,7 @@ int main(int argc, char* argv[])
 			buff1[i] = 255;
 		}*/
 	  
-
+#ifdef CONVERT_TIFF
 		std::cout << "Converting images to tif" << std::endl;
 		// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
 		// to boost the write throughput more. It should be noted that we are currently unable to 
@@ -1175,7 +1190,7 @@ int main(int argc, char* argv[])
 
 		uint8_t write_files = 1;
 		uint32_t chunk_number = 0;
-		uint16_t save_threads = 10;
+		uint16_t save_threads = 20;
 
 		std::vector<uint8_t> thread_row;
 		
@@ -1275,7 +1290,7 @@ int main(int argc, char* argv[])
 		std::cout << std::endl;
 		std::cout << "Total Time To Write Tiff: " << elapsed << "us" << std::endl;
 		std::cout << "Total Time To Write in Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
-
+#endif
 
 		// This is tripple Nested... Is there a better way to do this?
 
@@ -1322,22 +1337,35 @@ int main(int argc, char* argv[])
 
 		std::cout << std::endl << "Finished Converting to tif" << std::endl;
 
+		uint32_t max_dropped = 0;
 		// Checking For Longer than acceptable Frame Times
 		for (int i = 0; i < 25; i++) {
+			uint32_t dropped_frames = 0;
 			int64_t prev = events[i][0].time_stamp;
 			int64_t first_miss_cnt = events[i][0].missed_frame_count;
 			for (int j = 1; j < frames; j++) {
-				if ((abs(events[i][j].time_stamp - prev)) > float(50000) + 1/((float)fps)*1e9) {
-					std::cout << "camera: " << i << std::endl;
-					std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
-					std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
-					//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
-					//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
-				}
-				prev = events[i][j].time_stamp;
-			}
+				if (events[i].size() > j) {
+					if ((abs(events[i][j].time_stamp - prev)) > float(50000) + 1 / ((float)fps) * 1e9) {
+						std::cout << "camera: " << i << std::endl;
+						//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
+						std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
+						dropped_frames++;
+						//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
+						//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+					}
 
+					prev = events[i][j].time_stamp;
+				}
+				else {
+					std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
+				}
+			}
+			std::cout << ".";
+			max_dropped = max(max_dropped, dropped_frames);
 		}
+		std::cout << std::endl;
+		std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
+		std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
 
 		// Free These Aligned Buffers PLEASE!
 		_aligned_free(buff1);
