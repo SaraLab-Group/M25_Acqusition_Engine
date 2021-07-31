@@ -2,6 +2,7 @@
 
 #include "USB_THREAD.h"
 
+
 usb_dev_handle* open_dev(void)
 {
     struct usb_bus* bus;
@@ -97,6 +98,7 @@ void* USB_THREAD(void* data)
     //outgoing.fps = thd_data->fps;
     uint8_t send_data = 1;
     uint8_t running = 1;
+    
     /*****************************************************************************************/
     while (running) {
         // Signaling
@@ -107,15 +109,18 @@ void* USB_THREAD(void* data)
             send_data = 1;
         }
 
+        std::unique_lock<std::mutex> flg(*thd_data->crit);
         if (thd_data->flags & START_COUNT) {
             outgoing.flags |= START_COUNT;
             send_data = 1;
         }
-
+        
         if (thd_data->flags & STOP_COUNT) {
             outgoing.flags |= STOP_COUNT;
+
             send_data = 1;
         }
+        flg.unlock();
 
         if (thd_data->flags & EXIT_THREAD) {
             running = 0;

@@ -14,6 +14,7 @@
 #include <lusb0_usb.h>
 #include <stdio.h>
 #include <cstdint>
+#include <mutex>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -79,6 +80,7 @@ typedef struct USB_THD_DATA {
     // Do I need this?
     uint16_t flags;
     uint16_t fps;
+    std::mutex* crit;
 };
 
 usb_dev_handle* open_dev(void);

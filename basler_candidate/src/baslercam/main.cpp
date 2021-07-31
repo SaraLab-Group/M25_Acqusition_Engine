@@ -44,22 +44,24 @@ image event handlers. Please note that this is not shown in this example.
 #include <algorithm>
 #include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
 
-//#include <boost/iostreams/device/mapped_file.hpp>
-//#include <filesystem>
 
 #ifndef _WIN32
 #include <pthread.h>
 #endif
 
+
 #include "USB_THREAD.h" // For USB function pointer used for threading.
 
+
 // comment this out to test just aquisition but not convert binary chunks to TIFF
-//#define CONVERT_TIFF
+#define CONVERT_TIFF
+
 
 // Namespace for using pylon objects.
 using namespace Pylon;
 using namespace GenApi;
 using namespace GenICam;
+
 
 using namespace Basler_UsbCameraParams;
 typedef CBaslerUsbCamera Camera_t;
@@ -67,20 +69,25 @@ typedef CBaslerUsbImageEventHandler ImageEventHandler_t; // Or use Camera_t::Ima
 typedef CBaslerUsbGrabResultPtr GrabResultPtr_t; // Or use Camera_t::GrabResultPtr_t
 typedef CBaslerUsbCameraEventHandler CCameraEventHandler_t;
 
+
 // For array size
 static const uint8_t EIGHT_BIT = 8;
 static const uint8_t SIXTEEN_BIT = 16;
 
+
 // This Value is mostly for testing as we may apply a crop factor
 static const uint32_t PIX_OVER_8 = 288000; // This is (1920*1200)/8 makes it easier to multiply by 8 or 16bit
 
+
 // This Value was for testing manual buffering of std::ofstream
-static const uint32_t FS_BUF_SIZE = 131072;//524288; //2097152;//262144;
+// static const uint32_t FS_BUF_SIZE = 131072;//524288; //2097152;//262144;
+
 
 // WriteFile only returns a DWORD == uint32_t
 // The Writes must be alligned to 512B sectors
 // Therefore MAX_ALLIGNED_WRITE is the largest 
 // you can tell WriteFile to write at once.
+
 
 static const DWORD ALIGNMENT_BYTES = 512;
 static const DWORD MAX_ALIGNED_WRITE = 4294966784;
@@ -97,12 +104,14 @@ typedef struct frame_buffer_16 {
 	uint8_t image_array[PIX_OVER_8 * SIXTEEN_BIT];
 };
 
+
 // Number of camera images to be grabbed.
 // Currently just building an array big enough for 25 images
 // Regardless of number of cameras present.
 static const uint32_t c_countOfImagesToGrab = 25;
 
 static const size_t c_maxCamerasToUse = 25;
+
 
 //frame_buffer buff1[c_countOfImagesToGrab];
 //frame_buffer buff2[c_countOfImagesToGrab];
@@ -113,6 +122,7 @@ static const size_t c_maxCamerasToUse = 25;
 // These are to keep track of the head of our buffers
 uint8_t* head_buff1 = nullptr;
 uint8_t* head_buff2 = nullptr;
+
 
 // This is for keeping track of frames to buffer
 // And buffer chunks written to disk
@@ -125,6 +135,7 @@ uint32_t frame_count = 0;
 uint32_t frames = 0; // global frames can be changed in main
 bool capture = false;
 
+
 typedef struct cam_data {
 	uint8_t number;  // This gives sequentially alocated camera index
 	uint64_t offset; // This gives the image_size * number value
@@ -132,6 +143,7 @@ typedef struct cam_data {
 	uint8_t* image_dat; // Might be redundant since declared in same scope as lamda
 
 };
+
 
 typedef struct write_data {
 	//frame_buffer* write_buff = out_buff;
@@ -142,6 +154,7 @@ typedef struct write_data {
     std::mutex* lk;
 };
 
+
 //For keeping track of Frame events
 
 typedef struct cam_event {
@@ -151,9 +164,11 @@ typedef struct cam_event {
 	uint64_t frame;
 };
 
+
 // 2304000 1920x1200
 // Namespace for using cout.
 using namespace std;
+
 
 // variables for scan opt
 const uint32_t horz_max = 1920;
@@ -168,11 +183,14 @@ uint8_t bitDepth = 8;
 uint8_t fps = 100;
 
 
-
 double old = 0.0; //variable to test trigger delay
+
+// Mutex for thread signals
+std::mutex crit;
 
 //A prototype
 void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
+
 
 //Directory name images to be saved.
 // Should probably be set from pycro or micro manager.
@@ -182,6 +200,7 @@ string  strMetaFileName = "Meta.txt";
 
 // why won't you work?
 string tiff_dir = "D:\\Ant1 Test";// \\Tiff";
+
 
 // From Basler Sample Code for fast binary writes;
 void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
@@ -404,11 +423,10 @@ void readFile(const char* fileName, uint64_t* outNumberofBytes, uint8_t* chunk)
 	//std::cout << "file_size: " << size << std::endl;
 
 	CloseHandle(hFile);
-
-
 }
 
 
+// Make a directory tree???
 void mkdirTree(string sub, string dir) {
 	if (sub.length() == 0)
 		return;
@@ -425,6 +443,7 @@ void mkdirTree(string sub, string dir) {
 		mkdirTree(sub.substr(i + 1), dir);
 }
 
+
 /* Not Currently in use From Baler binary write sample code*/
 void Save_Metadata(list<string>& strList, string strMetaFilename)
 {
@@ -438,6 +457,7 @@ void Save_Metadata(list<string>& strList, string strMetaFilename)
 	fs.close();
 }
 
+
 /*Interesting I think the normal Sleep function is allows context switching and "sleeps threads the same"*/
 void sleep(int sec) {
 	for (int i = sec; i > 0; --i) {
@@ -447,12 +467,12 @@ void sleep(int sec) {
 }
 
 
-
 enum MyEvents
 {
 	eMyEventFrameStart = 100,
 	//eMyEventFrameStartWait = 200
 };
+
 
 /* Currently Unused */
 class CSampleCameraEventHandler : public CCameraEventHandler_t
@@ -489,6 +509,7 @@ public:
 	//}
 
 };
+
 
 /* This has a lot of behind the scenes thread generation and not really possible to synchronize
    Keeping this here for refference                                                          */
@@ -679,7 +700,6 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 }
 
 
-
 // Lets See if I can reuse this old code for arg parsing
 int scan_opts(int argc, char** argv) {
 
@@ -774,8 +794,8 @@ int scan_opts(int argc, char** argv) {
 
 }
 
-// Some More Globals to go with main
 
+// Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
 
 int main(int argc, char* argv[])
@@ -804,6 +824,7 @@ int main(int argc, char* argv[])
 
 	usb_thread_data.flags |= CHANGE_FPS;
 	usb_thread_data.fps = fps;
+	usb_thread_data.crit = &crit;
 
 	std::thread USB_THD_OBJ(USB_THREAD, (void*)&usb_thread_data);
 
@@ -1002,7 +1023,9 @@ int main(int argc, char* argv[])
 			//std::cout << "Completed Cycle: " << std::endl;
 			if (pre_write > 1) {
 				if (frame_count == 0) {
+					std::unique_lock<std::mutex> flg(crit);
 					usb_thread_data.flags |= START_COUNT;
+					flg.unlock();
 				}
 				if (!begin_writing && frame_count == fps - 1) {
 					begin_writing = 1;
@@ -1013,7 +1036,9 @@ int main(int argc, char* argv[])
 
 			if (frame_count == frames) {
 				capture = false;
+				std::unique_lock<std::mutex> flg(crit);
 				usb_thread_data.flags |= STOP_COUNT;
+				flg.unlock();
 				//cnt_v.notify_one(); // Wake me up inside
 			}
 
