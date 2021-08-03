@@ -3,15 +3,17 @@ import binascii
 import threading
 import time
 import struct
+from lib2to3.pytree import convert
+from struct import unpack
 import socket
-
+from subprocess import call
 
 from ctypes import *
 from typing import Any, Tuple
 
 from M25_ui import Ui_MainWindow
 from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow
+    QApplication, QDialog, QMainWindow, QFileDialog
 )
 
 
@@ -48,7 +50,9 @@ bpp: int = 8
 capTime: int = 10
 path = "\0"*255
 path = "D:\\Ant1 Test\\tiff"
-flags:int = 0
+flags: int = 0
+exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\winsock_adventure_server\x64\Debug'
+myEXE = "winsock_adventure_server.exe"
 
 write_mutex = threading.Lock()
 def client_thread():
@@ -77,10 +81,26 @@ def client_thread():
             #packer = struct.Struct('L L L L L L 255s H')
             #packed_data = Payload(inData)
             #s.sendall(outData)
-            data = s.recv(512)
-
-        print('Received', repr(data))
-        time.sleep(1)
+            data: bytes = s.recv(512)
+            (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_capTime,
+             rec_path,
+             rec_flags) = unpack(
+                'L L L L L L'
+                '255s'
+                'H',
+                data
+            )
+        #pathStr = convert(rec_path)
+        print('Received horz: %d' % int(rec_horz))
+        print('Received vert: %d' % int(rec_vert))
+        print('Received fps: %d' % int(rec_fps))
+        print('Received exp: %d' % int(rec_exp))
+        print('Received bpp: %d' % int(rec_bpp))
+        print('Received capTime: %d' % int(rec_capTime))
+        print('Received path: %s' % rec_path)
+        print('Received flags: %d' % int(rec_flags))
+        #print('Received ' + repr(data))
+        time.sleep(0.5)
 
 
 th = threading.Thread(target=client_thread)
@@ -96,6 +116,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         global path
         self.WritePLineEdit.setText(path)
+        print(exe_path)
+        rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
         global bpp
         bpp = 8
         global run
@@ -167,6 +189,10 @@ class Window(QMainWindow, Ui_MainWindow):
             print("Button Value bpp: %d" % (radioButton.value))
         write_mutex.release()
 
+    def browseState(self):
+        global path
+        path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.WritePLineEdit.setText(path)
 
     def closeEvent(self, event):
         print('close event fired')

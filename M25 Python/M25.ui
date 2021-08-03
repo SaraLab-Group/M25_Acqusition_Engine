@@ -159,7 +159,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>320</y>
+      <y>400</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -168,7 +168,7 @@
      <string>Capture</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="WritePLlabel">
     <property name="geometry">
      <rect>
       <x>300</x>
@@ -181,7 +181,7 @@
      <string>Image Write Path</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="WritePLineEdit">
     <property name="geometry">
      <rect>
       <x>220</x>
@@ -191,7 +191,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="BrowsePushButton_2">
+   <widget class="QPushButton" name="BrowsePushButton">
     <property name="geometry">
      <rect>
       <x>480</x>
@@ -274,6 +274,45 @@
     </property>
     <property name="text">
      <string>Messages:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="AquireCamsButton">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>110</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Aquire Cams</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ReleaseCamsButton">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>110</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Release Cams</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>320</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Config</string>
     </property>
    </widget>
   </widget>
