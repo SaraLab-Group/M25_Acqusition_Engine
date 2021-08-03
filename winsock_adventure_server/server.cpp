@@ -137,7 +137,7 @@ int __cdecl main(void)
                     recvbuf[iResult] = '\0';
                 }
                 // Echo the buffer back to the sender
-                iSendResult = send(ClientSocket, recvbuf, iResult, 0);
+                iSendResult = send(ClientSocket, (char*)&rec_dat, iResult, 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed with error: %d\n", WSAGetLastError());
                     closesocket(ClientSocket);

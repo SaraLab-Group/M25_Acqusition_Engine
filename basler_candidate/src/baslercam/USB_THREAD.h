@@ -10,11 +10,9 @@
 
 #ifndef USB_THREAD_H
 #define USB_THREAD_H
-
+#include "project_headers.h"
 #include <lusb0_usb.h>
-#include <stdio.h>
-#include <cstdint>
-#include <mutex>
+
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -57,31 +55,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-/* Stuff to test our code This is the struct sent into our Psoc 5LP */
 
-#define CHANGE_FPS 0x1
-#define DROPPED_FRAME 0x2
-#define SET_RTC 0x4
-#define ACK_CMD 0x8
-#define START_COUNT 0x10
-#define COUNTING 0x20
-#define STOP_COUNT 0x40
-#define EXIT_THREAD 0x8000
-#define DEFAULT_FPS (100u)
-
-typedef struct usb_data {
-    uint16_t flags;
-    uint16_t fps;
-    uint32_t time_waiting; // Currently Time between not ready and ready
-    uint64_t count;
-};
-
-typedef struct USB_THD_DATA {
-    // Do I need this?
-    uint16_t flags;
-    uint16_t fps;
-    std::mutex* crit;
-};
 
 usb_dev_handle* open_dev(void);
 void* USB_THREAD(void* data);

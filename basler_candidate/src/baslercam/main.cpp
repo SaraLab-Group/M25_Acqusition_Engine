@@ -17,57 +17,8 @@ of all cameras in the CInstantCameraArray. The grabbed images can then be proces
 image event handlers. Please note that this is not shown in this example.
 */
 
-// Include files to use the pylon API.
-#include <pylon/PylonIncludes.h>
-#include <pylon/usb/BaslerUsbCamera.h>
-#include <pylon/usb/BaslerUsbInstantCamera.h>
-#include <pylon/InstantCamera.h>
-
-#ifdef PYLON_WIN_BUILD
-#    include <pylon/PylonGUI.h>
-#endif
-
-#include <thread>         // std::this_thread::sleep_for 
-#include <chrono>         // std::chrono::seconds
-#include <condition_variable> // For Waking Write Thread
-#include <barrier>
-#include <vector>
-#include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <string.h>
-#include <stdio.h>
-#include <direct.h>
-#include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <algorithm>
-#include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
-
-
-#ifndef _WIN32
-#include <pthread.h>
-#endif
-
-
 #include "USB_THREAD.h" // For USB function pointer used for threading.
 
-
-// comment this out to test just aquisition but not convert binary chunks to TIFF
-#define CONVERT_TIFF
-
-
-// Namespace for using pylon objects.
-using namespace Pylon;
-using namespace GenApi;
-using namespace GenICam;
-
-
-using namespace Basler_UsbCameraParams;
-typedef CBaslerUsbCamera Camera_t;
-typedef CBaslerUsbImageEventHandler ImageEventHandler_t; // Or use Camera_t::ImageEventHandler_t
-typedef CBaslerUsbGrabResultPtr GrabResultPtr_t; // Or use Camera_t::GrabResultPtr_t
-typedef CBaslerUsbCameraEventHandler CCameraEventHandler_t;
 
 
 // For array size
@@ -136,33 +87,7 @@ uint32_t frames = 0; // global frames can be changed in main
 bool capture = false;
 
 
-typedef struct cam_data {
-	uint8_t number;  // This gives sequentially alocated camera index
-	uint64_t offset; // This gives the image_size * number value
-	CInstantCamera* camPtr;
-	uint8_t* image_dat; // Might be redundant since declared in same scope as lamda
 
-};
-
-
-typedef struct write_data {
-	//frame_buffer* write_buff = out_buff;
-	bool first = true; // Most Likely not needed anymore controlled in buffere swap
-	uint8_t cam_count = 0;
-	// Both of these not really needed because declared in same scope of the lamda function
-	std::condition_variable* cv; 
-    std::mutex* lk;
-};
-
-
-//For keeping track of Frame events
-
-typedef struct cam_event {
-	double time_stamp;
-	double sensor_readout;
-	int64_t missed_frame_count;
-	uint64_t frame;
-};
 
 
 // 2304000 1920x1200
@@ -180,7 +105,7 @@ uint32_t vert = vert_max;
 uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint8_t bitDepth = 8;
-uint8_t fps = 100;
+uint8_t fps = 65;
 
 
 double old = 0.0; //variable to test trigger delay
@@ -198,7 +123,7 @@ string  strDirectryName = "D:\\Ant1 Test";//\\binaries";
 // From Basler Fast Write Example Not currently used;
 string  strMetaFileName = "Meta.txt";
 
-// why won't you work?
+// it tworks
 string tiff_dir = "D:\\Ant1 Test";// \\Tiff";
 
 
@@ -229,28 +154,8 @@ void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
 * ***************************************************************************************************/
 void saveBigBuffer(const char* FileName, uint8_t* buffer, uint8_t cam_count, uint64_t aligned_size)
 {
-	/* Some Dead Code from my attempts at using ofstream to be purged*/
-
-	//unsigned int bytes_written = 0;
-	//unsigned int file_size = sizeof(frame_buffer) * cam_count;
-	//std::ofstream fs;
-	//auto data = &buffer;
-
-	//write(data, FileName);
-	//auto fs = std::ofstream(FileName, std::ios::binary|std::ios::trunc);
-
 	uint8_t* pImageBuffer = (uint8_t*)buffer;
 	uint64_t bytes_written = 0;
-	/*fs.rdbuf()->pubsetbuf((char*)pImageBuffer, FS_BUF_SIZE);
-	fs.open(FileName, std::ios::binary|std::ios::trunc);
-	while (bytes_written < file_size) {
-		fs.write((char*)pImageBuffer, FS_BUF_SIZE);
-		pImageBuffer += FS_BUF_SIZE;
-		bytes_written += FS_BUF_SIZE;
-	}
-	//How big it be?
-	//printf("PayloadSize: %ld\n", sizeof(buffer));
-	fs.close();*/
 
 	/* Welcome to Windows Microsoft SDK enjoy the ride*/
 	HANDLE hFile;
@@ -265,8 +170,8 @@ void saveBigBuffer(const char* FileName, uint8_t* buffer, uint8_t cam_count, uin
 		GENERIC_WRITE,          // open for writing
 		0,                      // do not share
 		NULL,                   // default security
-		CREATE_ALWAYS,             // create new file only
-		FILE_FLAG_NO_BUFFERING,  // normal file
+		CREATE_ALWAYS,             // create Always
+		FILE_FLAG_NO_BUFFERING,  // Nobuffering file
 		NULL);                  // no attr. template
 
 	if (hFile == INVALID_HANDLE_VALUE)
@@ -325,8 +230,7 @@ void saveBigBuffer(const char* FileName, uint8_t* buffer, uint8_t cam_count, uin
 
 /* This little function is for the convert Binary to tif phase*/
 void readFile(const char* fileName, uint64_t* outNumberofBytes, uint8_t* chunk)
-{   // [out] char* buffer
-	//std::cout << "trying to read: " << fileName << std::endl;
+{   
 	ifstream fs(fileName, std::ifstream::binary);
 	fs.seekg(0, fs.end);
 	long long int size = fs.tellg();
@@ -822,7 +726,7 @@ int main(int argc, char* argv[])
 		//return 0; // Just testing
 	}
 
-	usb_thread_data.flags |= CHANGE_FPS;
+	usb_thread_data.flags |= CHANGE_CONFIG;
 	usb_thread_data.fps = fps;
 	usb_thread_data.crit = &crit;
 

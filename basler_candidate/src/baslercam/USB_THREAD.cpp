@@ -103,9 +103,9 @@ void* USB_THREAD(void* data)
     while (running) {
         // Signaling
         //printf("top of the mornin to yah\n");
-        if (thd_data->flags & CHANGE_FPS) {
+        if (thd_data->flags & CHANGE_CONFIG) {
             outgoing.fps = thd_data->fps;
-            outgoing.flags |= CHANGE_FPS;
+            outgoing.flags |= CHANGE_CONFIG;
             send_data = 1;
         }
 
