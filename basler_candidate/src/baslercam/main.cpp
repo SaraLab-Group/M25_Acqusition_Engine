@@ -18,6 +18,7 @@ image event handlers. Please note that this is not shown in this example.
 */
 
 #include "USB_THREAD.h" // For USB function pointer used for threading.
+#include "server_thread.h" // For inter process communication
 
 
 
@@ -470,7 +471,7 @@ public:
 };
 
 
-/* This Class is great configures camera parameters for us */
+/* This Class is --Wizardy-- great configures camera parameters for us */
 class CTriggerConfiguration : public CConfigurationEventHandler {
 public:
 	static void ApplyConfiguration(GENAPI_NAMESPACE::INodeMap& nodemap)
@@ -605,7 +606,7 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 
 
 // Lets See if I can reuse this old code for arg parsing
-int scan_opts(int argc, char** argv) {
+/*int scan_opts(int argc, char** argv) {
 
 	std::vector<std::string> opts;
 	for (int i = 1; i < argc; i++) {
@@ -696,119 +697,107 @@ int scan_opts(int argc, char** argv) {
 	}
 	return 0;
 
-}
+}*/
+
+
+// Prototypes because to many things defined before main and I don't like it
+int aquire_cameras(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
 
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
+SERVER_THD_DATA server_thread_data;
+std::condition_variable signal_main;
+std::mutex sleep_loop;
+TCP_IP_DAT incoming, outgoing;
+bool active = true;
+
 
 int main(int argc, char* argv[])
 {
 	// The exit code of the sample application.
 	int exitCode = 0;
-	usb_thread_data.flags = 0;
 
-	if (argc < 2) {
-		std::cout << "Usage: " << argv[0] << " -s <seconds>" << std::endl;
-		std::cout << "Must at least use whole second intervals." << std::endl;
-		std::cout << "Other Flags:" << std::endl;
-		std::cout << "Capture Area: -horz <pixels> -vert <pixels> (Default 1920 X 1200)" << std::endl;
-		std::cout << "Frame Rate: -f <fps>" << std::endl;
-		std::cout << "Bit Depth: -bpp <bits> (Default 8bits and supports 12bits but requires 16bpp storage)" << std::endl;
-		std::cout << "Exposure Time: -exp <time in us> Defualt 6700us or 6.7ms" << std::endl;
-		return exitCode;
-	}
-	else {
-		if (scan_opts(argc, argv) != 0) {
-			std::cout << "input error exiting" << std::endl;
-			return -1;
-		}
-		//return 0; // Just testing
-	}
+	// Just setting defaults not really needed 
+	incoming.horz = horz;
+	incoming.vert = vert;
+	incoming.fps = fps;
+	incoming.exp = exposure;
+	incoming.bpp = bitDepth;
+	incoming.capTime = seconds;
+	incoming.flags = 0;
 
-	usb_thread_data.flags |= CHANGE_CONFIG;
-	usb_thread_data.fps = fps;
+	server_thread_data.incoming_data = &incoming;
+	server_thread_data.outgoing_data = &outgoing;
+	server_thread_data.signal_ptr = &signal_main;
+	server_thread_data.mtx_ptr = &crit;
+	
+	usb_thread_data.incoming_data = &incoming;
+	usb_thread_data.outgoing_data = &outgoing;
+
 	usb_thread_data.crit = &crit;
 
+	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
 	std::thread USB_THD_OBJ(USB_THREAD, (void*)&usb_thread_data);
+    
+	cam_data cam_dat[c_maxCamerasToUse];
+	std::vector<std::string> serials;
+	std::vector<cam_event> events[25]; // This is for testing for dropped frames
+	unsigned int total_cams;
+	uint64_t image_size;
 
-	// Before using any pylon methods, the pylon runtime must be initialized. 
-	PylonInitialize();
-
-	// Create an example event handler. In the present case, we use one single camera handler for handling multiple camera events.
-	// The handler prints a message for each received event.
-	//CSampleCameraEventHandler* pHandler1 = new CSampleCameraEventHandler; /*This appears to be unused currently*/
-
-	// Want to create an offset for the cameras for array arithmatic here
-	// Once Pycro and Micro Manager TCP IP is implemented we will change this to be user set
-	uint64_t image_size = ((horz * vert) / 8)*bitDepth;
-	
-	// Nice day to try some code.
-	try
-	{
-		// Get the transport layer factory.
-		CTlFactory& tlFactory = CTlFactory::GetInstance();
-
-		// Get all attached devices and exit application if no device is found.
-		DeviceInfoList_t devices;
-		if (tlFactory.EnumerateDevices(devices) == 0)
-		{
-			throw RUNTIME_EXCEPTION("No camera present.");
-		}
-
-		/* Abandon All Instant Camera Array's Ye who enter here*/
-		// Create an array of instant cameras for the found devices and avoid exceeding a maximum number of devices.
-		//CInstantCameraArray cameras(min(devices.size(), c_maxCamerasToUse));
-
-		// This value should be reported back to the Pycro manager
-		unsigned int total_cams = min(devices.size(), c_maxCamerasToUse);
-
-		/* Lets make a humble array of pointers */
-		// May as well make all 25
-		CInstantCamera* pcam[c_maxCamerasToUse];
-		cam_data cam_dat[c_maxCamerasToUse];
-
-		// For keeping track of which index has which serial
-		// A switch case could be used to Number the cameras to their position
-		// to ease readability and processing if desired.
-		std::vector<std::string> serials;
-		std::vector<cam_event> events[25];
-
-		// Create and attach all Pylon Devices.
-		// We could probably not use the pcam array and just allocate directly to cam_dat
-		// Since all of these are declared in the same scope as the lamda functions
-
-		//for (size_t i = 0; i < cameras.GetSize(); ++i) /* Why the pre-increment? */
-		for (unsigned int i = 0; i < total_cams; i++)
-		{
-			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
-			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
-
-			INodeMap& nodemap = pcam[i]->GetNodeMap();
-
-			//pcam[i].RegisterImageEventHandler(new CSampleImageEventHandler, RegistrationMode_Append, Cleanup_Delete); /* Just say no to their threaded stuff */
-			pcam[i]->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
-
-			//pcam[i]->GrabCameraEvents = true; /* Not sure we need this for our method? */
-
-			if (!IsAvailable(nodemap.GetNode("EventSelector"))) {
-				throw RUNTIME_EXCEPTION("The device doesn't support events.");
+	while (active) {
+		std::unique_lock slp(sleep_loop);
+		signal_main.wait(slp);
+		std::unique_lock prot(crit);
+		if (incoming.flags & AQUIRE_CAMERAS) {
+			incoming.flags &= ~AQUIRE_CAMERAS;
+			prot.unlock();
+			if (aquire_cameras(&serials, cam_dat, &total_cams, &image_size)) {
+				prot.lock();
+				outgoing.flags |= AQUIRE_FAIL;
+				prot.unlock();
 			}
-
-			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("ExposureEnd");
-			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
-			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("FrameStartWait");
-			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
-
-			serials.push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
-			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
-			cam_dat[i].number = i;
-			cam_dat[i].offset = i * image_size;
-			cam_dat[i].camPtr = pcam[i];
-			// Moved this out of the thread initilization stuff
-			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
-			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+			else {
+				prot.lock();
+				outgoing.flags |= CAMERAS_AQUIRED;
+				prot.unlock();
+			}
 		}
+		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_AQUIRED) {
+			incoming.flags &= ~RELEASE_CAMERAS;
+			prot.unlock();
+			// Releases all pylon resources. 
+			PylonTerminate();
+			prot.lock();
+			outgoing.flags &= ~CAMERAS_AQUIRED;
+			prot.unlock();
+		}
+		else if (incoming.flags & CHANGE_CONFIG && !(outgoing.flags & CAPTURING)) {
+			prot.unlock();
+			horz = incoming.horz;
+			vert = incoming.vert;
+			exposure = incoming.exp;
+			bitDepth = incoming.bpp;
+			fps = incoming.fps;
+			seconds = incoming.capTime;
+			if (outgoing.flags & CAMERAS_AQUIRED) {
+				for (int i = 0; i < total_cams; i++) {
+					cam_dat[i].camPtr->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
+				}
+			}
+			prot.lock();
+			outgoing.flags |= CHANGE_CONFIG;
+			prot.unlock();
+		}
+		else {
+			// Ultimately We shouldn't ever get here
+			// Since that means we received a false wakeup signal
+			prot.unlock();
+		}
+		
+
+	}
 
 
 		// Starts grabbing for all cameras starting with index 0. The grabbing
@@ -928,7 +917,7 @@ int main(int argc, char* argv[])
 			if (pre_write > 1) {
 				if (frame_count == 0) {
 					std::unique_lock<std::mutex> flg(crit);
-					usb_thread_data.flags |= START_COUNT;
+					usb_thread_data.incoming_data->flags |= START_COUNT;
 					flg.unlock();
 				}
 				if (!begin_writing && frame_count == fps - 1) {
@@ -941,7 +930,7 @@ int main(int argc, char* argv[])
 			if (frame_count == frames) {
 				capture = false;
 				std::unique_lock<std::mutex> flg(crit);
-				usb_thread_data.flags |= STOP_COUNT;
+				usb_thread_data.incoming_data->flags |= STOP_COUNT;
 				flg.unlock();
 				//cnt_v.notify_one(); // Wake me up inside
 			}
@@ -1062,7 +1051,7 @@ int main(int argc, char* argv[])
 					std::unique_lock<std::mutex> lck(lk); // lock for control signal.
 					mtx.unlock(); // ded mutex
 					cnt_v.wait(lck); // Woken by Barrier Completion
-					mtx.lock(); // ded mutex
+					mtx.lock(); // ded mutex This is for preventing the buffer swap thread from waking write thread before it's finished
 				}
 				//std::cout << "Past Lock" << std::endl;
 
@@ -1299,8 +1288,9 @@ int main(int argc, char* argv[])
 		// Free These Aligned Buffers PLEASE!
 		_aligned_free(buff1);
 		_aligned_free(buff2);
-		usb_thread_data.flags |= EXIT_THREAD;
+		usb_thread_data.incoming_data->flags |= EXIT_THREAD;
 		USB_THD_OBJ.join();
+		SRVR_THD_OBJ.join();
 		//auto start = chrono::steady_clock::now();
 		//cout << "Before FileName" << endl;
 		//FileName << strDirectryName << "MyBigFatGreekWedding" << ".bin";
@@ -1319,24 +1309,106 @@ int main(int argc, char* argv[])
 		//Save_Metadata(Metasdata, strDirectryName + strMetaFileName);
 		//if we substitute the while loop for the for loop and the retrieve the method works but it only takes half of the images since it is dumping half.
 
+
+
+	// Comment the following two lines to disable waiting on exit.
+	cerr << endl << "Press Enter to exit." << endl;
+	while (cin.get() != '\n');
+	
+
+	return exitCode;
+}
+
+int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+	// Before using any pylon methods, the pylon runtime must be initialized. 
+	PylonInitialize();
+
+	// Create an example event handler. In the present case, we use one single camera handler for handling multiple camera events.
+	// The handler prints a message for each received event.
+	//CSampleCameraEventHandler* pHandler1 = new CSampleCameraEventHandler; /*This appears to be unused currently*/
+
+	// Want to create an offset for the cameras for array arithmatic here
+	// Once Pycro and Micro Manager TCP IP is implemented we will change this to be user set
+	*image_size = ((horz * vert) / 8) * bitDepth;
+
+	// Nice day to try some code.
+	try
+	{
+		// Get the transport layer factory.
+		CTlFactory& tlFactory = CTlFactory::GetInstance();
+
+		// Get all attached devices and exit application if no device is found.
+		DeviceInfoList_t devices;
+		if (tlFactory.EnumerateDevices(devices) == 0)
+		{
+			throw RUNTIME_EXCEPTION("No camera present.");
+		}
+
+		/* Abandon All Instant Camera Array's Ye who enter here*/
+		// Create an array of instant cameras for the found devices and avoid exceeding a maximum number of devices.
+		//CInstantCameraArray cameras(min(devices.size(), c_maxCamerasToUse));
+
+		// This value should be reported back to the Pycro manager
+		*total_cams = min(devices.size(), c_maxCamerasToUse);
+
+		/* Lets make a humble array of pointers */
+		// May as well make all 25
+		CInstantCamera* pcam[c_maxCamerasToUse];
+		
+
+		// For keeping track of which index has which serial
+		// A switch case could be used to Number the cameras to their position
+		// to ease readability and processing if desired.
+		// std::vector<std::string> serials;
+		// std::vector<cam_event> events[25];
+
+		// Create and attach all Pylon Devices.
+		// We could probably not use the pcam array and just allocate directly to cam_dat
+		// Since all of these are declared in the same scope as the lamda functions
+
+		//for (size_t i = 0; i < cameras.GetSize(); ++i) /* Why the pre-increment? */
+		for (unsigned int i = 0; i < *total_cams; i++)
+		{
+			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
+			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
+
+			INodeMap& nodemap = pcam[i]->GetNodeMap();
+
+			//pcam[i].RegisterImageEventHandler(new CSampleImageEventHandler, RegistrationMode_Append, Cleanup_Delete); /* Just say no to their threaded stuff */
+
+			// This should set Default Configuration if no configuration change applied.
+			pcam[i]->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
+
+			//pcam[i]->GrabCameraEvents = true; /* Not sure we need this for our method? */
+
+			if (!IsAvailable(nodemap.GetNode("EventSelector"))) {
+				throw RUNTIME_EXCEPTION("The device doesn't support events.");
+			}
+
+			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("ExposureEnd");
+			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
+			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("FrameStartWait");
+			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
+
+			serials->push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
+			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
+			cam_dat[i].number = i;
+			cam_dat[i].offset = i * (*image_size);
+			cam_dat[i].camPtr = pcam[i];
+			// Moved this out of the thread initilization stuff
+			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
+			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+		}
+		return 0;
 	}
 	catch (const GenericException& e)
 	{
 		// Error handling
 		cerr << "An exception occurred." << endl
 			<< e.GetDescription() << endl;
-		exitCode = 1;
-		usb_thread_data.flags |= EXIT_THREAD;
-		USB_THD_OBJ.join();
+		//exitCode = 1;
+		//usb_thread_data.incoming_data->flags |= EXIT_THREAD;
+		//USB_THD_OBJ.join();
+		return 1;
 	}
-
-	// Comment the following two lines to disable waiting on exit.
-	cerr << endl << "Press Enter to exit." << endl;
-	while (cin.get() != '\n');
-
-	// Releases all pylon resources. 
-	PylonTerminate();
-	
-
-	return exitCode;
 }

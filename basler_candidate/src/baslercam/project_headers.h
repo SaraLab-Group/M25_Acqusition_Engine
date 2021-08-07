@@ -99,30 +99,25 @@ typedef struct cam_event {
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
-#define AQUIRE_CAMERAS 0x08
-#define RELEASE_CAMERAS 0x100
-#define AQUIRE_FAIL 0x200
-#define START_CAPTURE 0x400
-#define CAPTURING 0x800
-#define IM_HERE 0x1000
-#define CONVERTING 0x2000
-#define FINISHED_TASK 0x4000
-#define EXIT_THREAD 0x8000
+#define AQUIRE_CAMERAS 0x80
+#define CAMERAS_AQUIRED 0x100
+#define RELEASE_CAMERAS 0x200
+#define AQUIRE_FAIL 0x400
+#define START_CAPTURE 0x800
+#define CAPTURING 0x1000
+#define USB_HERE 0x2000 // Use this as flag for Server alive too, since we wont trigger without USB
+#define CONVERTING 0x4000
+#define FINISHED_CONVERT 0x8000
+#define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
 typedef struct usb_data {
-    uint16_t flags;
-    uint16_t fps;
+    uint32_t flags;
+    uint32_t fps;
     uint32_t time_waiting; // Currently Time between not ready and ready
     uint64_t count;
 };
 
-typedef struct USB_THD_DATA {
-    // Do I need this?
-    uint16_t flags;
-    uint16_t fps;
-    std::mutex* crit;
-};
 
 /*class ConfData(Structure) :
     __fields__ = [('horz', c_uint),
@@ -134,7 +129,7 @@ typedef struct USB_THD_DATA {
     ('flags', c_uint16)]
 */
 
-typedef struct receive_dat {
+typedef struct TCP_IP_DAT {
     uint32_t horz;
     uint32_t vert;
     uint32_t fps;
@@ -142,7 +137,21 @@ typedef struct receive_dat {
     uint32_t bpp;
     uint32_t capTime;
     char path[255];
-    uint16_t flags;
+    uint32_t flags;
+};
+
+typedef struct USB_THD_DATA {
+    // Do I need this?
+    TCP_IP_DAT* incoming_data;
+    TCP_IP_DAT* outgoing_data;
+    std::mutex* crit;
+};
+
+typedef struct SERVER_THD_DATA {
+    TCP_IP_DAT* incoming_data;
+    TCP_IP_DAT* outgoing_data;
+    std::condition_variable* signal_ptr;
+    std::mutex* mtx_ptr;
 };
 
 #endif

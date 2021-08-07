@@ -1,7 +1,10 @@
 #include "server_thread.h"
 
-void* server_thread(void* server_data)
+void* SERVER_THREAD(void* server_data)
 {
+    
+    SERVER_THD_DATA* server_thread_data = (SERVER_THD_DATA*)server_data;
+
     WSADATA wsaData;
     int iResult;
 
@@ -59,7 +62,8 @@ void* server_thread(void* server_data)
 
     freeaddrinfo(result);
 
-    receive_dat rec_dat;
+    //tcp_ip_dat rec_dat;
+
 
     while (running) {
 
@@ -87,29 +91,41 @@ void* server_thread(void* server_data)
 
         // Receive until the peer shuts down the connection
         do {
+            std::unique_lock<std::mutex> critical(*server_thread_data->mtx_ptr);
+            iResult = recv(ClientSocket, (char*)&server_thread_data->incoming_data, sizeof(TCP_IP_DAT), 0);
+            critical.unlock();
 
-            iResult = recv(ClientSocket, (char*)&rec_dat, sizeof(receive_dat), 0);
+
             if (iResult > 0) {
-                printf("Bytes received: %d\n", iResult);
-                printf("messege: %s\n", rec_dat.path);
-                printf("Horz: %u\n", rec_dat.horz);
-                printf("Vert: %u\n", rec_dat.vert);
-                printf("fps: %u\n", rec_dat.fps);
-                printf("exp: %u\n", rec_dat.exp);
-                printf("bpp: %u\n", rec_dat.bpp);
-                printf("capTime: %u\n", rec_dat.capTime);
-                printf("flags: %u\n", rec_dat.flags);
-
-                if (iResult < recvbuflen) {
-                    recvbuf[iResult] = '\0';
+                /*printf("Bytes received: %d\n", iResult);
+                printf("messege: %s\n", server_thread_data->incoming_data->path);
+                printf("Horz: %u\n", server_thread_data->incoming_data->horz);
+                printf("Vert: %u\n", server_thread_data->incoming_data->vert);
+                printf("fps: %u\n", server_thread_data->incoming_data->fps);
+                printf("exp: %u\n", server_thread_data->incoming_data->exp);
+                printf("bpp: %u\n", server_thread_data->incoming_data->bpp);
+                printf("capTime: %u\n", server_thread_data->incoming_data->capTime);
+                printf("flags: %u\n", server_thread_data->incoming_data->flags);*/
+                critical.lock();
+                if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | AQUIRE_CAMERAS | START_CAPTURE | EXIT_THREAD)) {
+                    // Wakeup main loop if one of these event flags is present
+                    server_thread_data->signal_ptr->notify_one();
+                    if (server_thread_data->incoming_data->flags & EXIT_THREAD) {
+                        running = false;
+                    }
+                    critical.unlock();
                 }
+                else {
+                    critical.unlock();
+                }
+
                 // Echo the buffer back to the sender
-                iSendResult = send(ClientSocket, recvbuf, iResult, 0);
+                iSendResult = send(ClientSocket, (char*)&server_thread_data->outgoing_data, sizeof(TCP_IP_DAT), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed with error: %d\n", WSAGetLastError());
                     closesocket(ClientSocket);
                     WSACleanup();
-                   break;
+                    //return 1;
                 }
                 printf("Bytes sent: %d\n\n", iSendResult);
             }

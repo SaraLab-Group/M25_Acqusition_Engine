@@ -98,31 +98,33 @@ void* USB_THREAD(void* data)
     //outgoing.fps = thd_data->fps;
     uint8_t send_data = 1;
     uint8_t running = 1;
-    
+
+
     /*****************************************************************************************/
     while (running) {
         // Signaling
         //printf("top of the mornin to yah\n");
-        if (thd_data->flags & CHANGE_CONFIG) {
-            outgoing.fps = thd_data->fps;
-            outgoing.flags |= CHANGE_CONFIG;
+        std::unique_lock flg(*thd_data->crit);
+        if (thd_data->incoming_data->flags & CHANGE_CONFIG && !(thd_data->outgoing_data->flags & ACK_CMD)) {          
+            outgoing.fps = thd_data->incoming_data->fps;
+            outgoing.flags |= CHANGE_CONFIG;           
+            thd_data->outgoing_data->flags |= ACK_CMD;            
             send_data = 1;
         }
 
-        std::unique_lock<std::mutex> flg(*thd_data->crit);
-        if (thd_data->flags & START_COUNT) {
+        if (thd_data->incoming_data->flags & START_COUNT) {
             outgoing.flags |= START_COUNT;
             send_data = 1;
         }
         
-        if (thd_data->flags & STOP_COUNT) {
+        if (thd_data->incoming_data->flags & STOP_COUNT) {
             outgoing.flags |= STOP_COUNT;
 
             send_data = 1;
         }
         flg.unlock();
 
-        if (thd_data->flags & EXIT_THREAD) {
+        if (thd_data->incoming_data->flags & EXIT_THREAD) {
             running = 0;
         }
 
@@ -138,7 +140,9 @@ void* USB_THREAD(void* data)
                 printf("success: bulk write %d bytes\n", ret);
             }
             outgoing.flags = 0; //~(CHANGE_FPS);
-            thd_data->flags = 0;
+            //flg.lock();
+            //thd_data->incoming_data->flags &= ~CHANGE_CONFIG;
+            //flg.unlock();
             send_data = 0;
         }
         //#endif
@@ -167,6 +171,10 @@ void* USB_THREAD(void* data)
         }
         else if (ret > 0)
         {
+            std::unique_lock<std::mutex> crit(*thd_data->crit);
+            thd_data->outgoing_data->flags |= USB_HERE;
+            crit.unlock();
+
             if (incoming.flags & START_COUNT) {
                 //printf("flags: %u\n", incoming.flags);
                 printf("fps: %u\n", incoming.fps);

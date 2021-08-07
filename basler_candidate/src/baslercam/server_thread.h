@@ -17,6 +17,6 @@
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-void* server_thread(void* server_data);
+void* SERVER_THREAD(void* server_data);
 
 #endif
