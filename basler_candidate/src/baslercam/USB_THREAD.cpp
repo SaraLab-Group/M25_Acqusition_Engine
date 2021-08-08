@@ -104,14 +104,22 @@ void* USB_THREAD(void* data)
     while (running) {
         // Signaling
         //printf("top of the mornin to yah\n");
-        std::unique_lock flg(*thd_data->crit);
-        if (thd_data->incoming_data->flags & CHANGE_CONFIG && !(thd_data->outgoing_data->flags & ACK_CMD)) {          
-            outgoing.fps = thd_data->incoming_data->fps;
-            outgoing.flags |= CHANGE_CONFIG;           
-            thd_data->outgoing_data->flags |= ACK_CMD;            
-            send_data = 1;
+        std::unique_lock<std::mutex> flg(*thd_data->crit2);
+        if (thd_data->incoming_data->flags & CHANGE_CONFIG) {
+            //printf("Outer IF\n");
+            if (!(thd_data->outgoing_data->flags & ACK_CMD)) {
+                printf("USB_CHANGE CONF\n");
+                outgoing.fps = thd_data->incoming_data->fps;
+                outgoing.flags |= CHANGE_CONFIG;
+                thd_data->outgoing_data->flags |= ACK_CMD;
+                send_data = 1;
+            }
         }
-
+        
+        // This shouldn't ever have a deadlock
+        // This MUTEX is only accessed by the
+        // Aquisition stage
+        std::unique_lock<std::mutex> cnt_lk(*thd_data->crit);
         if (thd_data->incoming_data->flags & START_COUNT) {
             outgoing.flags |= START_COUNT;
             send_data = 1;
@@ -122,14 +130,18 @@ void* USB_THREAD(void* data)
 
             send_data = 1;
         }
-        flg.unlock();
+        cnt_lk.unlock();
+        
 
         if (thd_data->incoming_data->flags & EXIT_THREAD) {
             running = 0;
         }
+        flg.unlock();
 
         if (send_data) {
+            //flg.lock();
             ret = usb_bulk_write(dev, EP_OUT, (char*)&outgoing, sizeof(usb_data), 5000);
+            //flg.unlock();
             //#endif
             if (ret < 0)
             {
@@ -163,7 +175,10 @@ void* USB_THREAD(void* data)
         //#else
                 // Running a sync read test
         //printf("before read\n");
+        //flg.lock();
         ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)&incoming, sizeof(usb_data), 0);
+        //flg.unlock();
+        //printf("ret: %d\n", ret);
         //#endif
         if (ret < 0)
         {
@@ -171,15 +186,16 @@ void* USB_THREAD(void* data)
         }
         else if (ret > 0)
         {
-            std::unique_lock<std::mutex> crit(*thd_data->crit);
+            //printf("something_returened\n");
+            flg.lock();
             thd_data->outgoing_data->flags |= USB_HERE;
-            crit.unlock();
+            flg.unlock();
 
             if (incoming.flags & START_COUNT) {
                 //printf("flags: %u\n", incoming.flags);
                 printf("fps: %u\n", incoming.fps);
                 //printf("time_waiting: %u\n", incoming.time_waiting);
-                printf("counter: %zu, period: %zu\n", incoming.count, incoming.time_waiting);
+                printf("counter: %l64u, period: %l32u\n", incoming.count, incoming.time_waiting);
             }
             //printf("success: bulk read %d bytes\n", ret);
             //printf("flags: %u\n", incoming.flags);

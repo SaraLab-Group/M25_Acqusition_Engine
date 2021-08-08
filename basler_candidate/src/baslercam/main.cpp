@@ -16,9 +16,11 @@ Alternatively, the grabbing can be started using the internal grab loop threads
 of all cameras in the CInstantCameraArray. The grabbed images can then be processed by one or more
 image event handlers. Please note that this is not shown in this example.
 */
-
+//#pragma once
+//#include "project_headers.h"
 #include "USB_THREAD.h" // For USB function pointer used for threading.
 #include "server_thread.h" // For inter process communication
+#include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
 
 
 
@@ -113,6 +115,7 @@ double old = 0.0; //variable to test trigger delay
 
 // Mutex for thread signals
 std::mutex crit;
+std::mutex crit2;
 
 //A prototype
 void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
@@ -730,15 +733,18 @@ int main(int argc, char* argv[])
 	server_thread_data.incoming_data = &incoming;
 	server_thread_data.outgoing_data = &outgoing;
 	server_thread_data.signal_ptr = &signal_main;
-	server_thread_data.mtx_ptr = &crit;
+	server_thread_data.mtx_ptr = &crit2;
 	
 	usb_thread_data.incoming_data = &incoming;
 	usb_thread_data.outgoing_data = &outgoing;
 
 	usb_thread_data.crit = &crit;
+	usb_thread_data.crit2 = &crit2;
 
-	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
+	// Start the USB and Server Threads
 	std::thread USB_THD_OBJ(USB_THREAD, (void*)&usb_thread_data);
+	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
+
     
 	cam_data cam_dat[c_maxCamerasToUse];
 	std::vector<std::string> serials;
@@ -746,48 +752,64 @@ int main(int argc, char* argv[])
 	unsigned int total_cams;
 	uint64_t image_size;
 
+
+	// This will act as the primary interface to change configurations, aquire cameras, start image capture, etc.
+	// I am using bitwise logical comparisons to check status and configuration flags.
 	while (active) {
+		//printf("Top of Main While\n");
 		std::unique_lock slp(sleep_loop);
+		//printf("Sleeping Self\n");
 		signal_main.wait(slp);
-		std::unique_lock prot(crit);
-		if (incoming.flags & AQUIRE_CAMERAS) {
-			incoming.flags &= ~AQUIRE_CAMERAS;
+		printf("Waking Up\n");
+		std::unique_lock prot(crit2);
+		if (incoming.flags & ACQUIRE_CAMERAS) {
+			incoming.flags &= ~ACQUIRE_CAMERAS;
+			outgoing.flags |= ACQUIRING_CAMERAS;
+			printf("Acquiring\n");
 			prot.unlock();
 			if (aquire_cameras(&serials, cam_dat, &total_cams, &image_size)) {
 				prot.lock();
-				outgoing.flags |= AQUIRE_FAIL;
+				outgoing.flags |= ACQUIRE_FAIL;
 				prot.unlock();
 			}
 			else {
 				prot.lock();
-				outgoing.flags |= CAMERAS_AQUIRED;
+				outgoing.flags |= CAMERAS_ACQUIRED;
+				outgoing.flags &= ~ACQUIRING_CAMERAS;
 				prot.unlock();
 			}
 		}
-		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_AQUIRED) {
+		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~RELEASE_CAMERAS;
+			printf("Release Cameras\n");
 			prot.unlock();
 			// Releases all pylon resources. 
 			PylonTerminate();
 			prot.lock();
-			outgoing.flags &= ~CAMERAS_AQUIRED;
+
+			outgoing.flags &= ~(CAMERAS_ACQUIRED | ACQUIRE_FAIL);
 			prot.unlock();
 		}
-		else if (incoming.flags & CHANGE_CONFIG && !(outgoing.flags & CAPTURING)) {
+		else if (incoming.flags & CHANGE_CONFIG && ~(outgoing.flags & (CAPTURING | CONFIG_CHANGED | CAMERAS_ACQUIRED))) {
 			prot.unlock();
+			printf("Change Config\n");
+
 			horz = incoming.horz;
 			vert = incoming.vert;
 			exposure = incoming.exp;
 			bitDepth = incoming.bpp;
 			fps = incoming.fps;
 			seconds = incoming.capTime;
-			if (outgoing.flags & CAMERAS_AQUIRED) {
+			tiff_dir = incoming.path;
+
+			/*if (outgoing.flags & CAMERAS_ACQUIRED) {
 				for (int i = 0; i < total_cams; i++) {
+					printf("Does this ever get here?\n");
 					cam_dat[i].camPtr->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
 				}
-			}
+			}*/
 			prot.lock();
-			outgoing.flags |= CHANGE_CONFIG;
+			outgoing.flags |= (CONFIG_CHANGED | CHANGE_CONFIG);
 			prot.unlock();
 		}
 		else {

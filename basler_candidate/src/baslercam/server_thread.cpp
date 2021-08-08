@@ -1,9 +1,16 @@
 #include "server_thread.h"
+#include <windows.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <cstdint>
 
 void* SERVER_THREAD(void* server_data)
 {
-    
+    printf("Starting Server\n");
     SERVER_THD_DATA* server_thread_data = (SERVER_THD_DATA*)server_data;
+    printf("Horz: %u\n",server_thread_data->incoming_data->horz);
 
     WSADATA wsaData;
     int iResult;
@@ -64,7 +71,7 @@ void* SERVER_THREAD(void* server_data)
 
     //tcp_ip_dat rec_dat;
 
-
+    printf("Starting Server Loop\n");
     while (running) {
 
         iResult = listen(ListenSocket, SOMAXCONN);
@@ -88,16 +95,18 @@ void* SERVER_THREAD(void* server_data)
 
         // No longer need server socket
         //closesocket(ListenSocket);
-
         // Receive until the peer shuts down the connection
+        //printf("sizeof(TCP_IP_DAT): %d\n", sizeof(TCP_IP_DAT));
         do {
             std::unique_lock<std::mutex> critical(*server_thread_data->mtx_ptr);
-            iResult = recv(ClientSocket, (char*)&server_thread_data->incoming_data, sizeof(TCP_IP_DAT), 0);
+            iResult = recv(ClientSocket, (char*)server_thread_data->incoming_data, sizeof(TCP_IP_DAT), 0);
             critical.unlock();
 
-
+            //printf("iResult: %d \n", iResult);
             if (iResult > 0) {
                 /*printf("Bytes received: %d\n", iResult);
+                critical.lock();
+              
                 printf("messege: %s\n", server_thread_data->incoming_data->path);
                 printf("Horz: %u\n", server_thread_data->incoming_data->horz);
                 printf("Vert: %u\n", server_thread_data->incoming_data->vert);
@@ -105,9 +114,19 @@ void* SERVER_THREAD(void* server_data)
                 printf("exp: %u\n", server_thread_data->incoming_data->exp);
                 printf("bpp: %u\n", server_thread_data->incoming_data->bpp);
                 printf("capTime: %u\n", server_thread_data->incoming_data->capTime);
-                printf("flags: %u\n", server_thread_data->incoming_data->flags);*/
+                printf("flags: %u\n", server_thread_data->incoming_data->flags);
+                printf("Before Mutex Lock\n");*/
                 critical.lock();
-                if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | AQUIRE_CAMERAS | START_CAPTURE | EXIT_THREAD)) {
+
+                // This statement addresses an issue with the USB THREAD and MAIN THREAD both needing to respond to the CHANGE_CONFIG flag; 
+                if (server_thread_data->outgoing_data->flags & CONFIG_CHANGED && server_thread_data->outgoing_data->flags & ACK_CMD) {
+                    server_thread_data->incoming_data->flags &= ~CHANGE_CONFIG;
+                    server_thread_data->outgoing_data->flags &= ~(CHANGE_CONFIG | CONFIG_CHANGED | ACK_CMD);
+                    printf("This Should stop CHANGE_CONFIG\n");
+                }
+
+
+                if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | ACQUIRE_CAMERAS | RELEASE_CAMERAS | START_CAPTURE | EXIT_THREAD)) {
                     // Wakeup main loop if one of these event flags is present
                     server_thread_data->signal_ptr->notify_one();
                     if (server_thread_data->incoming_data->flags & EXIT_THREAD) {
@@ -118,16 +137,18 @@ void* SERVER_THREAD(void* server_data)
                 else {
                     critical.unlock();
                 }
-
+                //printf("After Mutex Lock\n");
                 // Echo the buffer back to the sender
-                iSendResult = send(ClientSocket, (char*)&server_thread_data->outgoing_data, sizeof(TCP_IP_DAT), 0);
+                critical.lock();
+                iSendResult = send(ClientSocket, (char*)server_thread_data->outgoing_data, sizeof(TCP_IP_DAT), 0);
+                critical.unlock();
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed with error: %d\n", WSAGetLastError());
                     closesocket(ClientSocket);
                     WSACleanup();
                     //return 1;
                 }
-                printf("Bytes sent: %d\n\n", iSendResult);
+                //printf("Bytes sent: %d\n\n", iSendResult);
             }
             else if (iResult == 0)
                 printf("Connection closing...\n");

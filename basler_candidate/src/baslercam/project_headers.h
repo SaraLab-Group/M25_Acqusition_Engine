@@ -19,26 +19,24 @@
 #include <condition_variable> // For Waking Write Thread
 #include <barrier>
 #include <vector>
-#include <cstdlib>
+//#include <cstdlib> // why this and stdlib.h
 #include <iostream>
 #include <sstream>
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <direct.h>
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
-#include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
+//#include <Windows.h> //Needed For windows CreateFile and WriteFile File Handle libraries.
 
 
 #ifndef _WIN32
 #include <pthread.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstdint>
+
 #include <mutex>
 
 
@@ -99,21 +97,23 @@ typedef struct cam_event {
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
-#define AQUIRE_CAMERAS 0x80
-#define CAMERAS_AQUIRED 0x100
+#define ACQUIRE_CAMERAS 0x80
+#define CAMERAS_ACQUIRED 0x100
 #define RELEASE_CAMERAS 0x200
-#define AQUIRE_FAIL 0x400
+#define ACQUIRE_FAIL 0x400
 #define START_CAPTURE 0x800
 #define CAPTURING 0x1000
 #define USB_HERE 0x2000 // Use this as flag for Server alive too, since we wont trigger without USB
 #define CONVERTING 0x4000
 #define FINISHED_CONVERT 0x8000
+#define ACQUIRING_CAMERAS 0x10000
+#define CONFIG_CHANGED 0x20000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
 typedef struct usb_data {
-    uint32_t flags;
-    uint32_t fps;
+    uint16_t flags;
+    uint16_t fps;
     uint32_t time_waiting; // Currently Time between not ready and ready
     uint64_t count;
 };
@@ -145,6 +145,7 @@ typedef struct USB_THD_DATA {
     TCP_IP_DAT* incoming_data;
     TCP_IP_DAT* outgoing_data;
     std::mutex* crit;
+    std::mutex* crit2;
 };
 
 typedef struct SERVER_THD_DATA {
