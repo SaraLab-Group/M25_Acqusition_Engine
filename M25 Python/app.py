@@ -21,6 +21,26 @@ HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 27015        # The port used by the server
 run = True
 
+CHANGE_CONFIG = 0x1
+DROPPED_FRAME = 0x2
+SET_RTC = 0x4
+ACK_CMD = 0x8
+START_COUNT = 0x10
+COUNTING = 0x20
+STOP_COUNT = 0x40
+ACQUIRE_CAMERAS = 0x80
+CAMERAS_ACQUIRED = 0x100
+RELEASE_CAMERAS = 0x200
+AQUIRE_FAIL = 0x400
+START_CAPTURE = 0x800
+CAPTURING = 0x1000
+USB_HERE = 0x2000 #Use this as flag for Server alive too, since we wont trigger without USB
+CONVERTING = 0x4000
+FINISHED_CONVERT = 0x8000
+ACQUIRING_CAMERAS = 0x10000
+CONFIG_CHANGED = 0x20000
+EXIT_THREAD = 0x80000000
+DEFAULT_FPS = 65
 
 class ConfData(Structure):
     __fields__ = [('horz', c_uint32),
@@ -51,11 +71,13 @@ capTime: int = 10
 path = "\0"*255
 path = "D:\\Ant1 Test\\tiff"
 flags: int = 0
-exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\winsock_adventure_server\x64\Debug'
-myEXE = "winsock_adventure_server.exe"
+exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\ide\x64\Debug'
+myEXE = "Basler_Candidate.exe"
 
 write_mutex = threading.Lock()
 def client_thread():
+    #time.sleep(2)
+    prevFlag = 0
     while run:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
@@ -70,10 +92,12 @@ def client_thread():
             global flags
             write_mutex.acquire()
             values = (horz, vert, fps, exp, bpp, capTime, path.encode(), flags)
-            packer = struct.Struct('L L L L L L 255s H')
+            packer = struct.Struct('L L L L L L 255s L')
             packed_data = packer.pack(*values)
             s.sendall(packed_data)
-
+            #print('flags: %d' % int(flags))
+            flags = 0
+            #print('flags after: %d' % int(flags))
             write_mutex.release()
             #print(inData.path);
             #outData: bytes = inData
@@ -87,20 +111,26 @@ def client_thread():
              rec_flags) = unpack(
                 'L L L L L L'
                 '255s'
-                'H',
+                'L',
                 data
             )
         #pathStr = convert(rec_path)
-        print('Received horz: %d' % int(rec_horz))
-        print('Received vert: %d' % int(rec_vert))
-        print('Received fps: %d' % int(rec_fps))
-        print('Received exp: %d' % int(rec_exp))
-        print('Received bpp: %d' % int(rec_bpp))
-        print('Received capTime: %d' % int(rec_capTime))
-        print('Received path: %s' % rec_path)
-        print('Received flags: %d' % int(rec_flags))
+        #print('Received horz: %d' % int(rec_horz))
+        #print('Received vert: %d' % int(rec_vert))
+        #print('Received fps: %d' % int(rec_fps))
+        #print('Received exp: %d' % int(rec_exp))
+        #print('Received bpp: %d' % int(rec_bpp))
+        #print('Received capTime: %d' % int(rec_capTime))
+        #print('Received path: %s' % rec_path)
+        write_mutex.acquire()
+        if prevFlag != rec_flags:
+            print('Received flags: %d' % int(rec_flags))
+
+        flags = flags | rec_flags
+        prevFlag = rec_flags
+        write_mutex.release()
         #print('Received ' + repr(data))
-        time.sleep(0.5)
+        time.sleep(0.1)
 
 
 th = threading.Thread(target=client_thread)
@@ -193,6 +223,36 @@ class Window(QMainWindow, Ui_MainWindow):
         global path
         path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
         self.WritePLineEdit.setText(path)
+
+    def AcquireState(self):
+        global flags
+        global write_mutex
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED or flags & CAPTURING:
+            pass
+        else:
+            flags |= ACQUIRE_CAMERAS
+        write_mutex.release()
+
+    def ReleaseState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAPTURING:
+            pass
+        else:
+            flags |= RELEASE_CAMERAS
+        write_mutex.release()
+
+    def ConfState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAPTURING or flags & ACQUIRING_CAMERAS or flags & CAMERAS_ACQUIRED:
+            pass
+        else:
+            flags |= CHANGE_CONFIG
+        write_mutex.release()
 
     def closeEvent(self, event):
         print('close event fired')
