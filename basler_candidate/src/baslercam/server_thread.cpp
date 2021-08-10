@@ -71,6 +71,8 @@ void* SERVER_THREAD(void* server_data)
 
     //tcp_ip_dat rec_dat;
 
+    uint16_t usb_count = 50;
+
     printf("Starting Server Loop\n");
     while (running) {
 
@@ -118,18 +120,36 @@ void* SERVER_THREAD(void* server_data)
                 printf("Before Mutex Lock\n");*/
                 critical.lock();
 
-                // This statement addresses an issue with the USB THREAD and MAIN THREAD both needing to respond to the CHANGE_CONFIG flag; 
-                if (server_thread_data->outgoing_data->flags & CONFIG_CHANGED && server_thread_data->outgoing_data->flags & ACK_CMD) {
+                // This statement addresses an issue with the USB THREAD and MAIN THREAD both needing to respond to the CHANGE_CONFIG flag;
+                /*std::unique_lock<std::mutex> usb_srv_lk(*server_thread_data->usb_srv_mtx);
+                if (server_thread_data->outgoing_data->flags & CONFIG_CHANGED && server_thread_data->usb_outgoing->flags & ACK_CMD) {
                     server_thread_data->incoming_data->flags &= ~CHANGE_CONFIG;
+                    server_thread_data->usb_outgoing->flags &= ~ACK_CMD;
                     server_thread_data->outgoing_data->flags &= ~(CHANGE_CONFIG | CONFIG_CHANGED | ACK_CMD);
                     printf("This Should stop CHANGE_CONFIG\n");
                 }
-
+                usb_srv_lk.unlock();*/
+                std::unique_lock<std::mutex> usb_srv_lk(*server_thread_data->usb_srv_mtx);
+                if (server_thread_data->usb_outgoing->flags & USB_HERE) {
+                    server_thread_data->outgoing_data->flags |= USB_HERE;
+                    server_thread_data->outgoing_data->fps = server_thread_data->usb_outgoing->fps;
+                } 
+                usb_srv_lk.unlock();
 
                 if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | ACQUIRE_CAMERAS | RELEASE_CAMERAS | START_CAPTURE | EXIT_THREAD)) {
                     // Wakeup main loop if one of these event flags is present
-                    server_thread_data->signal_ptr->notify_one();
+                    usb_srv_lk.lock();
+                    if (server_thread_data->incoming_data->flags & CHANGE_CONFIG) {
+                        printf("setting usb change_config flag\n");
+                        server_thread_data->usb_outgoing->flags |= CHANGE_CONFIG;
+                        server_thread_data->usb_outgoing->fps = server_thread_data->incoming_data->fps;
+                    }
+                    usb_srv_lk.unlock();
+
+                    server_thread_data->signal_ptr->notify_one(); // Wakes up Main Loop
+
                     if (server_thread_data->incoming_data->flags & EXIT_THREAD) {
+                        server_thread_data->usb_incoming->flags |= EXIT_THREAD;
                         running = false;
                     }
                     critical.unlock();

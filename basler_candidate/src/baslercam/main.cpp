@@ -107,8 +107,8 @@ uint32_t horz = horz_max;
 uint32_t vert = vert_max;
 uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
-uint8_t bitDepth = 8;
-uint8_t fps = 65;
+uint32_t bitDepth = 8;
+uint32_t fps = 65;
 
 
 double old = 0.0; //variable to test trigger delay
@@ -116,6 +116,7 @@ double old = 0.0; //variable to test trigger delay
 // Mutex for thread signals
 std::mutex crit;
 std::mutex crit2;
+std::mutex crit3; // For USB SERVER data;
 
 //A prototype
 void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
@@ -705,14 +706,16 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 
 // Prototypes because to many things defined before main and I don't like it
 int aquire_cameras(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
-
+void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
+usb_data usb_incoming, usb_outgoing;
 SERVER_THD_DATA server_thread_data;
 std::condition_variable signal_main;
 std::mutex sleep_loop;
 TCP_IP_DAT incoming, outgoing;
+std::vector<cam_event> events[25]; // This is for testing for dropped frames
 bool active = true;
 
 
@@ -724,22 +727,25 @@ int main(int argc, char* argv[])
 	// Just setting defaults not really needed 
 	incoming.horz = horz;
 	incoming.vert = vert;
-	incoming.fps = fps;
+	usb_outgoing.fps = incoming.fps = fps;
 	incoming.exp = exposure;
 	incoming.bpp = bitDepth;
 	incoming.capTime = seconds;
-	incoming.flags = 0;
+	usb_incoming.flags = incoming.flags = 0;
 
 	server_thread_data.incoming_data = &incoming;
 	server_thread_data.outgoing_data = &outgoing;
+	server_thread_data.usb_incoming = &usb_incoming;
+	server_thread_data.usb_outgoing = &usb_outgoing;
 	server_thread_data.signal_ptr = &signal_main;
 	server_thread_data.mtx_ptr = &crit2;
+	server_thread_data.usb_srv_mtx = &crit3;
 	
-	usb_thread_data.incoming_data = &incoming;
-	usb_thread_data.outgoing_data = &outgoing;
+	usb_thread_data.incoming = &usb_incoming;
+	usb_thread_data.outgoing = &usb_outgoing;
 
 	usb_thread_data.crit = &crit;
-	usb_thread_data.crit2 = &crit2;
+	usb_thread_data.usb_srv_mtx = &crit3;
 
 	// Start the USB and Server Threads
 	std::thread USB_THD_OBJ(USB_THREAD, (void*)&usb_thread_data);
@@ -747,10 +753,14 @@ int main(int argc, char* argv[])
 
     
 	cam_data cam_dat[c_maxCamerasToUse];
+
+	// For keeping track of which index has which serial
+    // A switch case could be used to Number the cameras to their position
+    // to ease readability and processing if desired.
+
 	std::vector<std::string> serials;
-	std::vector<cam_event> events[25]; // This is for testing for dropped frames
 	unsigned int total_cams;
-	uint64_t image_size;
+	uint64_t image_size = ((horz * vert) / 8) * bitDepth;;
 
 
 	// This will act as the primary interface to change configurations, aquire cameras, start image capture, etc.
@@ -790,8 +800,8 @@ int main(int argc, char* argv[])
 			outgoing.flags &= ~(CAMERAS_ACQUIRED | ACQUIRE_FAIL);
 			prot.unlock();
 		}
-		else if (incoming.flags & CHANGE_CONFIG && ~(outgoing.flags & (CAPTURING | CONFIG_CHANGED | CAMERAS_ACQUIRED))) {
-			prot.unlock();
+		else if (incoming.flags & CHANGE_CONFIG && ~(outgoing.flags & (CAPTURING |CAMERAS_ACQUIRED))) {
+
 			printf("Change Config\n");
 
 			horz = incoming.horz;
@@ -801,6 +811,8 @@ int main(int argc, char* argv[])
 			fps = incoming.fps;
 			seconds = incoming.capTime;
 			tiff_dir = incoming.path;
+			image_size = ((horz * vert) / 8) * bitDepth;
+			//prot.unlock();
 
 			/*if (outgoing.flags & CAMERAS_ACQUIRED) {
 				for (int i = 0; i < total_cams; i++) {
@@ -808,9 +820,20 @@ int main(int argc, char* argv[])
 					cam_dat[i].camPtr->RegisterConfiguration(new CTriggerConfiguration, RegistrationMode_Append, Cleanup_Delete);
 				}
 			}*/
-			prot.lock();
-			outgoing.flags |= (CONFIG_CHANGED | CHANGE_CONFIG);
+			//prot.lock();
+			incoming.flags &= ~CHANGE_CONFIG;
 			prot.unlock();
+		}
+		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+			incoming.flags &= ~START_CAPTURE;
+			outgoing.flags |= CAPTURING;
+			prot.unlock();
+			start_capture(&serials, cam_dat, &total_cams, &image_size);
+		}
+		else if (incoming.flags & EXIT_THREAD) {
+			usb_outgoing.flags |= EXIT_USB;
+			prot.unlock();
+			active = false;
 		}
 		else {
 			// Ultimately We shouldn't ever get here
@@ -822,495 +845,10 @@ int main(int argc, char* argv[])
 	}
 
 
-		// Starts grabbing for all cameras starting with index 0. The grabbing
-		// is started for one camera after the other. That's why the images of all
-		// cameras are not taken at the same time.
-		// However, a hardware trigger setup can be used to cause all cameras to grab images synchronously.
-		// According to their default configuration, the cameras are
-		// set up for free-running continuous acquisition.
 
-		/* This might need to be initialized in the threads or as threads are created */
-		// *** cameras.StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByInstantCamera);
 
 
-		//cameras.StartGrabbing(GrabStrategy_LatestImageOnly, GrabLoop_ProvidedByInstantCamera);
-		//GrabStrategy_LatestImageOnly
-
-
-
-		//Testing to turn on and off the lines
-		//bool flag = 0;
-		//INodeMap& nodemap = pcam[0]->GetNodeMap();
-		//INodeMap& nodemap2 = cameras[1].GetNodeMap();
-		//bool status = 0;
-		//bool previous = 1;
-		//bool finished = false;
-
-		// Should this be monitored in Write Thread?
-		uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
-
-		// Create the Write Directory "Root"
-		_mkdir(strDirectryName.c_str());
-
-		//append path for destination folder
-		strDirectryName += "\\binaries";
-
-		_mkdir(tiff_dir.c_str());
-
-		tiff_dir += "\\tiff";
-
-		// create subfolders
-		_mkdir(strDirectryName.c_str());
-		_mkdir(tiff_dir.c_str());
-
-		/**************************************************/
-		/* To be put into the body of the capture threads */
-		/**************************************************/
-
-		// To Do: rewrite his into a full function, but how to pass data into it easily?
-		// Unfortunately standard barrier does not allow pointers to be made of it
-		// nor References, so I need to either make it global or initialize it in the scope
-		// of the lamda functions I'm using to make my thread loop.
-
-		// frames will probably need to come from the tcp/ip pycromanager interface
-		frames = seconds * fps;
-		// How Many Large Binary Chunks of 100 frames we'll Write
-		uint64_t binary_chunks = seconds;
-
-		// Our Buffer Size is 100 Frames, which should be 1 second at 100fps
-		// Currently we are set to only 8bits and not handling crop factor
-		// image_size moved up before cams are attached
-		// data_size is the actual size of the data stored which
-		// may or may not be byte aligned.
-
-		uint64_t frame_size = image_size * total_cams;
-		uint64_t data_size = frame_size * fps;
-		uint64_t buff_size = data_size;
-
-		// Just make sure the buffer is sector aligned
-		// Any "Slack" will go unused and be no more than
-		// 511 Bytes
-
-		if (buff_size % ALIGNMENT_BYTES) {
-			buff_size += (ALIGNMENT_BYTES - (buff_size % ALIGNMENT_BYTES));
-		}
-
-		// Allocate Aligned buffers
-		// lets dynamically allocate buffers through testing with windows SDK
-		// It was revealed that our NVM uses 512B sectors; therfore, we must
-		// allign our data to be written to 512B sectors to do so we can use
-		// _aligned_malloc( size_wanted, alignment)
-		// must use _aligned_free();
-
-		uint8_t* buff1 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
-		uint8_t* buff2 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
-		head_buff1 = buff1;
-		head_buff2 = buff2;
-		uint8_t* in_buff = buff1;
-		uint8_t* out_buff = buff2;
-
-		// Attempting to Pre-Initialize Memory
-		// To see if it helped early slow start
-		// Next I will try to fill the buffers for 200 frames or 2 seconds before
-		// Storing data as an attempt to get all of the Caches behaving.
-
-		/*for (uint64_t i = 0; i < buff_size; i++) {
-			buff1 = 0;
-			buff2 = 0;
-		}*/
-
-		// Some Mutex stuff
-		std::condition_variable cnt_v; // For sleeping and waking write
-		std::mutex lk; // Requred for the condition_variable to sleep.
-		std::mutex ded; // Prevent Write getting behind
-
-
-		// This is the magical mythical buffer swap
-		uint32_t swap_counter = 0;
-		uint8_t toggle = 0;
-		uint8_t begin_writing = 0;
-		uint8_t pre_write = 0;
-		uint32_t swap_count = 0;
-
-
-		auto buffer_swap = [&]() noexcept {
-			// Currently Swaps Buffer every fps Frames
-			//std::cout << "Completed Cycle: " << std::endl;
-			if (pre_write > 1) {
-				if (frame_count == 0) {
-					std::unique_lock<std::mutex> flg(crit);
-					usb_thread_data.incoming_data->flags |= START_COUNT;
-					flg.unlock();
-				}
-				if (!begin_writing && frame_count == fps - 1) {
-					begin_writing = 1;
-				}
-				frame_count++;
-			}
-
-
-			if (frame_count == frames) {
-				capture = false;
-				std::unique_lock<std::mutex> flg(crit);
-				usb_thread_data.incoming_data->flags |= STOP_COUNT;
-				flg.unlock();
-				//cnt_v.notify_one(); // Wake me up inside
-			}
-
-			if (swap_counter >= fps - 1) {
-
-				std::cout << "Swapping Count: " << swap_count++ << std::endl;
-				if (toggle) {
-					in_buff = head_buff1;
-					out_buff = head_buff2;
-					toggle = !toggle;
-				}
-				else {
-					in_buff = head_buff2;
-					out_buff = head_buff1;
-					toggle = !toggle;
-				}
-				// Write Thread Starts off Sleeping
-				// Waiting for this function to wake it
-				swap_counter = 0;
-				// Allow Buffer to fill twice before Collecting data.
-				// This will allow both buffers to be initialized
-				// Hopefully reducing caching latency.
-
-				if (begin_writing) {
-					std::unique_lock<std::mutex> mtx(ded); // Really this lock blocks from moving forward until the write thread is ready to be woken.
-					//mtx.lock();
-					cnt_v.notify_one(); // Wake me up inside
-					mtx.unlock(); // unlunk
-				}
-				else {
-					pre_write++;
-				}
-			}
-			else {
-				in_buff += frame_size;
-				swap_counter++;
-			}
-
-		};
-
-		// This Synchronization primitive makes sure all of the cams complete before starting again
-		// It also atomically calls buffer swap to handle buffer incrementing and signaling write thread
-		std::barrier sync_point(total_cams, buffer_swap);
-
-		capture = true;
-		write_count = 0;
-		frame_count = 0;
-
-		// This is the begining fo my lambda function for the camera capture threads.
-		auto cam_thd = [&](cam_data* cam) {
-
-			//cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
-			//cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
-
-			CGrabResultPtr ptrGrabResult;
-			INodeMap& nodemap = cam->camPtr->GetNodeMap();
-			//Find if all the cameras are ready
-
-			while (capture) {
-				// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
-				//auto start = chrono::steady_clock::now();
-				cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
-
-				// Image grabbed successfully?
-				if (ptrGrabResult->GrabSucceeded())
-				{
-					// A little Pointer Arithmatic never hurt anybody
-					memcpy((void*)(in_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
-					if (pre_write > 1) {
-						cam_event thd_event;
-						thd_event.frame = frame_count;
-						//thd_event.missed_frame_count = ptrGrabResult->GetNumberOfSkippedImages();
-						//thd_event.sensor_readout = CFloatPtr(nodemap.GetNode("SensorReadoutTime"))->GetValue();   //Microseconds					
-						thd_event.time_stamp = ptrGrabResult->GetTimeStamp() / 1.0;
-						events[cam->number].push_back(thd_event);
-					}
-
-					// Hurry up and wait
-					sync_point.arrive_and_wait();
-				}
-				else
-				{
-					// Give us an error message.  Camera 14 is the only one I've seen hit this.
-					std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << " cam: " << serials[cam->number] << endl;
-					// Hurry up and wait
-					sync_point.arrive_and_wait();
-				}
-				//auto end = chrono::steady_clock::now();
-				//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
-
-				//std::cout << "Taken Time for saving image to ram: " << (int)cam->number << " " << elapsed << "us" << endl;
-
-			}
-			//std::cout << "thd: " << (int)cam->number << " joining" << std::endl;
-		};
-
-		// struct for write thread;
-		write_data mr_write;
-		// becomes false after desired frames grabbed.
-		mr_write.first = true;
-		mr_write.cam_count = total_cams;
-
-		// Write Thread "Lamda Function"
-		auto write_thrd = [&](write_data* ftw) {
-			// This Mutex is for preventing the write thread from getting 
-			// behind the Read Threads and miss it's wake signal from
-			// The Barier Completion function
-			std::unique_lock<std::mutex> mtx(ded);
-			
-			while (write_count < binary_chunks) {
-				// Takes the lock then decides to take a nap
-				// Until the buffer is ready to write
-		
-				// This if statement is a crutch to prevent an early attempt to wake the thread
-				// on the last write call.
-				if (capture) {
-					std::unique_lock<std::mutex> lck(lk); // lock for control signal.
-					mtx.unlock(); // ded mutex
-					cnt_v.wait(lck); // Woken by Barrier Completion
-					mtx.lock(); // ded mutex This is for preventing the buffer swap thread from waking write thread before it's finished
-				}
-				//std::cout << "Past Lock" << std::endl;
-
-				//auto start = chrono::steady_clock::now();
-				std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
-				saveBigBuffer(Filename.c_str(), out_buff, ftw->cam_count, buff_size);
-				write_count++;
-				//auto end = chrono::steady_clock::now();
-				//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
-
-				//std::cout << "Taken Time for writing frame:" << write_count << " " << elapsed << "us" << endl;
-			}
-			//std::cout << "Write thd joining" << std::endl;
-		};
-
-		std::cout << "Building Threads: " << std::endl;
-		std::vector<std::thread> threads;
-		for (int i = 0; i < total_cams; i++) {
-			threads.emplace_back(cam_thd, &cam_dat[i]);
-		}
-
-		threads.emplace_back(write_thrd, &mr_write);
-		auto start = chrono::steady_clock::now();
-		// Join the Threads. This should block until capture done
-		for (auto& thread : threads) {
-			thread.join();
-		}
-
-		auto end = chrono::steady_clock::now();
-		long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
-		std::cout << "Total Time: " << elapsed << "us" << endl;
-		std::cout << "Total Time Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
-
-
-		std::cout << "Image Aquisition Finished" << std::endl;
-
-		// Sanity Check
-		//uint32_t val = 255;
-		
-		/*for (int i = 0; i < buff_size; i++) {
-			buff1[i] = 255;
-		}*/
-	  
-#ifdef CONVERT_TIFF
-		std::cout << "Converting images to tif" << std::endl;
-		// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
-		// to boost the write throughput more. It should be noted that we are currently unable to 
-		// Write to USB external drives for some odd reason.
-
-		// I'm reusing the Barrier Mutex concept from earlier
-
-		/* This is the end condition lamda for the barrier mutex it load the Chunk to be 
-		    Split into individual tif files by the worker threads. */
-
-		uint8_t write_files = 1;
-		uint32_t chunk_number = 0;
-		uint16_t save_threads = 20;
-
-		std::vector<uint8_t> thread_row;
-		
-		for (int i = 0; i < save_threads; i++) {
-			uint16_t row = i;
-			thread_row.push_back(row);
-		}
-
-		auto completion_condition = [&]() noexcept {
-			//std::cout << "completion has happened" << std::endl;
-			for (int i = 0; i < save_threads; i++) {
-				thread_row[i] += save_threads;
-			}
-			if (thread_row[save_threads - 1] > fps) {
-				chunk_number++;
-				//std::cout << " " << chunk_number << " ";
-				if (chunk_number > binary_chunks - 1) {
-					// Don't read more files
-					write_files = 0;
-					//std::cout << "^";
-				}
-				else {
-					std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
-					uint64_t outNumberofBytes;
-					//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
-					readFile(Filename.c_str(), &outNumberofBytes, buff1);
-					for (int i = 0; i < save_threads; i++) {
-						thread_row[i] = i;
-					}
-				}
-			}
-
-		};
-
-		std::barrier sync_point2(save_threads, completion_condition);
-
-		// re using cam_data out of convinience
-
-		auto save_img = [&](cam_data* cam) {
-
-			
-			while (write_files) {
-				for (int i = 0; i < total_cams; i++) {
-					std::string tiff_path = tiff_dir + "\\" + serials[i];
-					_mkdir(tiff_path.c_str()); //make the dir
-					std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
-					//std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
-
-					CPylonImage srcImage;
-					if (bitDepth > 8) {
-						srcImage.AttachUserBuffer((void*)(buff1 + (i * image_size) + (thread_row[cam->number] * frame_size)), image_size, PixelType_Mono16, horz, vert, 0);
-					}
-					else {
-						srcImage.AttachUserBuffer((void*)(buff1 + (i * image_size) + (thread_row[cam->number] * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
-					}
-					if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
-					    // Making Write Atomic Just in case.
-						// Reusing the Mutext from earlier.
-						//std::unique_lock<std::mutex> lck(lk);
-						CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
-						//lck.unlock();
-					}
-					else {
-						std::cout << "not a tiff needs conversion" << std::endl;
-					}
-				}
-				std::cout << '.';
-			    sync_point2.arrive_and_wait();
-			}
-			//std::cout << "thread: " << (int)cam->number << " exiting." << std::endl;
-		};
-
-
-		/* Load First Buffer Before Starting Threads */
-		/* chunk_number should already be set to 0 */
-
-		start = chrono::steady_clock::now();
-
-		std::string Filename = strDirectryName + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
-		uint64_t outNumberofBytes;
-		//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
-		readFile(Filename.c_str(), &outNumberofBytes, buff1);
-
-		threads.clear();// purge old threads
-
-		// Being Lazy and recycling the same syntax
-		for (int i = 0; i < save_threads; i++) {
-			threads.emplace_back(save_img, &cam_dat[i]);
-		}
-
-		// Join the Threads. This should block until write done
-		for (auto& thread : threads) {
-			thread.join();
-		}
-		end = chrono::steady_clock::now();
-		elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
-		std::cout << std::endl;
-		std::cout << "Total Time To Write Tiff: " << elapsed << "us" << std::endl;
-		std::cout << "Total Time To Write in Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
-#endif
-
-		// This is tripple Nested... Is there a better way to do this?
-
-		// Outer loop which CHUNK are we reading
-		/*for (int i = 0; i < binary_chunks; i++) {
-			std::string Filename = strDirectryName + "\\binary_chunk" + std::to_string(i) + ".bin";
-			uint64_t outNumberofBytes;
-			//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
-			readFile(Filename.c_str(), &outNumberofBytes, buff1);
-			//std::cout << "size read: " << outNumberofBytes << std::endl;
-
-			// Middle Loop which frame index are we readng from the chunk?
-			for (int j = 0; j < fps; j++) {
-				std::cout << ".";
-				
-				// Inner Loop Which Camera are we reading from the chunk
-				for (int k = 0; k < total_cams; k++) {
-				*/	//std::string Dir = "camera" + std::to_string(k);
-					//std::string tiff_folders = "\\.\PhysicalDrive1\\Ant1 Test\\" + serials[k];
-					/*if (*//*_mkdir(serials[k].c_str());*//*) {
-						std::cout << "but why can't I write: " << std::endl;
-					}*/
-					/*std::string filename = serials[k] + "\\image" + std::to_string(j + i*fps) + ".tif";
-
-					CPylonImage srcImage;
-					if(bitDepth > 8){
-						srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono16, horz, vert, 0);
-					}
-					else {
-						srcImage.AttachUserBuffer((void*)(buff1 + (k * image_size) + (j * frame_size)), image_size, PixelType_Mono8, horz, vert, 0);
-					}
-					if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
-						CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
-					}
-					else {
-						std::cout << "not a tiff needs conversion" << std::endl;
-					}
-					*//*if ((events[k][j].missed_frame_count - events[k][0].missed_frame_count)) {
-						std::cout << "Missed Frame Count cam: " << serials[k] << " = " << events[k][j].missed_frame_count - events[k][0].missed_frame_count << std::endl;
-					}*/
-				/*}
-			}
-		}*/
-
-		std::cout << std::endl << "Finished Converting to tif" << std::endl;
-
-		uint32_t max_dropped = 0;
-		// Checking For Longer than acceptable Frame Times
-		for (int i = 0; i < 25; i++) {
-			uint32_t dropped_frames = 0;
-			int64_t prev = events[i][0].time_stamp;
-			int64_t first_miss_cnt = events[i][0].missed_frame_count;
-			for (int j = 1; j < frames; j++) {
-				if (events[i].size() > j) {
-					if ((abs(events[i][j].time_stamp - prev)) > float(50000) + 1 / ((float)fps) * 1e9) {
-						std::cout << "camera: " << i << std::endl;
-						//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
-						std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
-						dropped_frames++;
-						//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
-						//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
-					}
-
-					prev = events[i][j].time_stamp;
-				}
-				else {
-					std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
-				}
-			}
-			std::cout << ".";
-			max_dropped = max(max_dropped, dropped_frames);
-		}
-		std::cout << std::endl;
-		std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
-		std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
-
-		// Free These Aligned Buffers PLEASE!
-		_aligned_free(buff1);
-		_aligned_free(buff2);
-		usb_thread_data.incoming_data->flags |= EXIT_THREAD;
+		// usb_thread_data.incoming->flags |= EXIT_THREAD;
 		USB_THD_OBJ.join();
 		SRVR_THD_OBJ.join();
 		//auto start = chrono::steady_clock::now();
@@ -1351,7 +889,7 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 
 	// Want to create an offset for the cameras for array arithmatic here
 	// Once Pycro and Micro Manager TCP IP is implemented we will change this to be user set
-	*image_size = ((horz * vert) / 8) * bitDepth;
+	
 
 	// Nice day to try some code.
 	try
@@ -1378,9 +916,7 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 		CInstantCamera* pcam[c_maxCamerasToUse];
 		
 
-		// For keeping track of which index has which serial
-		// A switch case could be used to Number the cameras to their position
-		// to ease readability and processing if desired.
+
 		// std::vector<std::string> serials;
 		// std::vector<cam_event> events[25];
 
@@ -1407,11 +943,6 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 				throw RUNTIME_EXCEPTION("The device doesn't support events.");
 			}
 
-			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("ExposureEnd");
-			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
-			//CEnumerationPtr(nodemap.GetNode("EventSelector"))->FromString("FrameStartWait");
-			//CEnumerationPtr(nodemap.GetNode("EventNotification"))->FromString("On");
-
 			serials->push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
 			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
 			cam_dat[i].number = i;
@@ -1433,4 +964,457 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 		//USB_THD_OBJ.join();
 		return 1;
 	}
+}
+
+// A really Beefy Function.  Handles all of the Capture and Convert.
+void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+	// Should this be monitored in Write Thread?
+	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
+
+	// Create the Write Directory "Root"
+	_mkdir(strDirectryName.c_str());
+
+	//append path for destination folder
+	//strDirectryName += "\\binaries";
+
+	_mkdir(tiff_dir.c_str());
+
+	//tiff_dir += "\\tiff";
+
+	// create subfolders
+	_mkdir(strDirectryName.c_str());
+	_mkdir(tiff_dir.c_str());
+
+	/**************************************************/
+	/* To be put into the body of the capture threads */
+	/**************************************************/
+
+	// To Do: rewrite his into a full function, but how to pass data into it easily?
+	// Unfortunately standard barrier does not allow pointers to be made of it
+	// nor References, so I need to either make it global or initialize it in the scope
+	// of the lamda functions I'm using to make my thread loop.
+
+	// frames will probably need to come from the tcp/ip pycromanager interface
+	frames = seconds * fps;
+	printf("frames: %u\n", frames);
+	// How Many Large Binary Chunks of 100 frames we'll Write
+	uint64_t binary_chunks = seconds;
+
+	// Our Buffer Size is 100 Frames, which should be 1 second at 100fps
+	// Currently we are set to only 8bits and not handling crop factor
+	// image_size moved up before cams are attached
+	// data_size is the actual size of the data stored which
+	// may or may not be byte aligned.
+
+	uint64_t frame_size = (*image_size) * (*total_cams);
+	uint64_t data_size = frame_size * fps;
+	uint64_t buff_size = data_size;
+
+	// Just make sure the buffer is sector aligned
+	// Any "Slack" will go unused and be no more than
+	// 511 Bytes
+
+	if (buff_size % ALIGNMENT_BYTES) {
+		buff_size += (ALIGNMENT_BYTES - (buff_size % ALIGNMENT_BYTES));
+	}
+
+	// Allocate Aligned buffers
+	// lets dynamically allocate buffers through testing with windows SDK
+	// It was revealed that our NVM uses 512B sectors; therfore, we must
+	// allign our data to be written to 512B sectors to do so we can use
+	// _aligned_malloc( size_wanted, alignment)
+	// must use _aligned_free();
+
+	uint8_t* buff1 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
+	uint8_t* buff2 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
+	head_buff1 = buff1;
+	head_buff2 = buff2;
+	uint8_t* in_buff = buff1;
+	uint8_t* out_buff = buff2;
+
+	// Attempting to Pre-Initialize Memory
+	// To see if it helped early slow start
+	// Next I will try to fill the buffers for 200 frames or 2 seconds before
+	// Storing data as an attempt to get all of the Caches behaving.
+
+	/*for (uint64_t i = 0; i < buff_size; i++) {
+		buff1 = 0;
+		buff2 = 0;
+	}*/
+
+	// Some Mutex stuff
+	std::condition_variable cnt_v; // For sleeping and waking write
+	std::mutex lk; // Requred for the condition_variable to sleep.
+	std::mutex ded; // Prevent Write getting behind
+
+
+	// This is the magical mythical buffer swap
+	uint32_t swap_counter = 0;
+	uint8_t toggle = 0;
+	uint8_t begin_writing = 0;
+	uint8_t pre_write = 0;
+	uint32_t swap_count = 0;
+
+
+	auto buffer_swap = [&]() noexcept {
+		// Currently Swaps Buffer every fps Frames
+		//std::cout << "Completed Cycle: " << std::endl;
+		if (pre_write > 1) {
+			if (frame_count == 0) {
+				std::cout << "START_COUNT" << std::endl;
+				std::unique_lock<std::mutex> flg(crit);
+				usb_thread_data.outgoing->flags |= START_COUNT;
+				flg.unlock();
+			}
+			if (!begin_writing && frame_count == fps - 1) {
+				begin_writing = 1;
+			}
+			frame_count++;
+		}
+
+
+		if (frame_count == frames) {
+			capture = false;
+			std::cout << "START_COUNT" << std::endl;
+			std::unique_lock<std::mutex> flg(crit);
+			usb_thread_data.outgoing->flags |= STOP_COUNT;
+			flg.unlock();
+			//cnt_v.notify_one(); // Wake me up inside
+		}
+
+		if (swap_counter >= fps - 1) {
+
+			std::cout << "Swapping Count: " << swap_count++ << std::endl;
+			if (toggle) {
+				in_buff = head_buff1;
+				out_buff = head_buff2;
+				toggle = !toggle;
+			}
+			else {
+				in_buff = head_buff2;
+				out_buff = head_buff1;
+				toggle = !toggle;
+			}
+			// Write Thread Starts off Sleeping
+			// Waiting for this function to wake it
+			swap_counter = 0;
+			// Allow Buffer to fill twice before Collecting data.
+			// This will allow both buffers to be initialized
+			// Hopefully reducing caching latency.
+
+			if (begin_writing) {
+				std::unique_lock<std::mutex> mtx(ded); // Really this lock blocks from moving forward until the write thread is ready to be woken.
+				//mtx.lock();
+				cnt_v.notify_one(); // Wake me up inside
+				mtx.unlock(); // unlunk
+			}
+			else {
+				pre_write++;
+			}
+		}
+		else {
+			in_buff += frame_size;
+			swap_counter++;
+		}
+
+	};
+
+	// This Synchronization primitive makes sure all of the cams complete before starting again
+	// It also atomically calls buffer swap to handle buffer incrementing and signaling write thread
+	std::barrier sync_point(*total_cams, buffer_swap);
+
+	capture = true;
+	write_count = 0;
+	frame_count = 0;
+
+	// This is the begining fo my lambda function for the camera capture threads.
+	auto cam_thd = [&](cam_data* cam) {
+
+		//cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
+		//cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+
+		CGrabResultPtr ptrGrabResult;
+		INodeMap& nodemap = cam->camPtr->GetNodeMap();
+		//Find if all the cameras are ready
+
+		while (capture) {
+			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
+			//auto start = chrono::steady_clock::now();
+			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
+
+			// Image grabbed successfully?
+			if (ptrGrabResult->GrabSucceeded())
+			{
+				// A little Pointer Arithmatic never hurt anybody
+				memcpy((void*)(in_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
+				if (pre_write > 1) {
+					cam_event thd_event;
+					thd_event.frame = frame_count;
+					//thd_event.missed_frame_count = ptrGrabResult->GetNumberOfSkippedImages();
+					//thd_event.sensor_readout = CFloatPtr(nodemap.GetNode("SensorReadoutTime"))->GetValue();   //Microseconds					
+					thd_event.time_stamp = ptrGrabResult->GetTimeStamp() / 1.0;
+					events[cam->number].push_back(thd_event);
+				}
+
+				// Hurry up and wait
+				sync_point.arrive_and_wait();
+			}
+			else
+			{
+				// Give us an error message.  Camera 14 is the only one I've seen hit this.
+				std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << " cam: " << (*serials)[cam->number] << endl;
+				// Hurry up and wait
+				sync_point.arrive_and_wait();
+			}
+			//auto end = chrono::steady_clock::now();
+			//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+
+			//std::cout << "Taken Time for saving image to ram: " << (int)cam->number << " " << elapsed << "us" << endl;
+
+		}
+		//std::cout << "thd: " << (int)cam->number << " joining" << std::endl;
+	};
+
+	// struct for write thread;
+	write_data mr_write;
+	// becomes false after desired frames grabbed.
+	mr_write.first = true;
+	mr_write.cam_count = *total_cams;
+
+	// Write Thread "Lamda Function"
+	auto write_thrd = [&](write_data* ftw) {
+		// This Mutex is for preventing the write thread from getting 
+		// behind the Read Threads and miss it's wake signal from
+		// The Barier Completion function
+		std::unique_lock<std::mutex> mtx(ded);
+
+		while (write_count < binary_chunks) {
+			// Takes the lock then decides to take a nap
+			// Until the buffer is ready to write
+
+			// This if statement is a crutch to prevent an early attempt to wake the thread
+			// on the last write call.
+			if (capture) {
+				std::unique_lock<std::mutex> lck(lk); // lock for control signal.
+				mtx.unlock(); // ded mutex
+				cnt_v.wait(lck); // Woken by Barrier Completion
+				mtx.lock(); // ded mutex This is for preventing the buffer swap thread from waking write thread before it's finished
+			}
+			//std::cout << "Past Lock" << std::endl;
+
+			//auto start = chrono::steady_clock::now();
+			std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
+			saveBigBuffer(Filename.c_str(), out_buff, ftw->cam_count, buff_size);
+			write_count++;
+			//auto end = chrono::steady_clock::now();
+			//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+
+			//std::cout << "Taken Time for writing frame:" << write_count << " " << elapsed << "us" << endl;
+		}
+		//std::cout << "Write thd joining" << std::endl;
+	};
+
+	std::cout << "Building Threads: " << std::endl;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < *total_cams; i++) {
+		threads.emplace_back(cam_thd, &cam_dat[i]);
+	}
+
+	threads.emplace_back(write_thrd, &mr_write);
+	auto start = chrono::steady_clock::now();
+	// Join the Threads. This should block until capture done
+	for (auto& thread : threads) {
+		thread.join();
+	}
+
+	auto end = chrono::steady_clock::now();
+	long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+	std::cout << "Total Time: " << elapsed << "us" << endl;
+	std::cout << "Total Time Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
+
+
+	std::cout << "Image Aquisition Finished" << std::endl;
+
+	std::unique_lock<std::mutex> flg(crit2);
+	outgoing.flags &= ~CAPTURING;
+	flg.unlock();
+
+	// Sanity Check
+	//uint32_t val = 255;
+
+	/*for (int i = 0; i < buff_size; i++) {
+		buff1[i] = 255;
+	}*/
+
+#ifdef CONVERT_TIFF
+
+	flg.lock();
+	outgoing.flags |= CONVERTING;
+	flg.unlock();
+
+	std::cout << "Converting images to tif" << std::endl;
+	// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
+	// to boost the write throughput more. It should be noted that we are currently unable to 
+	// Write to USB external drives for some odd reason.
+
+	// I'm reusing the Barrier Mutex concept from earlier
+
+	/* This is the end condition lamda for the barrier mutex it load the Chunk to be
+		Split into individual tif files by the worker threads. */
+
+	uint8_t write_files = 1;
+	uint32_t chunk_number = 0;
+	uint16_t save_threads = 5; // Five seems like a magic number
+	if (fps < 5) {
+		save_threads = 1;
+	}
+
+	std::vector<uint8_t> thread_row;
+
+	for (int i = 0; i < save_threads; i++) {
+		uint16_t row = i;
+		thread_row.push_back(row);
+	}
+
+	auto completion_condition = [&]() noexcept {
+		//std::cout << "completion has happened" << std::endl;
+		for (int i = 0; i < save_threads; i++) {
+			thread_row[i] += save_threads;
+		}
+		if (thread_row[save_threads - 1] > fps) {
+			chunk_number++;
+			//std::cout << " " << chunk_number << " ";
+			if (chunk_number > binary_chunks - 1) {
+				// Don't read more files
+				write_files = 0;
+				//std::cout << "^";
+			}
+			else {
+				std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+				uint64_t outNumberofBytes;
+				//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
+				readFile(Filename.c_str(), &outNumberofBytes, buff1);
+				for (int i = 0; i < save_threads; i++) {
+					thread_row[i] = i;
+				}
+			}
+		}
+
+	};
+
+	std::barrier sync_point2(save_threads, completion_condition);
+
+	// re using cam_data out of convinience
+
+	auto save_img = [&](cam_data* cam) {
+
+
+		while (write_files) {
+			for (int i = 0; i < *total_cams; i++) {
+				std::string tiff_path = tiff_dir + "\\" + (*serials)[i];
+				_mkdir(tiff_path.c_str()); //make the dir
+				std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+				//std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+
+				CPylonImage srcImage;
+				if (bitDepth > 8) {
+					srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono16, horz, vert, 0);
+				}
+				else {
+					srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono8, horz, vert, 0);
+				}
+				if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
+					// Making Write Atomic Just in case.
+					// Reusing the Mutext from earlier.
+					//std::unique_lock<std::mutex> lck(lk);
+					CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
+					//lck.unlock();
+				}
+				else {
+					std::cout << "not a tiff needs conversion" << std::endl;
+				}
+			}
+			std::cout << '.';
+			sync_point2.arrive_and_wait();
+		}
+		//std::cout << "thread: " << (int)cam->number << " exiting." << std::endl;
+	};
+
+
+	/* Load First Buffer Before Starting Threads */
+	/* chunk_number should already be set to 0 */
+
+	start = chrono::steady_clock::now();
+
+	std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+	uint64_t outNumberofBytes;
+	//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
+	readFile(Filename.c_str(), &outNumberofBytes, buff1);
+
+	threads.clear();// purge old threads
+
+	// Being Lazy and recycling the same syntax
+	for (int i = 0; i < save_threads; i++) {
+		threads.emplace_back(save_img, &cam_dat[i]);
+	}
+
+	// Join the Threads. This should block until write done
+	for (auto& thread : threads) {
+		thread.join();
+	}
+	end = chrono::steady_clock::now();
+	elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+	std::cout << std::endl;
+	std::cout << "Total Time To Write Tiff: " << elapsed << "us" << std::endl;
+	std::cout << "Total Time To Write in Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
+	flg.lock();
+	outgoing.flags &= ~CONVERTING;
+	flg.unlock();
+
+#endif
+
+
+
+	std::cout << std::endl << "Finished Converting to tif" << std::endl;
+
+	uint32_t max_dropped = 0;
+	// Checking For Longer than acceptable Frame Times
+	for (int i = 0; i < 25; i++) {
+		uint32_t dropped_frames = 0;
+		int64_t prev = events[i][0].time_stamp;
+		int64_t first_miss_cnt = events[i][0].missed_frame_count;
+		for (int j = 1; j < frames; j++) {
+			if (events[i].size() > j) {
+				if ((abs(events[i][j].time_stamp - prev)) >  5.0 / ((float)fps * 4) * 1e9) {
+					std::cout << "camera: " << i << std::endl;
+					//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
+					std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
+					dropped_frames++;
+					//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
+					//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+				}
+
+				prev = events[i][j].time_stamp;
+			}
+			else {
+				std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
+			}
+		}
+		std::cout << ".";
+		max_dropped = max(max_dropped, dropped_frames);
+	}
+	std::cout << std::endl;
+	std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
+	std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
+
+	// Free These Aligned Buffers PLEASE!
+	_aligned_free(buff1);
+	_aligned_free(buff2);
+
+	// Clear Events for another Capture
+	for (int i = 0; i < 25; i++) {
+		events[i].clear();
+	}
+	// Clear Threads
+	threads.clear();
 }

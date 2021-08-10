@@ -111,6 +111,8 @@ typedef struct cam_event {
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
+#define EXIT_USB 0x8000
+
 typedef struct usb_data {
     uint16_t flags;
     uint16_t fps;
@@ -142,17 +144,20 @@ typedef struct TCP_IP_DAT {
 
 typedef struct USB_THD_DATA {
     // Do I need this?
-    TCP_IP_DAT* incoming_data;
-    TCP_IP_DAT* outgoing_data;
+    usb_data* incoming;
+    usb_data* outgoing;
     std::mutex* crit;
-    std::mutex* crit2;
+    std::mutex* usb_srv_mtx;
 };
 
 typedef struct SERVER_THD_DATA {
     TCP_IP_DAT* incoming_data;
     TCP_IP_DAT* outgoing_data;
+    usb_data* usb_incoming;
+    usb_data* usb_outgoing;
     std::condition_variable* signal_ptr;
     std::mutex* mtx_ptr;
+    std::mutex* usb_srv_mtx;
 };
 
 #endif

@@ -34,7 +34,7 @@ void* USB_THREAD(void* data)
 
     // The Magic of Pointers
     USB_THD_DATA* thd_data = (USB_THD_DATA*)data;
-    usb_data incoming, outgoing;
+    //usb_data incoming, outgoing;
 
     usb_init(); /* initialize the library */
     usb_find_busses(); /* find all busses */
@@ -93,7 +93,7 @@ void* USB_THREAD(void* data)
     //#else
 
     /* This is just a hard coded write test for sending frame rate change instruction to PSOC */
-    outgoing.flags = 0;
+    //thd_data->incoming->flags = CHANGE_CONFIG;
     //outgoing.flags |= CHANGE_FPS;
     //outgoing.fps = thd_data->fps;
     uint8_t send_data = 1;
@@ -104,44 +104,45 @@ void* USB_THREAD(void* data)
     while (running) {
         // Signaling
         //printf("top of the mornin to yah\n");
-        std::unique_lock<std::mutex> flg(*thd_data->crit2);
-        if (thd_data->incoming_data->flags & CHANGE_CONFIG) {
+        std::unique_lock<std::mutex> flg(*thd_data->usb_srv_mtx);
+        if (thd_data->outgoing->flags & CHANGE_CONFIG) {
             //printf("Outer IF\n");
-            if (!(thd_data->outgoing_data->flags & ACK_CMD)) {
-                printf("USB_CHANGE CONF\n");
-                outgoing.fps = thd_data->incoming_data->fps;
-                outgoing.flags |= CHANGE_CONFIG;
-                thd_data->outgoing_data->flags |= ACK_CMD;
+            //if (!(thd_data->outgoing->flags & ACK_CMD)) {
+                printf("****USB_CHANGE CONF****\n");
+                //thd_data->outgoing->fps = thd_data->incoming->fps;
+                //thd_data->incoming->flags &= ~CHANGE_CONFIG;
+                //thd_data->outgoing->flags |= CHANGE_CONFIG;
+                //thd_data->outgoing->flags |= ACK_CMD;
                 send_data = 1;
-            }
+            //}
         }
         
         // This shouldn't ever have a deadlock
         // This MUTEX is only accessed by the
         // Aquisition stage
         std::unique_lock<std::mutex> cnt_lk(*thd_data->crit);
-        if (thd_data->incoming_data->flags & START_COUNT) {
-            outgoing.flags |= START_COUNT;
+        if (thd_data->outgoing->flags & START_COUNT) {
+            //thd_data->outgoing->flags |= START_COUNT;
             send_data = 1;
         }
         
-        if (thd_data->incoming_data->flags & STOP_COUNT) {
-            outgoing.flags |= STOP_COUNT;
-
+        if (thd_data->outgoing->flags & STOP_COUNT) {
+            //thd_data->outgoing->flags |= STOP_COUNT;
+            //thd_data->outgoing->flags &= ~START_COUNT;
             send_data = 1;
         }
         cnt_lk.unlock();
         
 
-        if (thd_data->incoming_data->flags & EXIT_THREAD) {
+        if (thd_data->outgoing->flags & EXIT_USB) {
             running = 0;
         }
         flg.unlock();
 
         if (send_data) {
-            //flg.lock();
-            ret = usb_bulk_write(dev, EP_OUT, (char*)&outgoing, sizeof(usb_data), 5000);
-            //flg.unlock();
+            flg.lock();
+            ret = usb_bulk_write(dev, EP_OUT, (char*)thd_data->outgoing, sizeof(usb_data), 500);
+            flg.unlock();
             //#endif
             if (ret < 0)
             {
@@ -150,12 +151,18 @@ void* USB_THREAD(void* data)
             else
             {
                 printf("success: bulk write %d bytes\n", ret);
+                send_data = 0;
+                flg.lock();
+                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT); //~(CHANGE_FPS);
+                //thd_data->incoming->flags &= ~CHANGE_CONFIG;
+                flg.unlock();
             }
-            outgoing.flags = 0; //~(CHANGE_FPS);
+
             //flg.lock();
-            //thd_data->incoming_data->flags &= ~CHANGE_CONFIG;
+            //thd_data->outgoing->flags &= CHANGE_CONFIG; //~(CHANGE_FPS);
+            //thd_data->incoming->flags &= ~CHANGE_CONFIG;
             //flg.unlock();
-            send_data = 0;
+            //send_data = 0;
         }
         //#endif
 
@@ -176,7 +183,7 @@ void* USB_THREAD(void* data)
                 // Running a sync read test
         //printf("before read\n");
         //flg.lock();
-        ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)&incoming, sizeof(usb_data), 0);
+        ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)thd_data->incoming, sizeof(usb_data), 0);
         //flg.unlock();
         //printf("ret: %d\n", ret);
         //#endif
@@ -186,16 +193,18 @@ void* USB_THREAD(void* data)
         }
         else if (ret > 0)
         {
-            //printf("something_returened\n");
+            if (thd_data->incoming->fps != thd_data->outgoing->fps) {
+                printf("FPS: %u\n", thd_data->incoming->fps);
+            }
             flg.lock();
-            thd_data->outgoing_data->flags |= USB_HERE;
+            thd_data->outgoing->flags |= USB_HERE;
             flg.unlock();
 
-            if (incoming.flags & START_COUNT) {
+            if (thd_data->incoming->flags & START_COUNT) {
                 //printf("flags: %u\n", incoming.flags);
-                printf("fps: %u\n", incoming.fps);
+                printf("fps: %u\n", thd_data->incoming->fps);
                 //printf("time_waiting: %u\n", incoming.time_waiting);
-                printf("counter: %l64u, period: %l32u\n", incoming.count, incoming.time_waiting);
+                printf("counter: %zu, period: %lu\n", thd_data->incoming->count, thd_data->incoming->time_waiting);
             }
             //printf("success: bulk read %d bytes\n", ret);
             //printf("flags: %u\n", incoming.flags);
