@@ -254,7 +254,23 @@ class Window(QMainWindow, Ui_MainWindow):
             flags |= CHANGE_CONFIG
         write_mutex.release()
 
+    def CaptureState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED:
+            if flags & CAPTURING:
+                pass
+            else:
+                flags |= START_CAPTURE
+        write_mutex.release()
+
     def closeEvent(self, event):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        flags |= EXIT_THREAD
+        write_mutex.release()
         print('close event fired')
         global run
         run = False

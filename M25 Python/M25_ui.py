@@ -109,7 +109,7 @@ class Ui_MainWindow(object):
         self.radioButton.toggled.connect(self.onClicked)
         self.radioButton.value = 8
         self.radioButton_2.toggled.connect(self.onClicked)
-        self.radioButton_2.value = 12
+        self.radioButton_2.value = 16
         self.HorzLineEdit.setText("1920")
         self.HorzLineEdit.textChanged.connect(self.sync_HorzLineEdit)
         self.HorzLineEdit.setValidator(self.onlyInt)
@@ -132,6 +132,7 @@ class Ui_MainWindow(object):
         self.AcquireCamsButton.clicked.connect(self.AcquireState)
         self.ReleaseCamsButton.clicked.connect(self.ReleaseState)
         self.ConfButton.clicked.connect(self.ConfState)
+        self.CapturePushButton.clicked.connect(self.CaptureState)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
