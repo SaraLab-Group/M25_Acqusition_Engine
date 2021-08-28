@@ -61,11 +61,16 @@
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
+#define SOFT_TRIGG_MODE 0x40000
+#define TIMED_TRIGG_MODE 0x80000
+#define SEND_TRIGG 0x100000
+#define TRIGG_SENT 0x200000
+
 #define DEFAULT_FPS (100u)
 
 struct usb_data{
-    uint16 flags;
     uint16 fps;
+    uint32 flags;
     uint32 time_waiting; // Currently Time between not ready and ready
     uint64 count;
 };
@@ -109,6 +114,7 @@ int main(void)
     incoming.flags = outgoing.flags = 0;
     incoming.fps = outgoing.fps = 100;
     outgoing.count = 0;
+    outgoing.flags |= TIMED_TRIGG_MODE;
     
     CyGlobalIntEnable; /* Enable global interrupts. */
 
@@ -185,6 +191,14 @@ int main(void)
             /* Trigger DMA to copy data from OUT endpoint buffer. */
 
             USBFS_ReadOutEP(OUT_EP_NUM, (uint8*)&incoming, sizeof(struct usb_data));
+            if(incoming.flags & SEND_TRIGG){
+                    SOFT_TRIG_Reg_Write(REG_ON);
+                    CyDelayUs(100);
+                    SOFT_TRIG_Reg_Write(REG_OFF);
+                    incoming.flags &= ~(SEND_TRIGG);
+                    outgoing.flags |= TRIGG_SENT;
+            }
+            
             if(incoming.flags & CHANGE_FPS){
                 uint32 new_period = set_fps();
                 Frame_Period_Timer_WritePeriod(new_period);
@@ -220,6 +234,28 @@ int main(void)
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
+            } else if(incoming.flags & SOFT_TRIGG_MODE) {
+                Frame_Period_Timer_Stop();
+                incoming.flags &= ~(SOFT_TRIGG_MODE);
+                outgoing.flags |= ~(SOFT_TRIGG_MODE);
+                outgoing.flags &= ~(TIMED_TRIGG_MODE);
+                sprintf(msg2, "SOFT TRIGGER");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
+            } else if(incoming.flags & TIMED_TRIGG_MODE) {
+                Frame_Period_Timer_Start();
+                incoming.flags &= ~(TIMED_TRIGG_MODE);
+                outgoing.flags |= ~(TIMED_TRIGG_MODE);
+                outgoing.flags &= ~(SOFT_TRIGG_MODE);
+                sprintf(msg2, "TIMED TRIGGER");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
             }
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
@@ -245,6 +281,7 @@ int main(void)
             outgoing.time_waiting = time_btwn_trig;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
+            outgoing.flags &= ~(TRIGG_SENT);
             to_send = 0;
         }
         
