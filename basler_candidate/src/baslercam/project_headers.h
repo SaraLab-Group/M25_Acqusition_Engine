@@ -108,10 +108,42 @@ typedef struct cam_event {
 #define FINISHED_CONVERT 0x8000
 #define ACQUIRING_CAMERAS 0x10000
 #define CONFIG_CHANGED 0x20000
+#define SOFT_TRIGG_MODE 0x40000
+#define TIMED_TRIGG_MODE 0x80000
+#define SEND_TRIGG 0x100000
+#define TRIGG_SENT 0x200000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
 #define EXIT_USB 0x8000
+
+// Camera Serials
+#define CAM_1 23206716
+#define CAM_2 23206693
+#define CAM_3 23200570
+#define CAM_4 23206700
+#define CAM_5 23206715
+#define CAM_6 23200558
+#define CAM_7 23206703
+#define CAM_8 23206711
+#define CAM_9 23206710
+#define CAM_10 23206705
+#define CAM_11 23206719
+#define CAM_12 23206707
+#define CAM_13 23206694
+#define CAM_14 23206682
+#define CAM_15 23206683
+#define CAM_16 23206704
+#define CAM_17 23206692
+#define CAM_18 23206691
+#define CAM_19 23206718
+#define CAM_20 23206690
+#define CAM_21 23206701
+#define CAM_22 23200571
+#define CAM_23 23206706
+#define CAM_24 23059572
+#define CAM_25 23206684
+
 
 typedef struct usb_data {
     uint16_t flags;

@@ -157,7 +157,7 @@ void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
 * you MUST keep track of how many bytes you've written, and edit the dwBytesToWrite value to match (albiet aligned match)
 * the remaining bytes to write, otherwise it will just blindly keep writing beyond the memory you intended.
 * ***************************************************************************************************/
-void saveBigBuffer(const char* FileName, uint8_t* buffer, uint8_t cam_count, uint64_t aligned_size)
+void saveBigBuffer(const char* FileName, uint8_t* buffer/*, uint8_t cam_count*/, uint64_t aligned_size)
 {
 	uint8_t* pImageBuffer = (uint8_t*)buffer;
 	uint64_t bytes_written = 0;
@@ -1204,7 +1204,8 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 
 			//auto start = chrono::steady_clock::now();
 			std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
-			saveBigBuffer(Filename.c_str(), out_buff, ftw->cam_count, buff_size);
+			printf("%s\n", Filename.c_str());
+			saveBigBuffer(Filename.c_str(), out_buff, buff_size);
 			write_count++;
 			//auto end = chrono::steady_clock::now();
 			//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
@@ -1264,24 +1265,25 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 
 	uint8_t write_files = 1;
 	uint32_t chunk_number = 0;
-	uint16_t save_threads = 5; // Five seems like a magic number
-	if (fps < 5) {
+	uint16_t save_threads = *total_cams; // Five seems like a magic number
+	/*if (fps < 5) {
 		save_threads = 1;
-	}
+	}*/
 
-	std::vector<uint8_t> thread_row;
+	/*std::vector<uint8_t> thread_row;
 
 	for (int i = 0; i < save_threads; i++) {
 		uint16_t row = i;
 		thread_row.push_back(row);
-	}
+	}*/
+	int thread_row = 0;
 
 	auto completion_condition = [&]() noexcept {
 		//std::cout << "completion has happened" << std::endl;
-		for (int i = 0; i < save_threads; i++) {
-			thread_row[i] += save_threads;
-		}
-		if (thread_row[save_threads - 1] > fps) {
+		//for (int i = 0; i < save_threads; i++) {
+			thread_row += 1; //save_threads;
+		//}
+		if (thread_row >= fps) {
 			chunk_number++;
 			//std::cout << " " << chunk_number << " ";
 			if (chunk_number > binary_chunks - 1) {
@@ -1294,9 +1296,9 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 				uint64_t outNumberofBytes;
 				//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 				readFile(Filename.c_str(), &outNumberofBytes, buff1);
-				for (int i = 0; i < save_threads; i++) {
-					thread_row[i] = i;
-				}
+				//for (int i = 0; i < save_threads; i++) {
+					thread_row = 0;
+				//}
 			}
 		}
 
@@ -1304,36 +1306,52 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 
 	std::barrier sync_point2(save_threads, completion_condition);
 
-	// re using cam_data out of convinience
+	// **** re using cam_data out of convinience  ************ I need to change this It's confusing to revisit just reuses the index should match acquire order **********
 
 	auto save_img = [&](cam_data* cam) {
 
 
 		while (write_files) {
-			for (int i = 0; i < *total_cams; i++) {
-				std::string tiff_path = tiff_dir + "\\" + (*serials)[i];
+			//for (int i = 0; i < *total_cams; i++) {
+				std::string tiff_path = tiff_dir + "\\" + (*serials)[cam->number];
 				_mkdir(tiff_path.c_str()); //make the dir
-				std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+				//std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
+				std::string filename = tiff_path + "\\image" + std::to_string(thread_row + chunk_number * fps) + ".raw";
 				//std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
 
 				CPylonImage srcImage;
+				CImageFormatConverter converter;
+				CPylonImage dstImage;
 				if (bitDepth > 8) {
-					srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono16, horz, vert, 0);
+					saveBigBuffer(filename.c_str(), (uint8_t*)(buff1 + (cam->number * (*image_size)) + (thread_row * frame_size)), *image_size);
+					//srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono16, horz, vert, 0);
+					//converter.OutputPixelFormat = PixelType_Mono16;
 				}
 				else {
-					srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono8, horz, vert, 0);
+					saveBigBuffer(filename.c_str(), (uint8_t*)(buff1 + (cam->number * (*image_size)) + (thread_row * frame_size)), *image_size);
+					//srcImage.AttachUserBuffer((void*)(buff1 + (i * (*image_size)) + (thread_row[cam->number] * frame_size)), *image_size, PixelType_Mono8, horz, vert, 0);
+					//converter.OutputPixelFormat = PixelType_Mono16;
 				}
-				if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
+				/*if (CImagePersistence::CanSaveWithoutConversion(ImageFileFormat_Tiff, srcImage)) {
+					std::cout << "CPylonImage Size " << srcImage.GetImageSize() << std::endl;
+					std::cout << "image_size " << (int)*image_size << std::endl;
 					// Making Write Atomic Just in case.
 					// Reusing the Mutext from earlier.
 					//std::unique_lock<std::mutex> lck(lk);
-					CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
+					/*uint64_t align_size = srcImage.GetImageSize();
+					if (align_size % ALIGNMENT_BYTES) {
+						align_size += (ALIGNMENT_BYTES - (align_size % ALIGNMENT_BYTES));
+						std::cout << "align_size " << (int)align_size << std::endl;
+					}*/
+
+					//saveBigBuffer(filename.c_str(), (uint8_t*)srcImage.GetBuffer(), align_size);
+				/*	CImagePersistence::Save(ImageFileFormat_Tiff, String_t(filename.c_str()), srcImage);
 					//lck.unlock();
 				}
 				else {
 					std::cout << "not a tiff needs conversion" << std::endl;
-				}
-			}
+				}*/
+			//}
 			std::cout << '.';
 			sync_point2.arrive_and_wait();
 		}
