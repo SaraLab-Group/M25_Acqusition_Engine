@@ -762,6 +762,14 @@ int main(int argc, char* argv[])
 	unsigned int total_cams;
 	uint64_t image_size = ((horz * vert) / 8) * bitDepth;;
 
+	// Just make sure the buffer is sector aligned
+    // Any "Slack" will go unused and be no more than
+    // 511 Bytes
+
+	if (image_size % ALIGNMENT_BYTES) {
+		image_size += (ALIGNMENT_BYTES - (image_size % ALIGNMENT_BYTES));
+	}
+
 
 	// This will act as the primary interface to change configurations, aquire cameras, start image capture, etc.
 	// I am using bitwise logical comparisons to check status and configuration flags.
@@ -812,6 +820,12 @@ int main(int argc, char* argv[])
 			seconds = incoming.capTime;
 			tiff_dir = incoming.path;
 			image_size = ((horz * vert) / 8) * bitDepth;
+
+			// attempt to force sector alignment
+			if (image_size % ALIGNMENT_BYTES) {
+				image_size += (ALIGNMENT_BYTES - (image_size % ALIGNMENT_BYTES));
+			}
+
 			//prot.unlock();
 
 			/*if (outgoing.flags & CAMERAS_ACQUIRED) {

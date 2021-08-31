@@ -108,8 +108,8 @@ typedef struct cam_event {
 #define FINISHED_CONVERT 0x8000
 #define ACQUIRING_CAMERAS 0x10000
 #define CONFIG_CHANGED 0x20000
-#define SOFT_TRIGG_MODE 0x40000
-#define TIMED_TRIGG_MODE 0x80000
+#define STAGE_TRIGG_ENABLE 0x40000
+#define STAGE_TRIGG_DISABLE 0x80000
 #define SEND_TRIGG 0x100000
 #define TRIGG_SENT 0x200000
 #define EXIT_THREAD 0x80000000
@@ -146,8 +146,8 @@ typedef struct cam_event {
 
 
 typedef struct usb_data {
-    uint16_t flags;
     uint16_t fps;
+    uint32_t flags;
     uint32_t time_waiting; // Currently Time between not ready and ready
     uint64_t count;
 };
