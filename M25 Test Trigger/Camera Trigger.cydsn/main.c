@@ -61,12 +61,12 @@
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
-#define SOFT_TRIGG_MODE 0x40000
-#define TIMED_TRIGG_MODE 0x80000
+#define STAGE_TRIGG_ENABLE 0x40000
+#define STAGE_TRIGG_DISABLE 0x80000
 #define SEND_TRIGG 0x100000
 #define TRIGG_SENT 0x200000
 
-#define DEFAULT_FPS (100u)
+#define DEFAULT_FPS (60u)
 
 struct usb_data{
     uint16 fps;
@@ -112,16 +112,18 @@ int main(void)
 {
     //uint16 length;
     incoming.flags = outgoing.flags = 0;
-    incoming.fps = outgoing.fps = 100;
+    incoming.fps = outgoing.fps = DEFAULT_FPS;
     outgoing.count = 0;
-    outgoing.flags |= TIMED_TRIGG_MODE;
+    //outgoing.flags |= TIMED_TRIGG_MODE;
     
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     Trigger_Count_Start(); // Counts how many times a capture event has occured.
+    STROBE_Start();
     Frame_Period_Timer_Start(); // Main Capture Rate
     TRIG_PERIOD_Start(); //Counting Time Camera isn't Ready
+
     PERIOD_ISR_StartEx(PERIOD_ISR);
     //TRIG_ISR_StartEx(TRIG_ISR_BOD);
     LCD_Char_Start();
@@ -151,7 +153,7 @@ int main(void)
     while (0u == USBFS_GetConfiguration())
     {
     }
-
+    set_fps();
     /* Enable OUT endpoint to receive data from host. */
     USBFS_EnableOutEP(OUT_EP_NUM);
     
