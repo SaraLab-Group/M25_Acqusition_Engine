@@ -801,6 +801,12 @@ int main(int argc, char* argv[])
 			incoming.flags &= ~RELEASE_CAMERAS;
 			printf("Release Cameras\n");
 			prot.unlock();
+
+			// Stop the trigger timer
+			std::unique_lock<std::mutex> flg(*usb_thread_data.usb_srv_mtx);
+			usb_thread_data.outgoing->flags |= (RELEASE_CAMERAS);
+			flg.unlock();
+
 			// Releases all pylon resources. 
 			PylonTerminate();
 			prot.lock();
@@ -845,7 +851,7 @@ int main(int argc, char* argv[])
 			start_capture(&serials, cam_dat, &total_cams, &image_size);
 		}
 		else if (incoming.flags & EXIT_THREAD) {
-			usb_outgoing.flags |= EXIT_USB;
+			usb_outgoing.flags |= EXIT_THREAD;
 			prot.unlock();
 			active = false;
 		}
@@ -966,6 +972,12 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 		}
+
+		// Only allow trigger timer to run once all cameras are acquired to prevent the buffers
+		// From starting out of sync.
+		std::unique_lock<std::mutex> flg(*usb_thread_data.usb_srv_mtx);
+		usb_thread_data.outgoing->flags |= (CAMERAS_ACQUIRED);
+		flg.unlock();
 		return 0;
 	}
 	catch (const GenericException& e)

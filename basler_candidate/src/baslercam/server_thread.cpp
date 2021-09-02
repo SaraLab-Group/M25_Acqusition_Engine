@@ -149,7 +149,7 @@ void* SERVER_THREAD(void* server_data)
                     server_thread_data->signal_ptr->notify_one(); // Wakes up Main Loop
 
                     if (server_thread_data->incoming_data->flags & EXIT_THREAD) {
-                        server_thread_data->usb_incoming->flags |= EXIT_THREAD;
+                        server_thread_data->usb_outgoing->flags |= EXIT_THREAD;
                         running = false;
                     }
                     critical.unlock();

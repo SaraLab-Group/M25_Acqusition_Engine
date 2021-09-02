@@ -92,7 +92,7 @@ typedef struct cam_event {
 
 #define CHANGE_CONFIG 0x1
 #define DROPPED_FRAME 0x2
-#define SET_RTC 0x4
+#define NEW_CNT 0x4
 #define ACK_CMD 0x8
 #define START_COUNT 0x10
 #define COUNTING 0x20
@@ -115,7 +115,7 @@ typedef struct cam_event {
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
-#define EXIT_USB 0x8000
+//#define EXIT_USB 0x8000  Big Yikes
 
 // Camera Serials
 #define CAM_1 23206716

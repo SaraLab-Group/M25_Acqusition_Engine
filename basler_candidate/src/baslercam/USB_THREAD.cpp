@@ -105,7 +105,8 @@ void* USB_THREAD(void* data)
         // Signaling
         //printf("top of the mornin to yah\n");
         std::unique_lock<std::mutex> flg(*thd_data->usb_srv_mtx);
-        if (thd_data->outgoing->flags & CHANGE_CONFIG) {
+        //std::cout << "in usb mutex" << std::endl;
+        if (thd_data->outgoing->flags & (CHANGE_CONFIG | CAMERAS_ACQUIRED | RELEASE_CAMERAS)) {
             //printf("Outer IF\n");
             //if (!(thd_data->outgoing->flags & ACK_CMD)) {
                 printf("****USB_CHANGE CONF****\n");
@@ -134,7 +135,7 @@ void* USB_THREAD(void* data)
         cnt_lk.unlock();
         
 
-        if (thd_data->outgoing->flags & EXIT_USB) {
+        if (thd_data->outgoing->flags & EXIT_THREAD) {
             running = 0;
         }
         flg.unlock();
@@ -153,7 +154,7 @@ void* USB_THREAD(void* data)
                 printf("success: bulk write %d bytes\n", ret);
                 send_data = 0;
                 flg.lock();
-                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT); //~(CHANGE_FPS);
+                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT | CAMERAS_ACQUIRED | RELEASE_CAMERAS); //~(CHANGE_FPS);
                 //thd_data->incoming->flags &= ~CHANGE_CONFIG;
                 flg.unlock();
             }
@@ -183,7 +184,9 @@ void* USB_THREAD(void* data)
                 // Running a sync read test
         //printf("before read\n");
         //flg.lock();
+        //printf("USB.incoming.flags %u\n", thd_data->incoming->flags);
         ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)thd_data->incoming, sizeof(usb_data), 0);
+        //printf("USB.incoming.flags %u after\n", thd_data->incoming->flags);
         //flg.unlock();
         //printf("ret: %d\n", ret);
         //#endif
@@ -193,16 +196,17 @@ void* USB_THREAD(void* data)
         }
         else if (ret > 0)
         {
-            if (thd_data->incoming->fps != thd_data->outgoing->fps) {
+            /*if (thd_data->incoming->fps != thd_data->outgoing->fps) {
                 printf("FPS: %u\n", thd_data->incoming->fps);
-            }
+            }*/
             flg.lock();
             thd_data->outgoing->flags |= USB_HERE;
             flg.unlock();
 
-            if (thd_data->incoming->flags & START_COUNT) {
+            if (thd_data->incoming->flags & START_COUNT && thd_data->incoming->flags & NEW_CNT) {
                 //printf("flags: %u\n", incoming.flags);
                 printf("fps: %u\n", thd_data->incoming->fps);
+                printf("USB.incoming.flags %u after\n", thd_data->incoming->flags);
                 //printf("time_waiting: %u\n", incoming.time_waiting);
                 printf("counter: %zu, period: %lu\n", thd_data->incoming->count, thd_data->incoming->time_waiting);
             }
