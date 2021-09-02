@@ -153,14 +153,14 @@
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\and_v1_0.v</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\version.cypatch</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\and_v1_0\Custom\custom.cs</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.cysym</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.pdf</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.primitive</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.cystate</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\version.cypatch</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\Custom\custom.cs</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\PSoC5\API\intc.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\PSoC5\API\intc.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.cysym</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.pdf</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.primitive</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\cy_isr_v1_71.cystate</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\version.cypatch</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\Custom\custom.cs</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\PSoC5\API\intc.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_isr_v1_71\PSoC5\API\intc.h</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.cysym</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.v</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\CyControlReg_v1_80\CyControlReg_v1_80.cycdx</v>
@@ -333,36 +333,41 @@
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_isr_v1_70\PSoC5\API\intc.h</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_psoc3_usb_v1_0\cy_psoc3_usb_v1_0.cyprimitive</v>
 <v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\cy_psoc3_usb_v1_0\cy_psoc3_usb_v1_0.cysym</v>
+<v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.cysym</v>
+<v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.pdf</v>
+<v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\or_v1_0.v</v>
+<v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\version.cypatch</v>
+<v>${CyRoot}\psoc\content\CyPrimitives\cyprimitives.cylib\or_v1_0\Custom\custom.cs</v>
 <v>.\Camera Trigger.cydwr</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cm3gcc.ld</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3RealView.scat</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3Start.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cm3.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cm3_psoc5.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmGnu.s</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmRv.s</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyDmac.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyDmac.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyFlash.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyFlash.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyLib.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyLib.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cypins.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyPm.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyPm.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CySpc.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CySpc.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cytypes.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyutils.c</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cmFunc.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cmInstr.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3Iar.icf</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmIar.s</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_armcc.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_gcc.h</v>
-<v>..\..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_compiler.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\Em_EEPROM_Dynamic_v2_20\API\cy_em_eeprom.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cm3gcc.ld</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3RealView.scat</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3Start.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cm3.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cm3_psoc5.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmGnu.s</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmRv.s</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyDmac.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyDmac.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyFlash.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyFlash.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyLib.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyLib.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cypins.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyPm.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyPm.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CySpc.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CySpc.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cytypes.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cyutils.c</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cmFunc.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\core_cmInstr.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\Cm3Iar.icf</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\CyBootAsmIar.s</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_armcc.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_gcc.h</v>
+<v>..\..\..\..\Documents\PSoC Creator\4.2\Downloads ( 4.2).cylib\cy_boot_v5_82\PSoC5\API\cmsis_compiler.h</v>
 </deps_list>
 <gen_list>
 <v>Generated_Source\PSoC5\cyfitter_cfg.h</v>
@@ -409,6 +414,9 @@
 <v>Generated_Source\PSoC5\RESET_RDY_TIMER_PM.c</v>
 <v>Generated_Source\PSoC5\TRIG_ISR.c</v>
 <v>Generated_Source\PSoC5\TRIG_ISR.h</v>
+<v>Generated_Source\PSoC5\STROBE_OUT_aliases.h</v>
+<v>Generated_Source\PSoC5\STROBE_OUT.c</v>
+<v>Generated_Source\PSoC5\STROBE_OUT.h</v>
 <v>Generated_Source\PSoC5\USBFS.c</v>
 <v>Generated_Source\PSoC5\USBFS.h</v>
 <v>Generated_Source\PSoC5\USBFS_audio.c</v>
@@ -432,6 +440,18 @@
 <v>Generated_Source\PSoC5\USBFS_cydmac.h</v>
 <v>Generated_Source\PSoC5\USBFS_msc.c</v>
 <v>Generated_Source\PSoC5\USBFS_msc.h</v>
+<v>Generated_Source\PSoC5\SOFT_TRIG_Reg.h</v>
+<v>Generated_Source\PSoC5\SOFT_TRIG_Reg.c</v>
+<v>Generated_Source\PSoC5\SOFT_TRIG_Reg_PM.c</v>
+<v>Generated_Source\PSoC5\STROBE.c</v>
+<v>Generated_Source\PSoC5\STROBE.h</v>
+<v>Generated_Source\PSoC5\STROBE_PM.c</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.h</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.c</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG_ENABLE_PM.c</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG_aliases.h</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG.c</v>
+<v>Generated_Source\PSoC5\STAGE_TRIGG.h</v>
 <v>Generated_Source\PSoC5\LCD_Char_LCDPort_aliases.h</v>
 <v>Generated_Source\PSoC5\LCD_Char_LCDPort.c</v>
 <v>Generated_Source\PSoC5\LCD_Char_LCDPort.h</v>
@@ -487,7 +507,7 @@
 <v>C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif</v>
 <v>C:\Program Files (x86)\Cypress\PSoC Creator\4.2\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3.vif</v>
 </warp_dep>
-<deps_time v="132708781876278259" />
+<deps_time v="132750233885982828" />
 <top_block v="TopDesign" />
 <last_generation v="11" />
 <pdl_path v="" />
@@ -516,6 +536,13 @@
 <dep name=".\Generated_Source\PSoC5\LCD_Char_LCDPort_aliases.h" />
 <dep name=".\Generated_Source\PSoC5\PERIOD_ISR.h" />
 <dep name=".\Generated_Source\PSoC5\RESET_RDY_TIMER.h" />
+<dep name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.h" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG.h" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.h" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_aliases.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE_OUT.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE_OUT_aliases.h" />
 <dep name=".\Generated_Source\PSoC5\TRG_OUT.h" />
 <dep name=".\Generated_Source\PSoC5\TRG_OUT_aliases.h" />
 <dep name=".\Generated_Source\PSoC5\TRIG_ISR.h" />
@@ -566,6 +593,13 @@
 <file name=".\Generated_Source\PSoC5\LCD_Char_LCDPort_aliases.h" />
 <file name=".\Generated_Source\PSoC5\PERIOD_ISR.h" />
 <file name=".\Generated_Source\PSoC5\RESET_RDY_TIMER.h" />
+<file name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.h" />
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG.h" />
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.h" />
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG_aliases.h" />
+<file name=".\Generated_Source\PSoC5\STROBE.h" />
+<file name=".\Generated_Source\PSoC5\STROBE_OUT.h" />
+<file name=".\Generated_Source\PSoC5\STROBE_OUT_aliases.h" />
 <file name=".\Generated_Source\PSoC5\TRG_OUT.h" />
 <file name=".\Generated_Source\PSoC5\TRG_OUT_aliases.h" />
 <file name=".\Generated_Source\PSoC5\TRIG_ISR.h" />
@@ -773,6 +807,90 @@
 <dep name=".\Generated_Source\PSoC5\cytypes.h" />
 </file>
 <file name=".\Generated_Source\PSoC5\RESET_RDY_TIMER_PM.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\SOFT_TRIG_Reg.o">
+<dep name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.c" />
+<dep name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\SOFT_TRIG_Reg_PM.o">
+<dep name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg.h" />
+<dep name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg_PM.c" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\SOFT_TRIG_Reg_PM.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG.o">
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG.c" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG.h" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_aliases.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cypins.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG_ENABLE.o">
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.c" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG_ENABLE_PM.o">
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.h" />
+<dep name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE_PM.c" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STAGE_TRIGG_ENABLE_PM.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STROBE.o">
+<dep name=".\Generated_Source\PSoC5\CyFlash.h" />
+<dep name=".\Generated_Source\PSoC5\CyLib.h" />
+<dep name=".\Generated_Source\PSoC5\CySpc.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE.c" />
+<dep name=".\Generated_Source\PSoC5\STROBE.h" />
+<dep name=".\Generated_Source\PSoC5\cyPm.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STROBE.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STROBE_OUT.o">
+<dep name=".\Generated_Source\PSoC5\STROBE_OUT.c" />
+<dep name=".\Generated_Source\PSoC5\STROBE_OUT.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE_OUT_aliases.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cypins.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STROBE_OUT.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\STROBE_PM.o">
+<dep name=".\Generated_Source\PSoC5\CyFlash.h" />
+<dep name=".\Generated_Source\PSoC5\CyLib.h" />
+<dep name=".\Generated_Source\PSoC5\CySpc.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE.h" />
+<dep name=".\Generated_Source\PSoC5\STROBE_PM.c" />
+<dep name=".\Generated_Source\PSoC5\cyPm.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\STROBE_PM.c" />
 <file name=".\CortexM3\ARM_GCC_541\Debug\TRG_OUT.o">
 <dep name=".\Generated_Source\PSoC5\TRG_OUT.c" />
 <dep name=".\Generated_Source\PSoC5\TRG_OUT.h" />
@@ -1322,6 +1440,7 @@
 <dep name=".\CortexM3\ARM_GCC_541\Debug\RESET_RDY_TIMER.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\RESET_RDY_TIMER_PM.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\TRIG_ISR.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STROBE_OUT.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_audio.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_boot.o" />
@@ -1336,6 +1455,13 @@
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_vnd.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_midi.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_msc.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\SOFT_TRIG_Reg.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\SOFT_TRIG_Reg_PM.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STROBE.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STROBE_PM.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG_ENABLE.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG_ENABLE_PM.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\STAGE_TRIGG.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\LCD_Char_LCDPort.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_ep2_dma.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\USBFS_ep1_dma.o" />
@@ -1410,15 +1536,24 @@
 <name_val_pair name="Generated_Source\PSoC5\CySpc.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\cyutils.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="C:\Users\Mr Machine\GIT\M25_Code\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\CortexM3\ARM_GCC_541\Debug\Camera Trigger.hex" v="-mcpu=cortex-m3 -mthumb -L Generated_Source\PSoC5 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T Generated_Source\PSoC5\cm3gcc.ld -specs=nano.specs -Wl,--gc-sections -g -ffunction-sections -Og -ffat-lto-objects" />
+<name_val_pair name="Generated_Source\PSoC5\STROBE_OUT.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\SOFT_TRIG_Reg.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\SOFT_TRIG_Reg_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\STROBE.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\STROBE_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\STAGE_TRIGG_ENABLE.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\STAGE_TRIGG_ENABLE_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\STAGE_TRIGG.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\CortexM3\ARM_GCC_541\Debug\Camera Trigger.hex" v="-mcpu=cortex-m3 -mthumb -L Generated_Source\PSoC5 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T Generated_Source\PSoC5\cm3gcc.ld -specs=nano.specs -Wl,--gc-sections -g -ffunction-sections -Og -ffat-lto-objects" />
 </name>
 </genericCmdLineData>
-<codeGenCmdLineTag v="-.appdatapath &quot;C:\Users\Mr Machine\AppData\Local\Cypress Semiconductor\PSoC Creator\4.2&quot; -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p &quot;C:\Users\Mr Machine\GIT\M25_Code\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj&quot; -d CY8C5888LTI-LP097 -s &quot;C:\Users\Mr Machine\GIT\M25_Code\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Generated_Source\PSoC5&quot; -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE" />
+<codeGenCmdLineTag v="-.appdatapath &quot;C:\Users\Mr Machine\AppData\Local\Cypress Semiconductor\PSoC Creator\4.2&quot; -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p &quot;C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj&quot; -d CY8C5888LTI-LP097 -s &quot;C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Generated_Source\PSoC5&quot; -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE" />
 </CyGuid_b0374e30-ce3a-47f2-ad85-821643292c68>
 </dataGuid>
 <dataGuid v="769d31ea-68b1-4f0c-b90a-7c10a43ee563">
 <CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563 type_name="CyDesigner.Common.ProjMgmt.Model.CyLinkCustomData" version="1">
 <link_deps_times>
-<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM3" v="132708798688837310" />
+<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM3" v="132750341133934378" />
 </link_deps_times>
 </CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563>
 </dataGuid>

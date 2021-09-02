@@ -56,17 +56,19 @@
 //Stuff for USB communication
 #define CHANGE_FPS 0x1
 #define DROPPED_FRAME 0x2
-#define SET_RTC 0x4
+#define NEW_CNT 0x4
 #define ACK_CMD 0x8
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
+#define CAMERAS_ACQUIRED 0x100
+#define RELEASE_CAMERAS 0x200
 #define STAGE_TRIGG_ENABLE 0x40000
 #define STAGE_TRIGG_DISABLE 0x80000
 #define SEND_TRIGG 0x100000
 #define TRIGG_SENT 0x200000
 
-#define DEFAULT_FPS (60u)
+#define DEFAULT_FPS (100)
 
 struct usb_data{
     uint16 fps;
@@ -77,7 +79,7 @@ struct usb_data{
 
 uint32 set_fps();
 
-struct usb_data incoming;
+volatile struct usb_data incoming;
 volatile struct usb_data outgoing;
 volatile uint8 to_send = 0;
 volatile uint8 send_count = 0;
@@ -96,8 +98,9 @@ CY_ISR(PERIOD_ISR){
     RESET_RDY_TIMER_Write(REG_OFF);
     
     //if(send_count){
-        to_send = 1;
+        //to_send = 1;
         outgoing.count++;
+        outgoing.flags |= NEW_CNT;
     //}
 //    if(!(counter % 100)){
 //        lcd_draw = 1;
@@ -121,7 +124,7 @@ int main(void)
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     Trigger_Count_Start(); // Counts how many times a capture event has occured.
     STROBE_Start();
-    Frame_Period_Timer_Start(); // Main Capture Rate
+    //Frame_Period_Timer_Start(); // Main Capture Rate
     TRIG_PERIOD_Start(); //Counting Time Camera isn't Ready
 
     PERIOD_ISR_StartEx(PERIOD_ISR);
@@ -132,7 +135,7 @@ int main(void)
     uint32 count = 0;
     char msg[16];
     char msg2[16];
-    sprintf(msg2, "Count Stopped");
+    sprintf(msg2, "CNT DSBLD STOP");
     sprintf(msg, "fps: %u", incoming.fps);
     
     //char bfr[] = "before";
@@ -193,12 +196,39 @@ int main(void)
             /* Trigger DMA to copy data from OUT endpoint buffer. */
 
             USBFS_ReadOutEP(OUT_EP_NUM, (uint8*)&incoming, sizeof(struct usb_data));
-            if(incoming.flags & SEND_TRIGG){
+            /*if(incoming.flags & SEND_TRIGG){
                     SOFT_TRIG_Reg_Write(REG_ON);
                     CyDelayUs(100);
                     SOFT_TRIG_Reg_Write(REG_OFF);
                     incoming.flags &= ~(SEND_TRIGG);
                     outgoing.flags |= TRIGG_SENT;
+            }*/
+            
+            
+            // These two statements make sure the trigger isn't running
+            // Until all of the CAMERAS have been acquired, and stops the trigger timer
+            // If the Cameras are released
+            
+            if(incoming.flags & CAMERAS_ACQUIRED){
+                Frame_Period_Timer_Start();
+                incoming.flags &= ~(CAMERAS_ACQUIRED);
+                sprintf(msg2, "CNT ENBLD STOP");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
+            }
+            
+            if(incoming.flags & RELEASE_CAMERAS){
+                Frame_Period_Timer_Stop();
+                incoming.flags &= !(RELEASE_CAMERAS);
+                sprintf(msg2, "CNT DSBLD STOP");
+                LCD_Char_ClearDisplay();    
+                LCD_Char_Position(0u,0u);
+                LCD_Char_PrintString(msg);
+                LCD_Char_Position(1u,0u);
+                LCD_Char_PrintString(msg2);
             }
             
             if(incoming.flags & CHANGE_FPS){
@@ -219,7 +249,7 @@ int main(void)
                 send_count = 1;
                 outgoing.flags |= START_COUNT;
                 incoming.flags &= ~(START_COUNT);
-                sprintf(msg2, "Count Started");
+                sprintf(msg2, "CNT ENBLD START");
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
@@ -230,13 +260,13 @@ int main(void)
                 send_count = 0;
                 incoming.flags &= ~(STOP_COUNT);
                 outgoing.flags &= ~(START_COUNT);
-                sprintf(msg2, "Count Stopped");
+                sprintf(msg2, "CNT ENBLD STOP");
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
-            } else if(incoming.flags & SOFT_TRIGG_MODE) {
+            } /*else if(incoming.flags & SOFT_TRIGG_MODE) {
                 Frame_Period_Timer_Stop();
                 incoming.flags &= ~(SOFT_TRIGG_MODE);
                 outgoing.flags |= ~(SOFT_TRIGG_MODE);
@@ -258,7 +288,7 @@ int main(void)
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
-            }
+            }*/
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
             /* Wait until DMA completes copying data from OUT endpoint buffer. */
@@ -278,14 +308,14 @@ int main(void)
         * After data has been copied, IN endpoint is ready to be read by the
         * host.
         */
-        if(to_send){
-
+        //if(to_send){
+        CyDelay(1);   
             outgoing.time_waiting = time_btwn_trig;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
-            outgoing.flags &= ~(TRIGG_SENT);
+            outgoing.flags &= ~(NEW_CNT);
             to_send = 0;
-        }
+        //}
         
 //        if(lcd_draw){
 //            LCD_Char_PrintString(msg);
