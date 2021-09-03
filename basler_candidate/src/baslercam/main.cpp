@@ -705,8 +705,9 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 
 
 // Prototypes because to many things defined before main and I don't like it
-int aquire_cameras(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
-void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+void identify_camera(std::string* serial, std::vector<std::string>* camera_name);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
@@ -758,7 +759,7 @@ int main(int argc, char* argv[])
     // A switch case could be used to Number the cameras to their position
     // to ease readability and processing if desired.
 
-	std::vector<std::string> serials;
+	std::vector<std::string> serials, camera_names;
 	unsigned int total_cams;
 	uint64_t image_size = ((horz * vert) / 8) * bitDepth;;
 
@@ -785,7 +786,7 @@ int main(int argc, char* argv[])
 			outgoing.flags |= ACQUIRING_CAMERAS;
 			printf("Acquiring\n");
 			prot.unlock();
-			if (aquire_cameras(&serials, cam_dat, &total_cams, &image_size)) {
+			if (aquire_cameras(&serials, &camera_names, cam_dat, &total_cams, &image_size)) {
 				prot.lock();
 				outgoing.flags |= ACQUIRE_FAIL;
 				prot.unlock();
@@ -848,7 +849,7 @@ int main(int argc, char* argv[])
 			incoming.flags &= ~START_CAPTURE;
 			outgoing.flags |= CAPTURING;
 			prot.unlock();
-			start_capture(&serials, cam_dat, &total_cams, &image_size);
+			start_capture(&serials, &camera_names, cam_dat, &total_cams, &image_size);
 		}
 		else if (incoming.flags & EXIT_THREAD) {
 			usb_outgoing.flags |= EXIT_THREAD;
@@ -899,7 +900,7 @@ int main(int argc, char* argv[])
 	return exitCode;
 }
 
-int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Before using any pylon methods, the pylon runtime must be initialized. 
 	PylonInitialize();
 
@@ -935,16 +936,15 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 		// May as well make all 25
 		CInstantCamera* pcam[c_maxCamerasToUse];
 		
+		// purge old aquired serials and camera_names
 
+		serials->clear();
+		camera_names->clear();
 
-		// std::vector<std::string> serials;
-		// std::vector<cam_event> events[25];
 
 		// Create and attach all Pylon Devices.
 		// We could probably not use the pcam array and just allocate directly to cam_dat
-		// Since all of these are declared in the same scope as the lamda functions
 
-		//for (size_t i = 0; i < cameras.GetSize(); ++i) /* Why the pre-increment? */
 		for (unsigned int i = 0; i < *total_cams; i++)
 		{
 			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
@@ -971,6 +971,7 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 			// Moved this out of the thread initilization stuff
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+			identify_camera(&serials->back(), camera_names);
 		}
 
 		// Only allow trigger timer to run once all cameras are acquired to prevent the buffers
@@ -993,7 +994,7 @@ int aquire_cameras(std::vector<std::string> *serials, cam_data* cam_dat, unsigne
 }
 
 // A really Beefy Function.  Handles all of the Capture and Convert.
-void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Should this be monitored in Write Thread?
 	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
 
@@ -1279,7 +1280,7 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 	outgoing.flags |= CONVERTING;
 	flg.unlock();
 
-	std::cout << "Converting images to tif" << std::endl;
+	std::cout << "Storing single images as raw" << std::endl;
 	// This is the binary to tiff image conversion section.  It would probably be a good idea to thread this
 	// to boost the write throughput more. It should be noted that we are currently unable to 
 	// Write to USB external drives for some odd reason.
@@ -1339,7 +1340,7 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 
 		while (write_files) {
 			//for (int i = 0; i < *total_cams; i++) {
-				std::string tiff_path = tiff_dir + "\\" + (*serials)[cam->number];
+				std::string tiff_path = tiff_dir + "\\" + (*camera_names)[cam->number];
 				_mkdir(tiff_path.c_str()); //make the dir
 				//std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
 				std::string filename = tiff_path + "\\image" + std::to_string(thread_row + chunk_number * fps) + ".raw";
@@ -1461,4 +1462,88 @@ void start_capture(std::vector<std::string>* serials, cam_data* cam_dat, unsigne
 	}
 	// Clear Threads
 	threads.clear();
+}
+
+void identify_camera(std::string* serial, std::vector<std::string>* camera_names) {
+	switch(std::stoi(*serial, nullptr, 0)) {
+	    case CAM_1:
+			camera_names->push_back("CAM_Z1");
+			break;
+		case CAM_2:
+			camera_names->push_back("CAM_Z2");
+			break;
+		case CAM_3:
+			camera_names->push_back("CAM_Z3");
+			break;
+		case CAM_4:
+			camera_names->push_back("CAM_Z4");
+			break;
+		case CAM_5:
+			camera_names->push_back("CAM_Z5");
+			break;
+		case CAM_6:
+			camera_names->push_back("CAM_Z6");
+			break;
+		case CAM_7:
+			camera_names->push_back("CAM_Z7");
+			break;
+		case CAM_8:
+			camera_names->push_back("CAM_Z8");
+			break;
+		case CAM_9:
+			camera_names->push_back("CAM_Z9");
+			break;
+		case CAM_10:
+			camera_names->push_back("CAM_Z10");
+			break;
+		case CAM_11:
+			camera_names->push_back("CAM_Z11");
+			break;
+		case CAM_12:
+			camera_names->push_back("CAM_Z12");
+			break;
+		case CAM_13:
+			camera_names->push_back("CAM_Z13");
+			break;
+		case CAM_14:
+			camera_names->push_back("CAM_Z14");
+			break;
+		case CAM_15:
+			camera_names->push_back("CAM_Z15");
+			break;
+		case CAM_16:
+			camera_names->push_back("CAM_Z16");
+			break;
+		case CAM_17:
+			camera_names->push_back("CAM_Z17");
+			break;
+		case CAM_18:
+			camera_names->push_back("CAM_Z18");
+			break;
+		case CAM_19:
+			camera_names->push_back("CAM_Z19");
+			break;
+		case CAM_20:
+			camera_names->push_back("CAM_Z20");
+			break;
+		case CAM_21:
+			camera_names->push_back("CAM_Z21");
+			break;
+		case CAM_22:
+			camera_names->push_back("CAM_Z22");
+			break;
+		case CAM_23:
+			camera_names->push_back("CAM_Z23");
+			break;
+		case CAM_24:
+			camera_names->push_back("CAM_Z24");
+			break;
+		case CAM_25:
+			camera_names->push_back("CAM_Z25");
+			break;
+		default:
+			std::cout << "error with switch case" << std::endl;
+			camera_names->push_back(*serial);
+			break;
+	}
 }
