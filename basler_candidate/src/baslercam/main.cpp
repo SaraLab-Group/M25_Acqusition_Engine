@@ -109,6 +109,7 @@ uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint32_t bitDepth = 8;
 uint32_t fps = 65;
+double gain = 0;
 
 
 double old = 0.0; //variable to test trigger delay
@@ -518,6 +519,12 @@ public:
 		CBooleanPtr(nodemap.GetNode("CenterX"))->SetValue(true);
 		CBooleanPtr(nodemap.GetNode("CenterY"))->SetValue(true);
 
+		// Set sensor gain
+		double d3 = CFloatPtr(nodemap.GetNode("Gain"))->GetValue();
+		std::cout << "Gain Current " << d3 << std::endl;
+		CFloatPtr(nodemap.GetNode("Gain"))->SetValue(gain);
+		d3 = CFloatPtr(nodemap.GetNode("Gain"))->GetValue();
+		std::cout << "Gain Current " << d3 << std::endl;
 
 		if (bitDepth > 8) {
 			SetPixelFormat_unofficial(nodemap, "Mono12");
@@ -761,7 +768,7 @@ int main(int argc, char* argv[])
 
 	std::vector<std::string> serials, camera_names;
 	unsigned int total_cams;
-	uint64_t image_size = ((horz * vert) / 8) * bitDepth;;
+	uint64_t image_size = ((horz * vert) / 8) * bitDepth;
 
 	// Just make sure the buffer is sector aligned
     // Any "Slack" will go unused and be no more than
@@ -825,6 +832,8 @@ int main(int argc, char* argv[])
 			bitDepth = incoming.bpp;
 			fps = incoming.fps;
 			seconds = incoming.capTime;
+			gain = incoming.gain;
+			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
 			tiff_dir = incoming.path;
 			image_size = ((horz * vert) / 8) * bitDepth;
 

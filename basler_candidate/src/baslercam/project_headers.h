@@ -170,9 +170,9 @@ typedef struct TCP_IP_DAT {
     uint32_t exp;
     uint32_t bpp;
     uint32_t capTime;
-    double gain;
     char path[255];
     uint32_t flags;
+    double gain;
 };
 
 typedef struct USB_THD_DATA {

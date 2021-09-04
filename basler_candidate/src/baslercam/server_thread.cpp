@@ -117,6 +117,7 @@ void* SERVER_THREAD(void* server_data)
                 printf("bpp: %u\n", server_thread_data->incoming_data->bpp);
                 printf("capTime: %u\n", server_thread_data->incoming_data->capTime);
                 printf("flags: %u\n", server_thread_data->incoming_data->flags);
+                printf("gain: %f\n", server_thread_data->incoming_data->gain);
                 printf("Before Mutex Lock\n");*/
                 critical.lock();
 

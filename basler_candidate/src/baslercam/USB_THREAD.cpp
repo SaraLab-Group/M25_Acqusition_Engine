@@ -206,7 +206,7 @@ void* USB_THREAD(void* data)
             if (thd_data->incoming->flags & START_COUNT && thd_data->incoming->flags & NEW_CNT) {
                 //printf("flags: %u\n", incoming.flags);
                 printf("fps: %u\n", thd_data->incoming->fps);
-                printf("USB.incoming.flags %u after\n", thd_data->incoming->flags);
+                //printf("USB.incoming.flags %u after\n", thd_data->incoming->flags);
                 //printf("time_waiting: %u\n", incoming.time_waiting);
                 printf("counter: %zu, period: %lu\n", thd_data->incoming->count, thd_data->incoming->time_waiting);
             }
