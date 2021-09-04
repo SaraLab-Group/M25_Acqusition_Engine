@@ -139,7 +139,7 @@ class Ui_MainWindow(object):
         self.ReleaseCamsButton.clicked.connect(self.ReleaseState)
         self.ConfButton.clicked.connect(self.ConfState)
         self.CapturePushButton.clicked.connect(self.CaptureState)
-        self.GainlineEdit.setText("0")
+        self.GainlineEdit.setText("0.0")
         self.GainlineEdit.textChanged.connect(self.sync_GainLineEdit)
 
         self.retranslateUi(MainWindow)

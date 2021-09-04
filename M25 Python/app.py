@@ -68,6 +68,7 @@ fps: int = 65
 exp: int = 6700
 bpp: int = 8
 capTime: int = 10
+gain: float = 0.0
 path = "\0"*255
 path = "D:\\Ant1 Test\\tiff"
 flags: int = 0
@@ -88,11 +89,12 @@ def client_thread():
             global exp
             global bpp
             global capTime
+            global gain
             global path
             global flags
             write_mutex.acquire()
-            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), flags)
-            packer = struct.Struct('L L L L L L 255s L')
+            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), flags, gain)
+            packer = struct.Struct('L L L L L L 255s L d')
             packed_data = packer.pack(*values)
             s.sendall(packed_data)
             #print('flags: %d' % int(flags))
@@ -108,10 +110,11 @@ def client_thread():
             data: bytes = s.recv(512)
             (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_capTime,
              rec_path,
-             rec_flags) = unpack(
+             rec_flags, rec_gain) = unpack(
                 'L L L L L L'
                 '255s'
-                'L',
+                'L'
+                'd',
                 data
             )
         #pathStr = convert(rec_path)
@@ -208,6 +211,16 @@ class Window(QMainWindow, Ui_MainWindow):
             capTime = (0)
         write_mutex.release()
 
+    def sync_GainLineEdit(self, text):
+        global gain
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            gain = (float(text))
+        else:
+            gain = float(0.0)
+        write_mutex.release()
+
 
     def onClicked(self):
         global bpp
@@ -272,6 +285,7 @@ class Window(QMainWindow, Ui_MainWindow):
         flags |= EXIT_THREAD
         write_mutex.release()
         print('close event fired')
+        time.sleep(0.2)
         global run
         run = False
         th.join
