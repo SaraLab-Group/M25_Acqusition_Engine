@@ -3,6 +3,7 @@ import binascii
 import threading
 import time
 import struct
+from datetime import date
 from lib2to3.pytree import convert
 from struct import unpack
 import socket
@@ -16,6 +17,7 @@ from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QFileDialog
 )
 
+today = date.today()
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 27015        # The port used by the server
@@ -70,7 +72,9 @@ bpp: int = 8
 capTime: int = 10
 gain: float = 0.0
 path = "\0"*255
-path = "D:\\Ant1 Test\\tiff"
+path = "D:\\Ant1 Test\\raws"
+proName = "\0"*255
+proName = today.strftime("%Y%m%d_M25")  #As Per Request 
 flags: int = 0
 exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\ide\x64\Debug'
 myEXE = "Basler_Candidate.exe"
@@ -91,10 +95,11 @@ def client_thread():
             global capTime
             global gain
             global path
+            global proName
             global flags
             write_mutex.acquire()
-            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), flags, gain)
-            packer = struct.Struct('L L L L L L 255s L d')
+            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), proName.encode(), flags, gain)
+            packer = struct.Struct('L L L L L L 255s 255s L d')
             packed_data = packer.pack(*values)
             s.sendall(packed_data)
             #print('flags: %d' % int(flags))
@@ -107,11 +112,12 @@ def client_thread():
             #packer = struct.Struct('L L L L L L 255s H')
             #packed_data = Payload(inData)
             #s.sendall(outData)
-            data: bytes = s.recv(512)
+            data: bytes = s.recv(1024)
             (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_capTime,
-             rec_path,
+             rec_path, rec_proName,
              rec_flags, rec_gain) = unpack(
                 'L L L L L L'
+                '255s'
                 '255s'
                 'L'
                 'd',
@@ -149,6 +155,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         global path
         self.WritePLineEdit.setText(path)
+        self.PNameLineEdit.setText(proName)
         print(exe_path)
         rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
         global bpp
@@ -221,6 +228,12 @@ class Window(QMainWindow, Ui_MainWindow):
             gain = float(0.0)
         write_mutex.release()
 
+    def sync_PNameLineEdit(self, text):
+        global proName
+        global write_mutex
+        write_mutex.acquire()
+        proName = text
+        write_mutex.release()
 
     def onClicked(self):
         global bpp

@@ -279,8 +279,8 @@
    <widget class="QPushButton" name="AcquireCamsButton">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>110</y>
+      <x>10</x>
+      <y>320</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -292,8 +292,8 @@
    <widget class="QPushButton" name="ReleaseCamsButton">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>110</y>
+      <x>110</x>
+      <y>320</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -305,7 +305,7 @@
    <widget class="QPushButton" name="ConfButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>210</x>
       <y>320</y>
       <width>75</width>
       <height>23</height>
@@ -336,6 +336,42 @@
     </property>
     <property name="text">
      <string>Gain(dB)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="LiveButton">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>400</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Live</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="PNameLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>110</y>
+      <width>251</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>90</y>
+      <width>61</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Project Name</string>
     </property>
    </widget>
   </widget>
