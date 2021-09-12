@@ -171,6 +171,7 @@ typedef struct TCP_IP_DAT {
     uint32_t bpp;
     uint32_t capTime;
     char path[255];
+    char proName[255];
     uint32_t flags;
     double gain;
 };

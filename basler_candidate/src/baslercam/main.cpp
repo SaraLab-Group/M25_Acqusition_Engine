@@ -130,7 +130,8 @@ string  strDirectryName = "D:\\Ant1 Test";//\\binaries";
 string  strMetaFileName = "Meta.txt";
 
 // it tworks
-string tiff_dir = "D:\\Ant1 Test";// \\Tiff";
+string raw_dir = "D:\\Ant1 Test";// \\Tiff";
+string proj_sub_dir;
 
 
 // From Basler Sample Code for fast binary writes;
@@ -220,15 +221,15 @@ void saveBigBuffer(const char* FileName, uint8_t* buffer/*, uint8_t cam_count*/,
 				//printf("Wrote %d bytes to %s successfully.\n", dwBytesWritten, FileName);
 			}*/
 			bytes_written += dwBytesWritten;
-			std::cout << dwBytesWritten << std::endl;
+			//std::cout << dwBytesWritten << std::endl;
 			if (aligned_size - bytes_written < dwBytesToWrite) {
 				dwBytesToWrite = aligned_size - bytes_written;
 			}
 		}
 	}
 	// Sanity Check
-	std::cout << "BytesWritten: " << bytes_written << std::endl;
-	std::cout << "file_size: " << aligned_size << std::endl;
+	//std::cout << "BytesWritten: " << bytes_written << std::endl;
+	//std::cout << "file_size: " << aligned_size << std::endl;
 
 	CloseHandle(hFile);
 }
@@ -712,9 +713,9 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 
 
 // Prototypes because to many things defined before main and I don't like it
-int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
-void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
-void identify_camera(std::string* serial, std::vector<std::string>* camera_name);
+int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+void identify_camera(std::string* serial, std::vector<std::string>* camera_name, std::vector<int>* zNums);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
@@ -767,6 +768,7 @@ int main(int argc, char* argv[])
     // to ease readability and processing if desired.
 
 	std::vector<std::string> serials, camera_names;
+	std::vector<int> camera_zNums;
 	unsigned int total_cams;
 	uint64_t image_size = ((horz * vert) / 8) * bitDepth;
 
@@ -793,7 +795,7 @@ int main(int argc, char* argv[])
 			outgoing.flags |= ACQUIRING_CAMERAS;
 			printf("Acquiring\n");
 			prot.unlock();
-			if (aquire_cameras(&serials, &camera_names, cam_dat, &total_cams, &image_size)) {
+			if (aquire_cameras(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size)) {
 				prot.lock();
 				outgoing.flags |= ACQUIRE_FAIL;
 				prot.unlock();
@@ -834,7 +836,8 @@ int main(int argc, char* argv[])
 			seconds = incoming.capTime;
 			gain = incoming.gain;
 			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
-			tiff_dir = incoming.path;
+			raw_dir = incoming.path;
+			proj_sub_dir = incoming.proName;
 			image_size = ((horz * vert) / 8) * bitDepth;
 
 			// attempt to force sector alignment
@@ -858,7 +861,7 @@ int main(int argc, char* argv[])
 			incoming.flags &= ~START_CAPTURE;
 			outgoing.flags |= CAPTURING;
 			prot.unlock();
-			start_capture(&serials, &camera_names, cam_dat, &total_cams, &image_size);
+			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
 		}
 		else if (incoming.flags & EXIT_THREAD) {
 			usb_outgoing.flags |= EXIT_THREAD;
@@ -909,7 +912,7 @@ int main(int argc, char* argv[])
 	return exitCode;
 }
 
-int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Before using any pylon methods, the pylon runtime must be initialized. 
 	PylonInitialize();
 
@@ -949,7 +952,7 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 
 		serials->clear();
 		camera_names->clear();
-
+		zNums->clear();
 
 		// Create and attach all Pylon Devices.
 		// We could probably not use the pcam array and just allocate directly to cam_dat
@@ -980,7 +983,7 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 			// Moved this out of the thread initilization stuff
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
-			identify_camera(&serials->back(), camera_names);
+			identify_camera(&serials->back(), camera_names, zNums);
 		}
 
 		// Only allow trigger timer to run once all cameras are acquired to prevent the buffers
@@ -1003,7 +1006,7 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 }
 
 // A really Beefy Function.  Handles all of the Capture and Convert.
-void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Should this be monitored in Write Thread?
 	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
 
@@ -1013,13 +1016,30 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	//append path for destination folder
 	//strDirectryName += "\\binaries";
 
-	_mkdir(tiff_dir.c_str());
+	//_mkdir(tiff_dir.c_str());
 
 	//tiff_dir += "\\tiff";
 
 	// create subfolders
 	_mkdir(strDirectryName.c_str());
-	_mkdir(tiff_dir.c_str());
+	_mkdir(raw_dir.c_str());
+	std::string sub_dir = raw_dir + "\\" + proj_sub_dir;
+	_mkdir(sub_dir.c_str());
+
+	std::string meta_fileName = sub_dir + "\\" + proj_sub_dir + ".txt";
+
+	// Create a metadata text file
+	ofstream myfile;
+	myfile.open(meta_fileName, std::ofstream::trunc); // will delete previous files with same name using trunc
+	myfile << "Project: " << proj_sub_dir << std::endl;
+	myfile << "Path: " << sub_dir << std::endl;
+	myfile << "Total Cameras: " << (int)*total_cams << std::endl;
+	myfile << "Horizontal: " << (int)horz << std::endl;
+	myfile << "Vertical: " << (int)vert << std::endl;
+	myfile << "Bit Depth: " << (int)bitDepth << std::endl;
+	myfile << "Frames Per Second: " << (int)fps << std::endl;
+	myfile << "Exposure time(us): " << (int)exposure << std::endl;
+
 
 	/**************************************************/
 	/* To be put into the body of the capture threads */
@@ -1053,6 +1073,11 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	if (buff_size % ALIGNMENT_BYTES) {
 		buff_size += (ALIGNMENT_BYTES - (buff_size % ALIGNMENT_BYTES));
 	}
+
+	myfile << "Time Captured(s): " << (int)seconds << std::endl;
+	myfile << "Raw image size (sector aligned 512B): " << (int)*image_size << std::endl;
+	myfile << "Frame Size(B): " << (int)frame_size << std::endl;
+	myfile.close();
 
 	// Allocate Aligned buffers
 	// lets dynamically allocate buffers through testing with windows SDK
@@ -1254,7 +1279,9 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	std::cout << "Building Threads: " << std::endl;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < *total_cams; i++) {
-		threads.emplace_back(cam_thd, &cam_dat[i]);
+		// To place Cameras in memory array in Z depth order (1 to 25) - 1
+		// im using the zNums vector to keep track of cameras z position
+		threads.emplace_back(cam_thd, &cam_dat[(zNums->at(i) - 1)]);
 	}
 
 	threads.emplace_back(write_thrd, &mr_write);
@@ -1349,10 +1376,10 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 		while (write_files) {
 			//for (int i = 0; i < *total_cams; i++) {
-				std::string tiff_path = tiff_dir + "\\" + (*camera_names)[cam->number];
-				_mkdir(tiff_path.c_str()); //make the dir
+				std::string raw_path = sub_dir + "\\" + "CAM_Z" + std::to_string(cam->number + 1);
+				_mkdir(raw_path.c_str()); //make the dir
 				//std::string filename = tiff_path + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
-				std::string filename = tiff_path + "\\image" + std::to_string(thread_row + chunk_number * fps) + ".raw";
+				std::string filename = raw_path + "\\image" + std::to_string(thread_row + chunk_number * fps) + ".raw";
 				//std::string filename = serials[i] + "\\image" + std::to_string(i + thread_row[cam->number] + chunk_number * fps) + ".tif";
 
 				CPylonImage srcImage;
@@ -1419,7 +1446,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	end = chrono::steady_clock::now();
 	elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
 	std::cout << std::endl;
-	std::cout << "Total Time To Write Tiff: " << elapsed << "us" << std::endl;
+	std::cout << "Total Time To Write raws: " << elapsed << "us" << std::endl;
 	std::cout << "Total Time To Write in Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
 	flg.lock();
 	outgoing.flags &= ~CONVERTING;
@@ -1473,82 +1500,107 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	threads.clear();
 }
 
-void identify_camera(std::string* serial, std::vector<std::string>* camera_names) {
+void identify_camera(std::string* serial, std::vector<std::string>* camera_names, std::vector<int>* zNums) {
 	switch(std::stoi(*serial, nullptr, 0)) {
 	    case CAM_1:
 			camera_names->push_back("CAM_Z1");
+			zNums->push_back(1);
 			break;
 		case CAM_2:
 			camera_names->push_back("CAM_Z2");
+			zNums->push_back(2);
 			break;
 		case CAM_3:
 			camera_names->push_back("CAM_Z3");
+			zNums->push_back(3);
 			break;
 		case CAM_4:
 			camera_names->push_back("CAM_Z4");
+			zNums->push_back(4);
 			break;
 		case CAM_5:
 			camera_names->push_back("CAM_Z5");
+			zNums->push_back(5);
 			break;
 		case CAM_6:
 			camera_names->push_back("CAM_Z6");
+			zNums->push_back(6);
 			break;
 		case CAM_7:
 			camera_names->push_back("CAM_Z7");
+			zNums->push_back(7);
 			break;
 		case CAM_8:
 			camera_names->push_back("CAM_Z8");
+			zNums->push_back(8);
 			break;
 		case CAM_9:
 			camera_names->push_back("CAM_Z9");
+			zNums->push_back(9);
 			break;
 		case CAM_10:
 			camera_names->push_back("CAM_Z10");
+			zNums->push_back(10);
 			break;
 		case CAM_11:
 			camera_names->push_back("CAM_Z11");
+			zNums->push_back(11);
 			break;
 		case CAM_12:
 			camera_names->push_back("CAM_Z12");
+			zNums->push_back(12);
 			break;
 		case CAM_13:
 			camera_names->push_back("CAM_Z13");
+			zNums->push_back(13);
 			break;
 		case CAM_14:
 			camera_names->push_back("CAM_Z14");
+			zNums->push_back(14);
 			break;
 		case CAM_15:
 			camera_names->push_back("CAM_Z15");
+			zNums->push_back(15);
 			break;
 		case CAM_16:
 			camera_names->push_back("CAM_Z16");
+			zNums->push_back(16);
 			break;
 		case CAM_17:
 			camera_names->push_back("CAM_Z17");
+			zNums->push_back(17);
 			break;
 		case CAM_18:
 			camera_names->push_back("CAM_Z18");
+			zNums->push_back(18);
 			break;
 		case CAM_19:
 			camera_names->push_back("CAM_Z19");
+			zNums->push_back(19);
 			break;
 		case CAM_20:
 			camera_names->push_back("CAM_Z20");
+			zNums->push_back(20);
 			break;
 		case CAM_21:
 			camera_names->push_back("CAM_Z21");
+			zNums->push_back(21);
 			break;
 		case CAM_22:
 			camera_names->push_back("CAM_Z22");
+			zNums->push_back(22);
 			break;
 		case CAM_23:
 			camera_names->push_back("CAM_Z23");
+			zNums->push_back(23);
 			break;
 		case CAM_24:
 			camera_names->push_back("CAM_Z24");
+			zNums->push_back(24);
 			break;
 		case CAM_25:
 			camera_names->push_back("CAM_Z25");
+			zNums->push_back(25);
 			break;
 		default:
 			std::cout << "error with switch case" << std::endl;
