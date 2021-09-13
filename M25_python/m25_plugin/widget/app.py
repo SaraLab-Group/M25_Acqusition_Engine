@@ -11,7 +11,7 @@ from subprocess import call
 from ctypes import *
 from typing import Any, Tuple
 
-from M25_ui import Ui_MainWindow
+from qt5_designer.M25_ui import Ui_MainWindow
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QFileDialog
 )
