@@ -1,6 +1,5 @@
-from qtpy.QtWidgets import QWidget
 from napari_plugin_engine import napari_hook_implementation
-from m25_plugin.widget.m25_control_widget import M25_widget
+from m25_controls.widget.m25_control_widget import M25_widget
 
 """
 Used qt designer to generate the UI

@@ -6,6 +6,8 @@ see: https://napari.org/docs/dev/plugins/hook_specifications.html
 
 Replace code below according to your needs.
 """
+import sys
+import binascii
 from napari_plugin_engine import napari_hook_implementation
 from m25_controls.widget import m25_widget
 
@@ -20,6 +22,8 @@ import logging
 from ctypes import *
 from PyQt5.QtWidgets import QWidget, QFileDialog,QDialog
 from napari import Viewer
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
+
 
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
@@ -136,8 +140,6 @@ def client_thread():
         write_mutex.release()
         #print('Received ' + repr(data))
         time.sleep(0.1)
-
-
 th = threading.Thread(target=client_thread)
 
 class M25_widget(QWidget):
@@ -146,17 +148,17 @@ class M25_widget(QWidget):
         self.viewer = napari_viewer
 
         #Layout the GUI
-        self.setupUi(self)
         self.ui = m25_widget.Ui_Form()
+        self.ui.setupUi(self)
 
         global path
-        self.WritePLineEdit.setText(path)
+        # self.WritePLineEdit.setText(path)
         print(exe_path)
-        rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
-        global bpp
-        bpp = 8
-        global run
-        th.start()
+        # rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
+        # global bpp
+        # bpp = 8
+        # global run
+        # th.start()
 
 
     def sync_HorzLineEdit(self, text):
