@@ -110,8 +110,9 @@ typedef struct cam_event {
 #define CONFIG_CHANGED 0x20000
 #define STAGE_TRIGG_ENABLE 0x40000
 #define STAGE_TRIGG_DISABLE 0x80000
-#define SEND_TRIGG 0x100000
-#define TRIGG_SENT 0x200000
+#define START_LIVE 0x100000
+#define LIVE_RUNNING 0x200000
+#define STOP_LIVE 0x400000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
@@ -143,6 +144,13 @@ typedef struct cam_event {
 #define CAM_23 23206706
 #define CAM_24 23059572
 #define CAM_25 23206684
+
+// shared mem flags
+#define WRITING_BUFF1 0x1
+#define WRITING_BUFF2 0x2
+#define READING_BUFF1 0x4
+#define READING_BUFF2 0x8
+
 
 
 typedef struct usb_data {
@@ -193,5 +201,15 @@ typedef struct SERVER_THD_DATA {
     std::mutex* mtx_ptr;
     std::mutex* usb_srv_mtx;
 };
+
+//https://stackoverflow.com/questions/26114518/ipc-between-python-and-win32-on-windows-os
+
+typedef struct
+{
+    void* hFileMap;
+    void* pData;
+    char MapName[256];
+    size_t Size;
+} SharedMemory;
 
 #endif

@@ -137,7 +137,7 @@ void* SERVER_THREAD(void* server_data)
                 } 
                 usb_srv_lk.unlock();
 
-                if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | ACQUIRE_CAMERAS | RELEASE_CAMERAS | START_CAPTURE | EXIT_THREAD)) {
+                if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | ACQUIRE_CAMERAS | RELEASE_CAMERAS | START_CAPTURE | START_LIVE | EXIT_THREAD)) {
                     // Wakeup main loop if one of these event flags is present
                     usb_srv_lk.lock();
                     if (server_thread_data->incoming_data->flags & CHANGE_CONFIG) {

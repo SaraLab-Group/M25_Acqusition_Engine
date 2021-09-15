@@ -715,7 +715,12 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format) {
 // Prototypes because to many things defined before main and I don't like it
 int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
 void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
+void live_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size);
 void identify_camera(std::string* serial, std::vector<std::string>* camera_name, std::vector<int>* zNums);
+bool CreateMemoryMap(SharedMemory* shm);
+bool FreeMemoryMap(SharedMemory* shm);
+
+//void* live_thread(void* flags);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
@@ -863,6 +868,12 @@ int main(int argc, char* argv[])
 			prot.unlock();
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
 		}
+		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+			incoming.flags &= ~START_LIVE;
+			outgoing.flags |= LIVE_RUNNING;
+			prot.unlock();
+			live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+		}
 		else if (incoming.flags & EXIT_THREAD) {
 			usb_outgoing.flags |= EXIT_THREAD;
 			prot.unlock();
@@ -1003,6 +1014,41 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 		//USB_THD_OBJ.join();
 		return 1;
 	}
+}
+
+// simple memory map stuff example code linked in project_headers.h
+bool CreateMemoryMap(SharedMemory* shm)
+{
+	if ((shm->hFileMap = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, shm->Size, shm->MapName)) == NULL)
+	{
+		return false;
+	}
+
+	if ((shm->pData = MapViewOfFile(shm->hFileMap, FILE_MAP_ALL_ACCESS, 0, 0, shm->Size)) == NULL)
+	{
+		CloseHandle(shm->hFileMap);
+		return false;
+	}
+	return true;
+}
+
+// For freeing my memory mapped file.
+bool FreeMemoryMap(SharedMemory* shm)
+{
+	if (shm && shm->hFileMap)
+	{
+		if (shm->pData)
+		{
+			UnmapViewOfFile(shm->pData);
+		}
+
+		if (shm->hFileMap)
+		{
+			CloseHandle(shm->hFileMap);
+		}
+		return true;
+	}
+	return false;
 }
 
 // A really Beefy Function.  Handles all of the Capture and Convert.
@@ -1499,6 +1545,230 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// Clear Threads
 	threads.clear();
 }
+
+// This is the start_capture function re imagined for live view.
+void live_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
+	// Should this be monitored in Write Thread?
+	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
+
+
+
+
+	/**************************************************/
+	/* To be put into the body of the capture threads */
+	/**************************************************/
+
+	// To Do: rewrite his into a full function, but how to pass data into it easily?
+	// Unfortunately standard barrier does not allow pointers to be made of it
+	// nor References, so I need to either make it global or initialize it in the scope
+	// of the lamda functions I'm using to make my thread loop.
+
+
+
+	uint64_t frame_size = (*image_size) * (*total_cams);
+//	uint64_t data_size = frame_size * fps;
+//	uint64_t buff_size = data_size;
+
+	// Just make sure the buffer is sector aligned
+	// Any "Slack" will go unused and be no more than
+	// 511 Bytes
+
+	// Allocate Mem Maps
+
+	SharedMemory RW_flags = { 0 };
+	RW_flags.Size = 8;
+	sprintf_s(RW_flags.MapName, "Local\\Flags");
+
+	uint8_t* buff_flags = nullptr;
+
+	if (CreateMemoryMap(&RW_flags))
+	{
+		buff_flags = (uint8_t*)RW_flags.pData;
+		memset(buff_flags, 0, RW_flags.Size);
+		*buff_flags = 0;
+	}
+	else {
+		std::cout << "Failed To Allocate RW_flags." << std::endl;
+	}
+
+	SharedMemory shm1 = { 0 };
+	shm1.Size = frame_size;
+	sprintf_s(shm1.MapName, "Local\\buff1");
+
+	uint8_t* buff1 = nullptr;
+
+	if (CreateMemoryMap(&shm1))
+	{
+		buff1 = (uint8_t*)shm1.pData;
+		memset(buff1, 0, shm1.Size);
+	}
+	else {
+		std::cout << "Failed To Allocate buff1." << std::endl;
+	}
+
+	SharedMemory shm2 = { 0 };
+	shm2.Size = frame_size;
+	sprintf_s(shm2.MapName, "Local\\buff2");
+
+	uint8_t* buff2 = nullptr;
+
+	if (CreateMemoryMap(&shm2))
+	{
+		buff2 = (uint8_t*)shm2.pData;
+		memset(buff2, 0, shm2.Size);
+	}
+	else {
+		std::cout << "Failed To Allocate buff2." << std::endl;
+	}
+
+	//uint8_t* buff1 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
+	//uint8_t* buff2 = (uint8_t*)_aligned_malloc(buff_size, ALIGNMENT_BYTES);
+	head_buff1 = buff1;
+	head_buff2 = buff2;
+	uint8_t* active_buff = buff1;
+
+	// Some Mutex stuff
+	std::condition_variable cnt_v; // For sleeping and waking write
+	std::mutex lk; // Requred for the condition_variable to sleep.
+	std::mutex ded; // Prevent Write getting behind
+
+	// This is the magical mythical buffer swap
+	//uint32_t swap_counter = 0;
+	//uint8_t toggle = 0;
+	//uint8_t begin_writing = 0;
+	//uint8_t pre_write = 0;
+	//uint32_t swap_count = 0;
+	*buff_flags |= WRITING_BUFF1;
+
+	auto buffer_swap = [&]() noexcept {
+        
+		if (*buff_flags & WRITING_BUFF1) {
+			if (*buff_flags & READING_BUFF2) {
+				// do nothing
+			}
+			else {
+				*buff_flags &= ~WRITING_BUFF1;
+				*buff_flags |= WRITING_BUFF2;
+				active_buff = head_buff2;
+			}
+		}
+		else {
+			if (*buff_flags&READING_BUFF1) {
+				// do nothing
+			}
+			else {
+				*buff_flags &= ~WRITING_BUFF2;
+				*buff_flags |= WRITING_BUFF1;
+				active_buff = head_buff1;
+			}
+		}
+
+		// This should safely stop live loop.
+		std::unique_lock<std::mutex> flg(crit2);
+		if (incoming.flags & STOP_LIVE) {
+			capture = false;
+			std::cout << "Exiting Live." << std::endl;
+		}
+		flg.unlock();
+
+	};
+
+	// This Synchronization primitive makes sure all of the cams complete before starting again
+	// It also atomically calls buffer swap to handle buffer incrementing and signaling write thread
+	std::barrier sync_point(*total_cams, buffer_swap);
+
+	capture = true;
+	write_count = 0;
+	frame_count = 0;
+
+	// This is the begining fo my lambda function for the camera capture threads.
+	auto cam_thd = [&](cam_data* cam) {
+
+		//cam->camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
+		//cam->camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
+
+		CGrabResultPtr ptrGrabResult;
+		INodeMap& nodemap = cam->camPtr->GetNodeMap();
+		//Find if all the cameras are ready
+
+		while (capture) {
+			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
+			//auto start = chrono::steady_clock::now();
+			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
+
+			// Image grabbed successfully?
+			if (ptrGrabResult->GrabSucceeded())
+			{
+				// A little Pointer Arithmatic never hurt anybody
+				memcpy((void*)(active_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
+
+				// Hurry up and wait
+				sync_point.arrive_and_wait();
+			}
+			else
+			{
+				// Give us an error message.  Camera 14 is the only one I've seen hit this.
+				std::cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << " cam: " << (*serials)[cam->number] << endl;
+				// Hurry up and wait
+				sync_point.arrive_and_wait();
+			}
+			//auto end = chrono::steady_clock::now();
+			//long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+
+			//std::cout << "Taken Time for saving image to ram: " << (int)cam->number << " " << elapsed << "us" << endl;
+
+		}
+		//std::cout << "thd: " << (int)cam->number << " joining" << std::endl;
+	};
+
+
+	std::cout << "Building Threads: " << std::endl;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < *total_cams; i++) {
+		// To place Cameras in memory array in Z depth order (1 to 25) - 1
+		// im using the zNums vector to keep track of cameras z position
+		threads.emplace_back(cam_thd, &cam_dat[(zNums->at(i) - 1)]);
+	}
+
+
+	auto start = chrono::steady_clock::now();
+	// Join the Threads. This should block until capture done
+	for (auto& thread : threads) {
+		thread.join();
+	}
+
+	auto end = chrono::steady_clock::now();
+	long long elapsed = chrono::duration_cast<chrono::microseconds>(end - start).count();
+	std::cout << "Total Time: " << elapsed << "us" << endl;
+	std::cout << "Total Time Seconds: " << elapsed / (double)1e6 << "s" << std::endl;
+
+
+	std::cout << "Live View Finished" << std::endl;
+
+	std::unique_lock<std::mutex> flg(crit2);
+	outgoing.flags &= ~LIVE_RUNNING;
+	flg.unlock();
+
+	// Free Memory Maps
+	FreeMemoryMap(&RW_flags);
+	FreeMemoryMap(&shm1);
+	FreeMemoryMap(&shm2);
+
+	// Clear Threads
+	threads.clear();
+}
+
+// thread for live view mode
+/*void* live_thread(void* flags) {
+
+	uint32_t* sig_flags = (uint32_t*)flags;
+
+	uint8_t running = 1;
+	while (running) {
+
+	}
+
+}*/
 
 void identify_camera(std::string* serial, std::vector<std::string>* camera_names, std::vector<int>* zNums) {
 	switch(std::stoi(*serial, nullptr, 0)) {
