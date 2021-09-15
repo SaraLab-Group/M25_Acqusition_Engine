@@ -3,6 +3,13 @@ import binascii
 import threading
 import time
 import struct
+import mmap
+from matplotlib import pyplot as plt
+import numpy as np
+#from StringIO import StringIO
+from PIL import *
+
+
 from datetime import date
 from lib2to3.pytree import convert
 from struct import unpack
@@ -23,6 +30,8 @@ HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 27015        # The port used by the server
 run = True
 
+
+# Signaling Flags
 CHANGE_CONFIG = 0x1
 DROPPED_FRAME = 0x2
 SET_RTC = 0x4
@@ -41,29 +50,20 @@ CONVERTING = 0x4000
 FINISHED_CONVERT = 0x8000
 ACQUIRING_CAMERAS = 0x10000
 CONFIG_CHANGED = 0x20000
+START_LIVE = 0x100000
+LIVE_RUNNING = 0x200000
+STOP_LIVE = 0x400000
 EXIT_THREAD = 0x80000000
 DEFAULT_FPS = 65
 
-class ConfData(Structure):
-    __fields__ = [('horz', c_uint32),
-                  ('vert', c_uint32),
-                  ('fps', c_uint32),
-                  ('exp', c_uint32),
-                  ('bpp', c_uint32),
-                  ('capTime', c_uint32),
-                  ('flags', c_uint16),
-                  ('path', c_char_p)]
+# shared mem flags
+WRITING_BUFF1 = 0x1
+WRITING_BUFF2 = 0x2
+READING_BUFF1 = 0x4
+READING_BUFF2 = 0x8
 
-#inData: ConfData = ConfData()
-#inData.horz = 1920
-#inData.vert = 1200
-#inData.fps = 65
-#inData.exp = 6700
-#inData.bpp = 8
-#inData.capTime = 10
-#inData.path = "\0"*255
-#inData.path = "D:\\Ant1 Test\\tiff"
-#inData.flags = 0
+
+
 horz: int = 1920
 vert: int = 1200
 fps: int = 65
@@ -74,10 +74,12 @@ gain: float = 0.0
 path = "\0"*255
 path = "D:\\Ant1 Test\\raws"
 proName = "\0"*255
-proName = today.strftime("%Y%m%d_M25")  #As Per Request 
+proName = today.strftime("%Y%m%d_M25")  #As Per Request
 flags: int = 0
 exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\ide\x64\Debug'
 myEXE = "Basler_Candidate.exe"
+
+live_running = False
 
 write_mutex = threading.Lock()
 def client_thread():
@@ -141,11 +143,86 @@ def client_thread():
         #print('Received ' + repr(data))
         time.sleep(0.1)
 
+global sleep_mutex
+sleep_mutex = threading.Event()
+
+def liveView_func():
+    global horz
+    global vert
+    global bpp
+    global flags
+    global run
+    global live_running
+
+    if run:
+        live_running = True
+
+        # Create Memory Maps
+        imageSize = np.uint64((horz * vert) / 8 * bpp)
+
+        # adhearing to sector aligned memory
+        if imageSize % 512 != 0:
+            imageSize += (512 - (imageSize % 512))
+
+        imgObj = np.dtype(np.uint8, imageSize)
+
+        RW_flags = mmap.mmap(0, 8, "Local\\Flags")  # for basic signaling
+        buff1 = mmap.mmap(0, int(imageSize * 25), "Local\\buff1")
+        buff2 = mmap.mmap(0, int(imageSize * 25), "Local\\buff2")
+        frameVect = []
+        read_flags = np.uint8
+        fig = plt.figure(figsize=(10, 7))
+        while live_running:
+            # do stuff
+            read_flags = RW_flags.read_byte()
+            RW_flags.seek(0)
+            if read_flags & WRITING_BUFF1:
+                read_flags |= READING_BUFF2
+                read_flags &= ~READING_BUFF1
+                RW_flags.write_byte(read_flags)
+                for i in range(25):
+                    frameVect.append(buff2.read(int(imageSize)))
+            else:
+                read_flags |= READING_BUFF1
+                read_flags &= ~READING_BUFF2
+                RW_flags.write_byte(read_flags)
+                for i in range(25):
+                    frameVect.append(buff2.read(int(imageSize)))
+            RW_flags.seek(0)
+            buff1.seek(0)
+            buff2.seek(0)
+            print("Then length: ", len(frameVect[i]))
+            # RW_flags &= ~( READING_BUFF1 | READING_BUFF2 )
+
+            for i in range(25):
+                image_conv = Image.frombuffer("L", [horz, vert],
+                                              frameVect[i],
+                                              'raw', 'L', 0, 1)
+
+                fig.add_subplot(5, 5, i + 1)
+                plt.imshow(image_conv)
+                plt.axis('off')
+
+            plt.show()
+
+            fig = plt.figure(figsize=(10, 7))
+            frameVect.clear()
+            time.sleep(0.001)
+
+def liveView_thread():
+    global run
+    global sleep_mutex
+    print("Start LiveView")
+    while run:
+        print("Before Wait")
+        sleep_mutex.wait(None)
+        print("Before LiveView Function")
+        liveView_func()
+        print("Bottom of Looop")
+
 
 th = threading.Thread(target=client_thread)
-
-
-
+l_th = threading.Thread(target=liveView_thread)
 
 
 class Window(QMainWindow, Ui_MainWindow):
@@ -162,6 +239,7 @@ class Window(QMainWindow, Ui_MainWindow):
         bpp = 8
         global run
         th.start()
+        l_th.start()
 
 
     def sync_HorzLineEdit(self, text):
@@ -291,8 +369,28 @@ class Window(QMainWindow, Ui_MainWindow):
                 flags |= START_CAPTURE
         write_mutex.release()
 
+    def toggleLive(self):
+        global write_mutex
+        global sleep_mutex
+        global flags
+        global live_running
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED:
+            if flags & CAPTURING:
+                pass
+            elif live_running:
+                live_running = False
+                flags |= STOP_LIVE
+                flags &= ~LIVE_RUNNING
+            else:
+                live_running = True
+                flags |= START_LIVE
+                sleep_mutex.set()
+        write_mutex.release()
+
     def closeEvent(self, event):
         global write_mutex
+        global sleep_mutex
         global flags
         write_mutex.acquire()
         flags |= EXIT_THREAD
@@ -301,7 +399,11 @@ class Window(QMainWindow, Ui_MainWindow):
         time.sleep(0.2)
         global run
         run = False
+        global live_running
+        live_running = False
+        sleep_mutex.set()
         th.join
+        l_th.join
 
 
 class FindReplaceDialog(QDialog):

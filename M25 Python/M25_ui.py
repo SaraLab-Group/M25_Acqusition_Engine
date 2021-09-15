@@ -151,6 +151,7 @@ class Ui_MainWindow(object):
         self.GainlineEdit.setText("0.0")
         self.GainlineEdit.textChanged.connect(self.sync_GainLineEdit)
         self.PNameLineEdit.textChanged.connect(self.sync_PNameLineEdit)
+        self.LiveButton.clicked.connect(self.toggleLive)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
