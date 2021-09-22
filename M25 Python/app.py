@@ -177,14 +177,16 @@ def liveView_func():
             read_flags = RW_flags.read_byte()
             RW_flags.seek(0)
             if read_flags & WRITING_BUFF1:
+                print("BUFF2")
                 read_flags |= READING_BUFF2
-                read_flags &= ~READING_BUFF1
+                read_flags &= ~(READING_BUFF1)
                 RW_flags.write_byte(read_flags)
                 for i in range(25):
                     frameVect.append(buff2.read(int(imageSize)))
             else:
+                print("BUFF1")
                 read_flags |= READING_BUFF1
-                read_flags &= ~READING_BUFF2
+                read_flags &= ~(READING_BUFF2)
                 RW_flags.write_byte(read_flags)
                 for i in range(25):
                     frameVect.append(buff2.read(int(imageSize)))
@@ -381,7 +383,8 @@ class Window(QMainWindow, Ui_MainWindow):
             elif live_running:
                 live_running = False
                 flags |= STOP_LIVE
-                flags &= ~LIVE_RUNNING
+                flags &= ~(LIVE_RUNNING)
+                sleep_mutex.clear()
             else:
                 live_running = True
                 flags |= START_LIVE
