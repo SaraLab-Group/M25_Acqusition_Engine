@@ -1643,28 +1643,28 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	auto buffer_swap = [&]() noexcept {
         
 		if (*buff_flags & WRITING_BUFF1) {
-			//if (*buff_flags & READING_BUFF2) {
+			if (*buff_flags & READING_BUFF2) {
 				// do nothing
-			//	std::cout << "^";
-			//}
-			//else {
+				std::cout << "^";
+			}
+			else {
 				*buff_flags &= ~WRITING_BUFF1;
 				*buff_flags |= WRITING_BUFF2;
 				active_buff = head_buff2;
-			//	std::cout << "2";
-			//}
+				std::cout << "2";
+			}
 		}
 		else {
-			//if (*buff_flags&READING_BUFF1) {
+			if (*buff_flags&READING_BUFF1) {
 				// do nothing
-			//	std::cout << ".";
-			//}
-			//else {
+				std::cout << ".";
+			}
+			else {
 				*buff_flags &= ~WRITING_BUFF2;
 				*buff_flags |= WRITING_BUFF1;
 				active_buff = head_buff1;
-			//	std::cout << "1";
-			//}
+				std::cout << "1";
+			}
 		}
 
 		// This should safely stop live loop.
@@ -1698,7 +1698,9 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
+			std::cout << "Before Retreive" << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
+			std::cout << "After Retreive" << std::endl;
 
 			// Image grabbed successfully?
 			if (ptrGrabResult->GrabSucceeded())
