@@ -1643,24 +1643,28 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	auto buffer_swap = [&]() noexcept {
         
 		if (*buff_flags & WRITING_BUFF1) {
-			if (*buff_flags & READING_BUFF2) {
+			//if (*buff_flags & READING_BUFF2) {
 				// do nothing
-			}
-			else {
+			//	std::cout << "^";
+			//}
+			//else {
 				*buff_flags &= ~WRITING_BUFF1;
 				*buff_flags |= WRITING_BUFF2;
 				active_buff = head_buff2;
-			}
+			//	std::cout << "2";
+			//}
 		}
 		else {
-			if (*buff_flags&READING_BUFF1) {
+			//if (*buff_flags&READING_BUFF1) {
 				// do nothing
-			}
-			else {
+			//	std::cout << ".";
+			//}
+			//else {
 				*buff_flags &= ~WRITING_BUFF2;
 				*buff_flags |= WRITING_BUFF1;
 				active_buff = head_buff1;
-			}
+			//	std::cout << "1";
+			//}
 		}
 
 		// This should safely stop live loop.
