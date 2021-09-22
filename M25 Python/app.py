@@ -179,17 +179,20 @@ def liveView_func():
             if read_flags & WRITING_BUFF1:
                 print("BUFF2")
                 read_flags |= READING_BUFF2
-                read_flags &= ~(READING_BUFF1)
+                #read_flags &= ~(READING_BUFF1)
                 RW_flags.write_byte(read_flags)
                 for i in range(25):
                     frameVect.append(buff2.read(int(imageSize)))
             else:
                 print("BUFF1")
                 read_flags |= READING_BUFF1
-                read_flags &= ~(READING_BUFF2)
+                #read_flags &= ~(READING_BUFF2)
                 RW_flags.write_byte(read_flags)
                 for i in range(25):
                     frameVect.append(buff2.read(int(imageSize)))
+            RW_flags.seek(0)
+            read_flags &= ~(READING_BUFF1 | READING_BUFF2)
+            RW_flags.write_byte(read_flags)
             RW_flags.seek(0)
             buff1.seek(0)
             buff2.seek(0)
