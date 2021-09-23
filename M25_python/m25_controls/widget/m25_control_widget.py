@@ -29,6 +29,7 @@ from m25_plugin.qt5_designer import M25_ui
 from PyQt5.QtWidgets import QWidget, QFileDialog
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from napari import Viewer
+
 today = date.today()
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
@@ -243,7 +244,7 @@ class M25_widget(QWidget):
         #Layout the GUI
         self.setupUi(self)
         self.ui = M25_widget.Ui_Form()
-        
+
         global path
         self.WritePLineEdit.setText(path)
         self.PNameLineEdit.setText(proName)
@@ -425,10 +426,20 @@ class FindReplaceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+class QtLogger(logging.Handler):
+    """
+    Class to changing logging handler to the napari log output display
+    """
+    def __init__(self, widget):
+        super().__init__()
+        self.widget = widget
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = Window()
-    win.show()
-    sys.exit(app.exec())
+    # necessary to be a logging handler
+
+
+#if __name__ == "__main__":
+#    app = QApplication(sys.argv)
+#    win = Window()
+#    win.show()
+#    sys.exit(app.exec())
 
