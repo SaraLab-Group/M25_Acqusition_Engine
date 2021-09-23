@@ -1,0 +1,434 @@
+import sys
+import binascii
+import threading
+import time
+import struct
+import mmap
+from matplotlib import pyplot as plt
+import numpy as np
+#from StringIO import StringIO
+from PIL import *
+
+
+from datetime import date
+from lib2to3.pytree import convert
+from struct import unpack
+import socket
+from subprocess import call
+
+from ctypes import *
+from typing import Any, Tuple
+
+#from M25_ui import Ui_MainWindow
+#from PyQt5.QtWidgets import (
+#    QApplication, QDialog, QMainWindow, QFileDialog
+#)
+
+from m25_plugin.qt5_designer.M25_ui import Ui_MainWindow
+from m25_plugin.qt5_designer import M25_ui
+from PyQt5.QtWidgets import QWidget, QFileDialog
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from napari import Viewer
+today = date.today()
+
+HOST = '127.0.0.1'  # The server's hostname or IP address
+PORT = 27015        # The port used by the server
+run = True
+
+
+# Signaling Flags
+CHANGE_CONFIG = 0x1
+DROPPED_FRAME = 0x2
+SET_RTC = 0x4
+ACK_CMD = 0x8
+START_COUNT = 0x10
+COUNTING = 0x20
+STOP_COUNT = 0x40
+ACQUIRE_CAMERAS = 0x80
+CAMERAS_ACQUIRED = 0x100
+RELEASE_CAMERAS = 0x200
+AQUIRE_FAIL = 0x400
+START_CAPTURE = 0x800
+CAPTURING = 0x1000
+USB_HERE = 0x2000 #Use this as flag for Server alive too, since we wont trigger without USB
+CONVERTING = 0x4000
+FINISHED_CONVERT = 0x8000
+ACQUIRING_CAMERAS = 0x10000
+CONFIG_CHANGED = 0x20000
+START_LIVE = 0x100000
+LIVE_RUNNING = 0x200000
+STOP_LIVE = 0x400000
+EXIT_THREAD = 0x80000000
+DEFAULT_FPS = 65
+
+# shared mem flags
+WRITING_BUFF1 = 0x1
+WRITING_BUFF2 = 0x2
+READING_BUFF1 = 0x4
+READING_BUFF2 = 0x8
+
+
+
+horz: int = 1920
+vert: int = 1200
+fps: int = 65
+exp: int = 6700
+bpp: int = 8
+capTime: int = 10
+gain: float = 0.0
+path = "\0"*255
+path = "D:\\Ant1 Test\\raws"
+proName = "\0"*255
+proName = today.strftime("%Y%m%d_M25")  #As Per Request
+flags: int = 0
+exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\ide\x64\Debug'
+myEXE = "Basler_Candidate.exe"
+
+live_running = False
+
+write_mutex = threading.Lock()
+def client_thread():
+    #time.sleep(2)
+    prevFlag = 0
+    while run:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            global write_mutex
+            global horz
+            global vert
+            global fps
+            global exp
+            global bpp
+            global capTime
+            global gain
+            global path
+            global proName
+            global flags
+            write_mutex.acquire()
+            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), proName.encode(), flags, gain)
+            packer = struct.Struct('L L L L L L 255s 255s L d')
+            packed_data = packer.pack(*values)
+            s.sendall(packed_data)
+            #print('flags: %d' % int(flags))
+            flags = 0
+            #print('flags after: %d' % int(flags))
+            write_mutex.release()
+            #print(inData.path);
+            #outData: bytes = inData
+            #values: Tuple[Any, Any, Any, Any, Any, Any, str, Any] = (inData.horz, inData.vert, inData.fps, inData.exp, inData.bpp, inData.capTime, inData.path, inData.flags)
+            #packer = struct.Struct('L L L L L L 255s H')
+            #packed_data = Payload(inData)
+            #s.sendall(outData)
+            data: bytes = s.recv(1024)
+            (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_capTime,
+             rec_path, rec_proName,
+             rec_flags, rec_gain) = unpack(
+                'L L L L L L'
+                '255s'
+                '255s'
+                'L'
+                'd',
+                data
+            )
+        #pathStr = convert(rec_path)
+        #print('Received horz: %d' % int(rec_horz))
+        #print('Received vert: %d' % int(rec_vert))
+        #print('Received fps: %d' % int(rec_fps))
+        #print('Received exp: %d' % int(rec_exp))
+        #print('Received bpp: %d' % int(rec_bpp))
+        #print('Received capTime: %d' % int(rec_capTime))
+        #print('Received path: %s' % rec_path)
+        write_mutex.acquire()
+        if prevFlag != rec_flags:
+            print('Received flags: %d' % int(rec_flags))
+
+        flags = flags | rec_flags
+        prevFlag = rec_flags
+        write_mutex.release()
+        #print('Received ' + repr(data))
+        time.sleep(0.1)
+
+global sleep_mutex
+sleep_mutex = threading.Event()
+
+def liveView_func():
+    global horz
+    global vert
+    global bpp
+    global flags
+    global run
+    global live_running
+
+    if run:
+        live_running = True
+
+        # Create Memory Maps
+        imageSize = np.uint64((horz * vert) / 8 * bpp)
+
+        # adhearing to sector aligned memory
+        if imageSize % 512 != 0:
+            imageSize += (512 - (imageSize % 512))
+
+        imgObj = np.dtype(np.uint8, imageSize)
+
+        RW_flags = mmap.mmap(0, 8, "Local\\Flags")  # for basic signaling
+        buff1 = mmap.mmap(0, int(imageSize * 25), "Local\\buff1")
+        buff2 = mmap.mmap(0, int(imageSize * 25), "Local\\buff2")
+        frameVect = []
+        read_flags = np.uint8
+        fig = plt.figure(figsize=(10, 7))
+        while live_running:
+            # do stuff
+            read_flags = RW_flags.read_byte()
+            RW_flags.seek(0)
+            if read_flags & WRITING_BUFF1:
+                print("BUFF2")
+                read_flags |= READING_BUFF2
+                #read_flags &= ~(READING_BUFF1)
+                RW_flags.write_byte(read_flags)
+                for i in range(25):
+                    frameVect.append(buff2.read(int(imageSize)))
+            else:
+                print("BUFF1")
+                read_flags |= READING_BUFF1
+                #read_flags &= ~(READING_BUFF2)
+                RW_flags.write_byte(read_flags)
+                for i in range(25):
+                    frameVect.append(buff2.read(int(imageSize)))
+            RW_flags.seek(0)
+            read_flags &= ~(READING_BUFF1 | READING_BUFF2)
+            RW_flags.write_byte(read_flags)
+            RW_flags.seek(0)
+            buff1.seek(0)
+            buff2.seek(0)
+            print("Then length: ", len(frameVect[i]))
+            # RW_flags &= ~( READING_BUFF1 | READING_BUFF2 )
+
+            for i in range(25):
+                image_conv = Image.frombuffer("L", [horz, vert],
+                                              frameVect[i],
+                                              'raw', 'L', 0, 1)
+
+                fig.add_subplot(5, 5, i + 1)
+                plt.imshow(image_conv)
+                plt.axis('off')
+
+            plt.show()
+
+            fig = plt.figure(figsize=(10, 7))
+            frameVect.clear()
+            time.sleep(0.001)
+
+def liveView_thread():
+    global run
+    global sleep_mutex
+    print("Start LiveView")
+    while run:
+        print("Before Wait")
+        sleep_mutex.wait(None)
+        print("Before LiveView Function")
+        liveView_func()
+        print("Bottom of Looop")
+
+
+th = threading.Thread(target=client_thread)
+l_th = threading.Thread(target=liveView_thread)
+
+
+class M25_widget(QWidget):
+    def __init__(self, napari_viewer: Viewer):
+        super().__init__()
+        self.viewer = napari_viewer
+
+        #Layout the GUI
+        self.setupUi(self)
+        self.ui = M25_widget.Ui_Form()
+        
+        global path
+        self.WritePLineEdit.setText(path)
+        self.PNameLineEdit.setText(proName)
+        print(exe_path)
+        rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
+        global bpp
+        bpp = 8
+        global run
+        th.start()
+        l_th.start()
+
+
+    def sync_HorzLineEdit(self, text):
+        global horz
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            horz = (int(text))
+        else:
+            horz = (0)
+        write_mutex.release()
+
+
+    def sync_VertLineEdit(self, text):
+        global vert
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            vert = (int(text))
+        else:
+            vert = (0)
+        write_mutex.release()
+
+
+    def sync_FPSLineEdit(self, text):
+        global fps
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            fps = (int(text))
+        else:
+            fps = (0)
+        write_mutex.release()
+
+
+    def sync_EXPLineEdit(self, text):
+        global exp
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            exp = (int(text))
+        else:
+            exp = (0)
+        write_mutex.release()
+
+
+    def sync_CapTimeLineEdit(self, text):
+        global capTime
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            capTime = (int(text))
+        else:
+            capTime = (0)
+        write_mutex.release()
+
+    def sync_GainLineEdit(self, text):
+        global gain
+        global write_mutex
+        write_mutex.acquire()
+        if len(text) > 0:
+            gain = (float(text))
+        else:
+            gain = float(0.0)
+        write_mutex.release()
+
+    def sync_PNameLineEdit(self, text):
+        global proName
+        global write_mutex
+        write_mutex.acquire()
+        proName = text
+        write_mutex.release()
+
+    def onClicked(self):
+        global bpp
+        global write_mutex
+        write_mutex.acquire()
+        radioButton = self.sender()
+        if radioButton.isChecked():
+            bpp = (radioButton.value)
+            print("Button Value bpp: %d" % (radioButton.value))
+        write_mutex.release()
+
+    def browseState(self):
+        global path
+        path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        self.WritePLineEdit.setText(path)
+
+    def AcquireState(self):
+        global flags
+        global write_mutex
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED or flags & CAPTURING:
+            pass
+        else:
+            flags |= ACQUIRE_CAMERAS
+        write_mutex.release()
+
+    def ReleaseState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAPTURING:
+            pass
+        else:
+            flags |= RELEASE_CAMERAS
+        write_mutex.release()
+
+    def ConfState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAPTURING or flags & ACQUIRING_CAMERAS or flags & CAMERAS_ACQUIRED:
+            pass
+        else:
+            flags |= CHANGE_CONFIG
+        write_mutex.release()
+
+    def CaptureState(self):
+        global write_mutex
+        global flags
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED:
+            if flags & CAPTURING:
+                pass
+            else:
+                flags |= START_CAPTURE
+        write_mutex.release()
+
+    def toggleLive(self):
+        global write_mutex
+        global sleep_mutex
+        global flags
+        global live_running
+        write_mutex.acquire()
+        if flags & CAMERAS_ACQUIRED:
+            if flags & CAPTURING:
+                pass
+            elif live_running:
+                live_running = False
+                flags |= STOP_LIVE
+                flags &= ~(LIVE_RUNNING)
+                sleep_mutex.clear()
+            else:
+                live_running = True
+                flags |= START_LIVE
+                sleep_mutex.set()
+        write_mutex.release()
+
+    def closeEvent(self, event):
+        global write_mutex
+        global sleep_mutex
+        global flags
+        write_mutex.acquire()
+        flags |= EXIT_THREAD
+        write_mutex.release()
+        print('close event fired')
+        time.sleep(0.2)
+        global run
+        run = False
+        global live_running
+        live_running = False
+        sleep_mutex.set()
+        th.join
+        l_th.join
+
+
+class FindReplaceDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    win = Window()
+    win.show()
+    sys.exit(app.exec())
+

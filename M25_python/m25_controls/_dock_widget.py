@@ -1,37 +1,35 @@
+"""
+This module is an example of a barebones QWidget plugin for napari
+
+It implements the ``napari_experimental_provide_dock_widget`` hook specification.
+see: https://napari.org/docs/dev/plugins/hook_specifications.html
+
+Replace code below according to your needs.
+"""
 import sys
 import binascii
+from napari_plugin_engine import napari_hook_implementation
+from m25_controls.widget import m25_widget
+
 import threading
 import time
 import struct
-import mmap
-from matplotlib import pyplot as plt
-import numpy as np
-#from StringIO import StringIO
-from PIL import *
-
-
-from datetime import date
-from lib2to3.pytree import convert
 from struct import unpack
 import socket
 from subprocess import call
+import logging
 
 from ctypes import *
-from typing import Any, Tuple
+from PyQt5.QtWidgets import QWidget, QFileDialog,QDialog
+from napari import Viewer
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
-from M25_ui import Ui_MainWindow
-from PyQt5.QtWidgets import (
-    QApplication, QDialog, QMainWindow, QFileDialog
-)
 
-today = date.today()
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 27015        # The port used by the server
 run = True
 
-
-# Signaling Flags
 CHANGE_CONFIG = 0x1
 DROPPED_FRAME = 0x2
 SET_RTC = 0x4
@@ -50,36 +48,40 @@ CONVERTING = 0x4000
 FINISHED_CONVERT = 0x8000
 ACQUIRING_CAMERAS = 0x10000
 CONFIG_CHANGED = 0x20000
-START_LIVE = 0x100000
-LIVE_RUNNING = 0x200000
-STOP_LIVE = 0x400000
 EXIT_THREAD = 0x80000000
 DEFAULT_FPS = 65
 
-# shared mem flags
-WRITING_BUFF1 = 0x1
-WRITING_BUFF2 = 0x2
-READING_BUFF1 = 0x4
-READING_BUFF2 = 0x8
+class ConfData(Structure):
+    __fields__ = [('horz', c_uint32),
+                  ('vert', c_uint32),
+                  ('fps', c_uint32),
+                  ('exp', c_uint32),
+                  ('bpp', c_uint32),
+                  ('capTime', c_uint32),
+                  ('flags', c_uint16),
+                  ('path', c_char_p)]
 
-
-
+#inData: ConfData = ConfData()
+#inData.horz = 1920
+#inData.vert = 1200
+#inData.fps = 65
+#inData.exp = 6700
+#inData.bpp = 8
+#inData.capTime = 10
+#inData.path = "\0"*255
+#inData.path = "D:\\Ant1 Test\\tiff"
+#inData.flags = 0
 horz: int = 1920
 vert: int = 1200
 fps: int = 65
 exp: int = 6700
 bpp: int = 8
 capTime: int = 10
-gain: float = 0.0
 path = "\0"*255
-path = "D:\\Ant1 Test\\raws"
-proName = "\0"*255
-proName = today.strftime("%Y%m%d_M25")  #As Per Request
+path = "D:\\Ant1 Test\\tiff"
 flags: int = 0
 exe_path: str = r'C:\Users\Callisto\Documents\abajor\M25_basler\basler_candidate\ide\x64\Debug'
 myEXE = "Basler_Candidate.exe"
-
-live_running = False
 
 write_mutex = threading.Lock()
 def client_thread():
@@ -95,13 +97,11 @@ def client_thread():
             global exp
             global bpp
             global capTime
-            global gain
             global path
-            global proName
             global flags
             write_mutex.acquire()
-            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), proName.encode(), flags, gain)
-            packer = struct.Struct('L L L L L L 255s 255s L d')
+            values = (horz, vert, fps, exp, bpp, capTime, path.encode(), flags)
+            packer = struct.Struct('L L L L L L 255s L')
             packed_data = packer.pack(*values)
             s.sendall(packed_data)
             #print('flags: %d' % int(flags))
@@ -114,15 +114,13 @@ def client_thread():
             #packer = struct.Struct('L L L L L L 255s H')
             #packed_data = Payload(inData)
             #s.sendall(outData)
-            data: bytes = s.recv(1024)
+            data: bytes = s.recv(512)
             (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_capTime,
-             rec_path, rec_proName,
-             rec_flags, rec_gain) = unpack(
+             rec_path,
+             rec_flags) = unpack(
                 'L L L L L L'
                 '255s'
-                '255s'
-                'L'
-                'd',
+                'L',
                 data
             )
         #pathStr = convert(rec_path)
@@ -142,109 +140,25 @@ def client_thread():
         write_mutex.release()
         #print('Received ' + repr(data))
         time.sleep(0.1)
-
-global sleep_mutex
-sleep_mutex = threading.Event()
-
-def liveView_func():
-    global horz
-    global vert
-    global bpp
-    global flags
-    global run
-    global live_running
-
-    if run:
-        live_running = True
-
-        # Create Memory Maps
-        imageSize = np.uint64((horz * vert) / 8 * bpp)
-
-        # adhearing to sector aligned memory
-        if imageSize % 512 != 0:
-            imageSize += (512 - (imageSize % 512))
-
-        imgObj = np.dtype(np.uint8, imageSize)
-
-        RW_flags = mmap.mmap(0, 8, "Local\\Flags")  # for basic signaling
-        buff1 = mmap.mmap(0, int(imageSize * 25), "Local\\buff1")
-        buff2 = mmap.mmap(0, int(imageSize * 25), "Local\\buff2")
-        frameVect = []
-        read_flags = np.uint8
-        fig = plt.figure(figsize=(10, 7))
-        while live_running:
-            # do stuff
-            read_flags = RW_flags.read_byte()
-            RW_flags.seek(0)
-            if read_flags & WRITING_BUFF1:
-                print("BUFF2")
-                read_flags |= READING_BUFF2
-                #read_flags &= ~(READING_BUFF1)
-                RW_flags.write_byte(read_flags)
-                for i in range(25):
-                    frameVect.append(buff2.read(int(imageSize)))
-            else:
-                print("BUFF1")
-                read_flags |= READING_BUFF1
-                #read_flags &= ~(READING_BUFF2)
-                RW_flags.write_byte(read_flags)
-                for i in range(25):
-                    frameVect.append(buff2.read(int(imageSize)))
-            RW_flags.seek(0)
-            read_flags &= ~(READING_BUFF1 | READING_BUFF2)
-            RW_flags.write_byte(read_flags)
-            RW_flags.seek(0)
-            buff1.seek(0)
-            buff2.seek(0)
-            print("Then length: ", len(frameVect[i]))
-            # RW_flags &= ~( READING_BUFF1 | READING_BUFF2 )
-
-            for i in range(25):
-                image_conv = Image.frombuffer("L", [horz, vert],
-                                              frameVect[i],
-                                              'raw', 'L', 0, 1)
-
-                fig.add_subplot(5, 5, i + 1)
-                plt.imshow(image_conv)
-                plt.axis('off')
-
-            plt.show()
-
-            fig = plt.figure(figsize=(10, 7))
-            frameVect.clear()
-            time.sleep(0.001)
-
-def liveView_thread():
-    global run
-    global sleep_mutex
-    print("Start LiveView")
-    while run:
-        print("Before Wait")
-        sleep_mutex.wait(None)
-        print("Before LiveView Function")
-        liveView_func()
-        print("Bottom of Looop")
-
-
 th = threading.Thread(target=client_thread)
-l_th = threading.Thread(target=liveView_thread)
 
+class M25_widget(QWidget):
+    def __init__(self, napari_viewer: Viewer):
+        super().__init__()
+        self.viewer = napari_viewer
 
-class Window(QMainWindow, Ui_MainWindow):
+        #Layout the GUI
+        self.ui = m25_widget.Ui_Form()
+        self.ui.setupUi(self)
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setupUi(self)
         global path
-        self.WritePLineEdit.setText(path)
-        self.PNameLineEdit.setText(proName)
+        # self.WritePLineEdit.setText(path)
         print(exe_path)
-        rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
-        global bpp
-        bpp = 8
-        global run
-        th.start()
-        l_th.start()
+        # rc = call("start cmd /K " + myEXE, cwd=exe_path, shell=True)  # run `cmdline` in `dir`
+        # global bpp
+        # bpp = 8
+        # global run
+        # th.start()
 
 
     def sync_HorzLineEdit(self, text):
@@ -301,22 +215,6 @@ class Window(QMainWindow, Ui_MainWindow):
             capTime = (0)
         write_mutex.release()
 
-    def sync_GainLineEdit(self, text):
-        global gain
-        global write_mutex
-        write_mutex.acquire()
-        if len(text) > 0:
-            gain = (float(text))
-        else:
-            gain = float(0.0)
-        write_mutex.release()
-
-    def sync_PNameLineEdit(self, text):
-        global proName
-        global write_mutex
-        write_mutex.acquire()
-        proName = text
-        write_mutex.release()
 
     def onClicked(self):
         global bpp
@@ -374,52 +272,39 @@ class Window(QMainWindow, Ui_MainWindow):
                 flags |= START_CAPTURE
         write_mutex.release()
 
-    def toggleLive(self):
-        global write_mutex
-        global sleep_mutex
-        global flags
-        global live_running
-        write_mutex.acquire()
-        if flags & CAMERAS_ACQUIRED:
-            if flags & CAPTURING:
-                pass
-            elif live_running:
-                live_running = False
-                flags |= STOP_LIVE
-                flags &= ~(LIVE_RUNNING)
-                sleep_mutex.clear()
-            else:
-                live_running = True
-                flags |= START_LIVE
-                sleep_mutex.set()
-        write_mutex.release()
-
     def closeEvent(self, event):
         global write_mutex
-        global sleep_mutex
         global flags
         write_mutex.acquire()
         flags |= EXIT_THREAD
         write_mutex.release()
         print('close event fired')
-        time.sleep(0.2)
         global run
         run = False
-        global live_running
-        live_running = False
-        sleep_mutex.set()
         th.join
-        l_th.join
 
 
 class FindReplaceDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+class QtLogger(logging.Handler):
+    """
+    Class to changing logging handler to the napari log output display
+    """
+    def __init__(self, widget):
+        super().__init__()
+        self.widget = widget
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = Window()
-    win.show()
-    sys.exit(app.exec())
+    # necessary to be a logging handler
+    def emit(self, record):
+        msg = self.format(record)
+        self.widget.appendPlainText(msg)
+
+
+@napari_hook_implementation
+def napari_experimental_provide_dock_widget():
+    # you can return either a single widget, or a sequence of widgets
+    # each widget is accessible as a new plugin that stacks in the side panel
+    return [(M25_widget, {'name': 'M25_viewer'})]
 
