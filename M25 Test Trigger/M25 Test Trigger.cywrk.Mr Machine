@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="M25 Test Trigger\Camera Trigger\Source Files\main.c">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
 <ExpandedNodeIds>
 <v>M25 Test Trigger</v>
 <v>M25 Test Trigger\Camera Trigger</v>
@@ -233,6 +233,7 @@
 <OpenDocs>
 <name v=".\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" />
 <name v=".\Camera Trigger.cydsn\main.c" />
+<name v=".\Camera Trigger.cydsn\Camera Trigger.cydwr" />
 </OpenDocs>
 <OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
 
@@ -240,7 +241,7 @@
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1514, 669" SelectedTabbedMdiWindow="457d916d-3354-432d-b1d0-f917e2d77482"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="337ed882-4094-4c1a-9624-8cbd362c05ff" /><DocumentWindow Key="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="340a6a35-e7a6-4f31-8006-0b62c27f9f2d" /><DocumentWindow Key="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="457d916d-3354-432d-b1d0-f917e2d77482" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1671, 669" SelectedTabbedMdiWindow="fa656e2d-459a-4265-a7af-60b7618874c4"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="337ed882-4094-4c1a-9624-8cbd362c05ff" /><DocumentWindow Key="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="340a6a35-e7a6-4f31-8006-0b62c27f9f2d" /><DocumentWindow Key="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="457d916d-3354-432d-b1d0-f917e2d77482" /><DocumentWindow Key="C:\Users\Mr Machine\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cydwr" Guid="fa656e2d-459a-4265-a7af-60b7618874c4" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>
