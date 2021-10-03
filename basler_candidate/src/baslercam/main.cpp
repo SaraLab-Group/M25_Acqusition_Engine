@@ -109,6 +109,7 @@ uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint32_t bitDepth = 8;
 uint32_t fps = 65;
+uint32_t z_frames = 100;
 double gain = 0;
 
 
@@ -864,15 +865,27 @@ int main(int argc, char* argv[])
 		}
 		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_CAPTURE;
+			usb_outgoing.flags |= START_CAPTURE;
 			outgoing.flags |= CAPTURING;
 			prot.unlock();
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~CAPTURING;
+		}
+		else if (incoming.flags & START_Z_STACK && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+			incoming.flags &= ~(START_CAPTURE|START_Z_STACK);
+			usb_outgoing.flags |= (START_CAPTURE|START_Z_STACK);
+			outgoing.flags |= Z_STACK_RUNNING;
+			prot.unlock();
+			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~Z_STACK_RUNNING;
 		}
 		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_LIVE;
 			outgoing.flags |= LIVE_RUNNING;
 			prot.unlock();
+			/*** This needs to be started in a worker thread using a control mutex temporary ***/
 			live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~LIVE_RUNNING;
 		}
 		else if (incoming.flags & EXIT_THREAD) {
 			usb_outgoing.flags |= EXIT_THREAD;
@@ -1097,7 +1110,13 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// of the lamda functions I'm using to make my thread loop.
 
 	// frames will probably need to come from the tcp/ip pycromanager interface
-	frames = seconds * fps;
+	if(outgoing.flags & START_Z_STACK){
+		frames = z_frames;
+	}
+	else {
+		frames = seconds * fps;
+	}
+
 	printf("frames: %u\n", frames);
 	// How Many Large Binary Chunks of 100 frames we'll Write
 	uint64_t binary_chunks = seconds;
@@ -1164,25 +1183,29 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 	auto buffer_swap = [&]() noexcept {
+		/**** Removed the 2 cycles of buffer pre-fill on 10/2/2021 ****/
+	    /**** The code is now simply commented out this needs      ****/
+		/**** to happen to make z-stack collection work properly   ****/
+
 		// Currently Swaps Buffer every fps Frames
 		//std::cout << "Completed Cycle: " << std::endl;
-		if (pre_write > 1) {
-			if (frame_count == 0) {
-				std::cout << "START_COUNT" << std::endl;
-				std::unique_lock<std::mutex> flg(crit);
-				usb_thread_data.outgoing->flags |= START_COUNT;
-				flg.unlock();
-			}
+		//if (pre_write > 1) {
+		//	if (frame_count == 0) {
+		//		std::cout << "START_COUNT" << std::endl;
+		//		std::unique_lock<std::mutex> flg(crit);
+		//		usb_thread_data.outgoing->flags |= START_COUNT;
+		//		flg.unlock();
+		//	}
 			if (!begin_writing && frame_count == fps - 1) {
 				begin_writing = 1;
 			}
 			frame_count++;
-		}
+		//}
 
 
 		if (frame_count == frames) {
 			capture = false;
-			std::cout << "START_COUNT" << std::endl;
+			std::cout << "STOP_COUNT" << std::endl;
 			std::unique_lock<std::mutex> flg(crit);
 			usb_thread_data.outgoing->flags |= STOP_COUNT;
 			flg.unlock();
@@ -1216,7 +1239,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 				mtx.unlock(); // unlunk
 			}
 			else {
-				pre_write++;
+				//pre_write++;
 			}
 		}
 		else {

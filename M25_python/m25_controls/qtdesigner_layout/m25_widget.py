@@ -106,39 +106,7 @@ class Ui_Form(object):
         self.ReleaseCamsButton.setGeometry(QtCore.QRect(120, 330, 75, 23))
         self.ReleaseCamsButton.setObjectName("ReleaseCamsButton")
 
-        ##Things I added
-        self.onlyInt = QtGui.QIntValidator()
-        self.radioButton.toggled.connect(self.onClicked)
-        self.radioButton.value = 8
-        self.radioButton_2.toggled.connect(self.onClicked)
-        self.radioButton_2.value = 16
-        self.HorzLineEdit.setText("1920")
-        self.HorzLineEdit.textChanged.connect(self.sync_HorzLineEdit)
-        self.HorzLineEdit.setValidator(self.onlyInt)
-        self.VertLineEdit.setText("1200")
-        self.VertLineEdit.textChanged.connect(self.sync_VertLineEdit)
-        self.VertLineEdit.setValidator(self.onlyInt)
-        self.FPSLineEdit.setText("65")
-        self.FPSLineEdit.textChanged.connect(self.sync_FPSLineEdit)
-        self.FPSLineEdit.setValidator(self.onlyInt)
-        self.EXPLineEdit.setText("6700")
-        self.EXPLineEdit.textChanged.connect(self.sync_EXPLineEdit)
-        self.EXPLineEdit.setValidator(self.onlyInt)
-        self.CapTimeLineEdit.setText("10")
-        self.CapTimeLineEdit.textChanged.connect(self.sync_CapTimeLineEdit)
-        self.CapTimeLineEdit.setValidator(self.onlyInt)
-        self.MsgLineEdit.setText("Default")
-        self.StatusLineEdit.setText("OFFLINE")
-        self.radioButton.setChecked(True)
-        self.BrowsePushButton.clicked.connect(self.browseState)
-        self.AcquireCamsButton.clicked.connect(self.AcquireState)
-        self.ReleaseCamsButton.clicked.connect(self.ReleaseState)
-        self.ConfButton.clicked.connect(self.ConfState)
-        self.CapturePushButton.clicked.connect(self.CaptureState)
-        self.GainlineEdit.setText("0.0")
-        self.GainlineEdit.textChanged.connect(self.sync_GainLineEdit)
-        self.PNameLineEdit.textChanged.connect(self.sync_PNameLineEdit)
-        self.LiveButton.clicked.connect(self.toggleLive)
+
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -166,3 +134,11 @@ class Ui_Form(object):
         self.CaptureLabel.setText(_translate("Form", "Capture Time(s)"))
         self.AcquireCamsButton.setText(_translate("Form", "AcqCams"))
         self.ReleaseCamsButton.setText(_translate("Form", "FreeCams"))
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     Form = QtWidgets.QWidget()
+#     ui = Ui_Form()
+#     ui.setupUi(Form)
+#     Form.show()
+#     sys.exit(app.exec_())

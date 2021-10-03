@@ -122,7 +122,7 @@ void* USB_THREAD(void* data)
         // This MUTEX is only accessed by the
         // Aquisition stage
         std::unique_lock<std::mutex> cnt_lk(*thd_data->crit);
-        if (thd_data->outgoing->flags & START_COUNT) {
+        if (thd_data->outgoing->flags & (START_CAPTURE | START_LIVE | START_Z_STACK)) {
             //thd_data->outgoing->flags |= START_COUNT;
             send_data = 1;
         }
@@ -154,7 +154,7 @@ void* USB_THREAD(void* data)
                 printf("success: bulk write %d bytes\n", ret);
                 send_data = 0;
                 flg.lock();
-                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT | CAMERAS_ACQUIRED | RELEASE_CAMERAS); //~(CHANGE_FPS);
+                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT | CAMERAS_ACQUIRED | RELEASE_CAMERAS | START_CAPTURE | START_LIVE |START_Z_STACK); //~(CHANGE_FPS);
                 //thd_data->incoming->flags &= ~CHANGE_CONFIG;
                 flg.unlock();
             }
@@ -200,7 +200,7 @@ void* USB_THREAD(void* data)
                 printf("FPS: %u\n", thd_data->incoming->fps);
             }*/
             flg.lock();
-            thd_data->outgoing->flags |= USB_HERE;
+            thd_data->incoming->flags |= USB_HERE;
             flg.unlock();
 
             if (thd_data->incoming->flags & START_COUNT && thd_data->incoming->flags & NEW_CNT) {

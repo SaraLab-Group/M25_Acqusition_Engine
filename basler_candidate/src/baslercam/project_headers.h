@@ -113,6 +113,9 @@ typedef struct cam_event {
 #define START_LIVE 0x100000
 #define LIVE_RUNNING 0x200000
 #define STOP_LIVE 0x400000
+#define START_Z_STACK 0x800000
+#define Z_STACK_RUNNING 0x1000000
+#define STOP_Z_STACK 0x2000000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 
@@ -200,6 +203,15 @@ typedef struct SERVER_THD_DATA {
     std::condition_variable* signal_ptr;
     std::mutex* mtx_ptr;
     std::mutex* usb_srv_mtx;
+};
+
+typedef struct LIVE_THD_DATA {
+    std::vector<std::string>* serials;
+    std::vector<std::string>* camera_names;
+    std::vector<int>* zNums;
+    cam_data* cam_dat;
+    unsigned int* total_cams;
+    uint64_t* image_size;
 };
 
 //https://stackoverflow.com/questions/26114518/ipc-between-python-and-win32-on-windows-os
