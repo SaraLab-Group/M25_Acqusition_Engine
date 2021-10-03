@@ -328,6 +328,7 @@
       <Data key="a1b3d673-0331-4313-a1cd-6f1fb930c9cc" value="timer_clock_1" />
     </Group>
     <Group key="Pin">
+      <Data key="4c36baaa-1db7-4c74-a5b2-27d07e109b1f" value="STAGE_READY" />
       <Data key="6cf36fa8-446a-4ca4-9ee3-1a930c3ddce0" value="CMRA_RDY_IN_1" />
       <Data key="6d415d0c-6e19-4843-a1e7-ac39c11d9e81" value="STAGE_TRIGG" />
       <Data key="8d318d8b-cf7b-4b6b-b02c-ab1c5c49d0ba" value="CMRA_RDY_IN" />
@@ -3422,6 +3423,11 @@
     </Group>
   </Group>
   <Group key="Pin2">
+    <Group key="4c36baaa-1db7-4c74-a5b2-27d07e109b1f">
+      <Group key="0">
+        <Data key="Port Format" value="1,6" />
+      </Group>
+    </Group>
     <Group key="6cf36fa8-446a-4ca4-9ee3-1a930c3ddce0">
       <Group key="0">
         <Data key="Port Format" value="1,6" />
