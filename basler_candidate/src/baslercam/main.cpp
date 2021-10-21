@@ -721,13 +721,15 @@ void identify_camera(std::string* serial, std::vector<std::string>* camera_name,
 bool CreateMemoryMap(SharedMemory* shm);
 bool FreeMemoryMap(SharedMemory* shm);
 
-//void* live_thread(void* flags);
+//void* live_thread(void* live_data);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
 usb_data usb_incoming, usb_outgoing;
 SERVER_THD_DATA server_thread_data;
-std::condition_variable signal_main;
+LIVE_THD_DATA live_thread_data;
+
+std::condition_variable signal_main, signal_live;
 std::mutex sleep_loop;
 TCP_IP_DAT incoming, outgoing;
 std::vector<cam_event> events[25]; // This is for testing for dropped frames
@@ -767,7 +769,7 @@ int main(int argc, char* argv[])
 	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
 
     
-	cam_data cam_dat[c_maxCamerasToUse];
+	cam_data cam_dat[MAX_CAMS];
 
 	// For keeping track of which index has which serial
     // A switch case could be used to Number the cameras to their position
@@ -785,6 +787,9 @@ int main(int argc, char* argv[])
 	if (image_size % ALIGNMENT_BYTES) {
 		image_size += (ALIGNMENT_BYTES - (image_size % ALIGNMENT_BYTES));
 	}
+    
+	// Make sure the trigger isn't running after a crash.
+	usb_outgoing.flags |= RELEASE_CAMERAS;
 
 
 	// This will act as the primary interface to change configurations, aquire cameras, start image capture, etc.
@@ -809,6 +814,7 @@ int main(int argc, char* argv[])
 			else {
 				prot.lock();
 				outgoing.flags |= CAMERAS_ACQUIRED;
+				usb_outgoing.flags |= CAMERAS_ACQUIRED;
 				outgoing.flags &= ~ACQUIRING_CAMERAS;
 				prot.unlock();
 			}
@@ -841,6 +847,7 @@ int main(int argc, char* argv[])
 			fps = incoming.fps;
 			seconds = incoming.capTime;
 			gain = incoming.gain;
+			z_frames = incoming.z_frames;
 			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
 			raw_dir = incoming.path;
 			proj_sub_dir = incoming.proName;
@@ -873,7 +880,7 @@ int main(int argc, char* argv[])
 		}
 		else if (incoming.flags & START_Z_STACK && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~(START_CAPTURE|START_Z_STACK);
-			usb_outgoing.flags |= (START_CAPTURE|START_Z_STACK);
+			usb_outgoing.flags |= (START_Z_STACK);
 			outgoing.flags |= Z_STACK_RUNNING;
 			prot.unlock();
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
@@ -882,6 +889,7 @@ int main(int argc, char* argv[])
 		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_LIVE;
 			outgoing.flags |= LIVE_RUNNING;
+			usb_outgoing.flags |= (START_LIVE | START_CAPTURE);
 			prot.unlock();
 			/*** This needs to be started in a worker thread using a control mutex temporary ***/
 			live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
@@ -981,9 +989,11 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 		// Create and attach all Pylon Devices.
 		// We could probably not use the pcam array and just allocate directly to cam_dat
 
+		//Device Index
+		unsigned int k = 0;
 		for (unsigned int i = 0; i < *total_cams; i++)
 		{
-			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
+			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[k]));
 			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
 
 			INodeMap& nodemap = pcam[i]->GetNodeMap();
@@ -1008,6 +1018,19 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 			identify_camera(&serials->back(), camera_names, zNums);
+
+			// Added this little piece of code to pop any unverified cam serial numbers off the list and Destroy Device
+			if (zNums->back() > 25) {
+				serials->pop_back();
+				zNums->pop_back();
+				camera_names->pop_back();
+				pcam[i]->DestroyDevice();
+				i--; // undo index for cam data;
+				std::cout << "*** Invalid Camera Serial Number for M25 array Deleted ***" << std::endl;
+			}
+
+			// Trying to keep devices index moving in case we encounter an invalid serial.
+			k++;
 		}
 
 		// Only allow trigger timer to run once all cameras are acquired to prevent the buffers
@@ -1110,11 +1133,15 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// of the lamda functions I'm using to make my thread loop.
 
 	// frames will probably need to come from the tcp/ip pycromanager interface
-	if(outgoing.flags & START_Z_STACK){
+	if(outgoing.flags & Z_STACK_RUNNING){
 		frames = z_frames;
+		myfile << "Mode: Z STACK" << std::endl;
+		myfile << "Time Captured(s): NA" << std::endl;
 	}
 	else {
 		frames = seconds * fps;
+		myfile << "Mode: Capture" << std::endl;
+		myfile << "Time Captured(s): " << (int)seconds << std::endl;
 	}
 
 	printf("frames: %u\n", frames);
@@ -1127,7 +1154,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// data_size is the actual size of the data stored which
 	// may or may not be byte aligned.
 
-	uint64_t frame_size = (*image_size) * (*total_cams);
+	uint64_t frame_size = (*image_size) * MAX_CAMS;
 	uint64_t data_size = frame_size * fps;
 	uint64_t buff_size = data_size;
 
@@ -1139,9 +1166,8 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 		buff_size += (ALIGNMENT_BYTES - (buff_size % ALIGNMENT_BYTES));
 	}
 
-	myfile << "Time Captured(s): " << (int)seconds << std::endl;
 	myfile << "Raw image size (sector aligned 512B): " << (int)*image_size << std::endl;
-	myfile << "Frame Size(B): " << (int)frame_size << std::endl;
+	myfile << "Frame Size(B): " << (int)frame_size << " (BASED ON MAX_CAMS 25)" << std::endl;
 	myfile.close();
 
 	// Allocate Aligned buffers
@@ -1270,6 +1296,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
+			std::cout << "camera: " << (int)cam->number << " waiting." << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
 
 			// Image grabbed successfully?
@@ -1277,14 +1304,15 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 			{
 				// A little Pointer Arithmatic never hurt anybody
 				memcpy((void*)(in_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
-				if (pre_write > 1) {
+				/** Removed the 2 frames of pre buffering, no longer using "pre_write" flag **/
+				//if (pre_write > 1) {
 					cam_event thd_event;
 					thd_event.frame = frame_count;
 					//thd_event.missed_frame_count = ptrGrabResult->GetNumberOfSkippedImages();
 					//thd_event.sensor_readout = CFloatPtr(nodemap.GetNode("SensorReadoutTime"))->GetValue();   //Microseconds					
 					thd_event.time_stamp = ptrGrabResult->GetTimeStamp() / 1.0;
 					events[cam->number].push_back(thd_event);
-				}
+				//}
 
 				// Hurry up and wait
 				sync_point.arrive_and_wait();
@@ -1526,36 +1554,37 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 	std::cout << std::endl << "Finished Converting to tif" << std::endl;
+	if (!(outgoing.flags & Z_STACK_RUNNING)) {
+		uint32_t max_dropped = 0;
+		// Checking For Longer than acceptable Frame Times
+		for (int i = 0; i < 25; i++) {
+			uint32_t dropped_frames = 0;
+			int64_t prev = events[i][0].time_stamp;
+			int64_t first_miss_cnt = events[i][0].missed_frame_count;
+			for (int j = 1; j < frames; j++) {
+				if (events[i].size() > j) {
+					if ((abs(events[i][j].time_stamp - prev)) > 5.0 / ((float)fps * 4) * 1e9) {
+						std::cout << "camera: " << i << std::endl;
+						//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
+						std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
+						dropped_frames++;
+						//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
+						//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+					}
 
-	uint32_t max_dropped = 0;
-	// Checking For Longer than acceptable Frame Times
-	for (int i = 0; i < 25; i++) {
-		uint32_t dropped_frames = 0;
-		int64_t prev = events[i][0].time_stamp;
-		int64_t first_miss_cnt = events[i][0].missed_frame_count;
-		for (int j = 1; j < frames; j++) {
-			if (events[i].size() > j) {
-				if ((abs(events[i][j].time_stamp - prev)) >  5.0 / ((float)fps * 4) * 1e9) {
-					std::cout << "camera: " << i << std::endl;
-					//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
-					std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
-					dropped_frames++;
-					//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
-					//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+					prev = events[i][j].time_stamp;
 				}
-
-				prev = events[i][j].time_stamp;
+				else {
+					std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
+				}
 			}
-			else {
-				std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
-			}
+			std::cout << ".";
+			max_dropped = max(max_dropped, dropped_frames);
 		}
-		std::cout << ".";
-		max_dropped = max(max_dropped, dropped_frames);
+		std::cout << std::endl;
+		std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
+		std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
 	}
-	std::cout << std::endl;
-	std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
-	std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
 
 	// Free These Aligned Buffers PLEASE!
 	_aligned_free(buff1);
@@ -1588,7 +1617,7 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 
 
-	uint64_t frame_size = (*image_size) * (*total_cams);
+	uint64_t frame_size = (*image_size) * MAX_CAMS;
 //	uint64_t data_size = frame_size * fps;
 //	uint64_t buff_size = data_size;
 
@@ -1904,6 +1933,7 @@ void identify_camera(std::string* serial, std::vector<std::string>* camera_names
 		default:
 			std::cout << "error with switch case" << std::endl;
 			camera_names->push_back(*serial);
+			zNums->push_back(26);
 			break;
 	}
 }

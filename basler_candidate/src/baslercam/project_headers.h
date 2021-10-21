@@ -118,7 +118,7 @@ typedef struct cam_event {
 #define STOP_Z_STACK 0x2000000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
-
+#define MAX_CAMS (25u)
 //#define EXIT_USB 0x8000  Big Yikes
 
 // Camera Serials
@@ -180,6 +180,7 @@ typedef struct TCP_IP_DAT {
     uint32_t fps;
     uint32_t exp;
     uint32_t bpp;
+    uint32_t z_frames;
     uint32_t capTime;
     char path[255];
     char proName[255];
