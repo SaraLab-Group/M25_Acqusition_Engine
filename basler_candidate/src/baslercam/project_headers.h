@@ -196,24 +196,30 @@ typedef struct USB_THD_DATA {
     std::mutex* usb_srv_mtx;
 };
 
+typedef struct LIVE_THD_DATA {
+    std::vector<std::string>* serials;
+    std::vector<std::string>* camera_names;
+    std::vector<int>* zNums;
+    std::condition_variable* signal_live;
+    std::mutex* crit;
+    cam_data* cam_dat;
+    unsigned int* total_cams;
+    uint64_t* image_size;
+    uint32_t flags;
+};
+
 typedef struct SERVER_THD_DATA {
     TCP_IP_DAT* incoming_data;
     TCP_IP_DAT* outgoing_data;
     usb_data* usb_incoming;
     usb_data* usb_outgoing;
+    uint32_t* live_flags;
     std::condition_variable* signal_ptr;
     std::mutex* mtx_ptr;
     std::mutex* usb_srv_mtx;
 };
 
-typedef struct LIVE_THD_DATA {
-    std::vector<std::string>* serials;
-    std::vector<std::string>* camera_names;
-    std::vector<int>* zNums;
-    cam_data* cam_dat;
-    unsigned int* total_cams;
-    uint64_t* image_size;
-};
+
 
 //https://stackoverflow.com/questions/26114518/ipc-between-python-and-win32-on-windows-os
 

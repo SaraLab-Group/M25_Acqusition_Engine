@@ -721,7 +721,7 @@ void identify_camera(std::string* serial, std::vector<std::string>* camera_name,
 bool CreateMemoryMap(SharedMemory* shm);
 bool FreeMemoryMap(SharedMemory* shm);
 
-//void* live_thread(void* live_data);
+void* live_thread(void* live_data);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
@@ -757,6 +757,7 @@ int main(int argc, char* argv[])
 	server_thread_data.signal_ptr = &signal_main;
 	server_thread_data.mtx_ptr = &crit2;
 	server_thread_data.usb_srv_mtx = &crit3;
+	server_thread_data.live_flags = &live_thread_data.flags;
 	
 	usb_thread_data.incoming = &usb_incoming;
 	usb_thread_data.outgoing = &usb_outgoing;
@@ -788,6 +789,17 @@ int main(int argc, char* argv[])
 		image_size += (ALIGNMENT_BYTES - (image_size % ALIGNMENT_BYTES));
 	}
     
+	// Set up Live Capture Thread
+	live_thread_data.camera_names = &camera_names;
+	live_thread_data.serials = &serials;
+	live_thread_data.zNums = &camera_zNums;
+	live_thread_data.image_size = &image_size;
+	live_thread_data.cam_dat = cam_dat;
+	live_thread_data.signal_live = &signal_live;
+	live_thread_data.crit = &crit2;
+	live_thread_data.total_cams = &total_cams;
+
+	std::thread LIVE_THD_OBJ(live_thread, (void*)&live_thread_data);
 	// Make sure the trigger isn't running after a crash.
 	usb_outgoing.flags |= RELEASE_CAMERAS;
 
@@ -819,7 +831,7 @@ int main(int argc, char* argv[])
 				prot.unlock();
 			}
 		}
-		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_ACQUIRED && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING))) {
 			incoming.flags &= ~RELEASE_CAMERAS;
 			printf("Release Cameras\n");
 			prot.unlock();
@@ -870,7 +882,7 @@ int main(int argc, char* argv[])
 			incoming.flags &= ~CHANGE_CONFIG;
 			prot.unlock();
 		}
-		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_CAPTURE;
 			usb_outgoing.flags |= START_CAPTURE;
 			outgoing.flags |= CAPTURING;
@@ -878,7 +890,7 @@ int main(int argc, char* argv[])
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
 			outgoing.flags &= ~CAPTURING;
 		}
-		else if (incoming.flags & START_Z_STACK && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & START_Z_STACK && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~(START_CAPTURE|START_Z_STACK);
 			usb_outgoing.flags |= (START_Z_STACK);
 			outgoing.flags |= Z_STACK_RUNNING;
@@ -886,18 +898,20 @@ int main(int argc, char* argv[])
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
 			outgoing.flags &= ~Z_STACK_RUNNING;
 		}
-		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_LIVE;
 			outgoing.flags |= LIVE_RUNNING;
 			usb_outgoing.flags |= (START_LIVE | START_CAPTURE);
 			prot.unlock();
 			/*** This needs to be started in a worker thread using a control mutex temporary ***/
-			live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
-			outgoing.flags &= ~LIVE_RUNNING;
+			//live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			//outgoing.flags &= ~LIVE_RUNNING;
+			signal_live.notify_one();
 		}
 		else if (incoming.flags & EXIT_THREAD) {
-			usb_outgoing.flags |= EXIT_THREAD;
+			usb_outgoing.flags |= EXIT_THREAD;		
 			prot.unlock();
+			signal_live.notify_one();
 			active = false;
 		}
 		else {
@@ -916,6 +930,7 @@ int main(int argc, char* argv[])
 		// usb_thread_data.incoming->flags |= EXIT_THREAD;
 		USB_THD_OBJ.join();
 		SRVR_THD_OBJ.join();
+		LIVE_THD_OBJ.join();
 		//auto start = chrono::steady_clock::now();
 		//cout << "Before FileName" << endl;
 		//FileName << strDirectryName << "MyBigFatGreekWedding" << ".bin";
@@ -1011,13 +1026,14 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 
 			serials->push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
 			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
-			cam_dat[i].number = i;
-			cam_dat[i].offset = i * (*image_size);
+
 			cam_dat[i].camPtr = pcam[i];
 			// Moved this out of the thread initilization stuff
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 			identify_camera(&serials->back(), camera_names, zNums);
+			cam_dat[i].number = ((uint8_t)zNums->back() - 1);
+			cam_dat[i].offset = ((uint64_t)zNums->back() - 1) * (*image_size);
 
 			// Added this little piece of code to pop any unverified cam serial numbers off the list and Destroy Device
 			if (zNums->back() > 25) {
@@ -1096,7 +1112,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	_mkdir(strDirectryName.c_str());
 
 	//append path for destination folder
-	//strDirectryName += "\\binaries";
+	strDirectryName += "\\binaries";
 
 	//_mkdir(tiff_dir.c_str());
 
@@ -1296,7 +1312,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
-			std::cout << "camera: " << (int)cam->number << " waiting." << std::endl;
+			//std::cout << "camera: " << (int)cam->number << " waiting." << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
 
 			// Image grabbed successfully?
@@ -1361,7 +1377,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 			//std::cout << "Past Lock" << std::endl;
 
 			//auto start = chrono::steady_clock::now();
-			std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
+			std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(write_count) + ".bin";
 			printf("%s\n", Filename.c_str());
 			saveBigBuffer(Filename.c_str(), out_buff, buff_size);
 			write_count++;
@@ -1452,7 +1468,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 				//std::cout << "^";
 			}
 			else {
-				std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+				std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 				uint64_t outNumberofBytes;
 				//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 				readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1524,7 +1540,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 	start = chrono::steady_clock::now();
 
-	std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+	std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 	uint64_t outNumberofBytes;
 	//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 	readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1697,31 +1713,31 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		if (*buff_flags & WRITING_BUFF1) {
 			if (*buff_flags & READING_BUFF2) {
 				// do nothing
-				std::cout << "^";
+				//std::cout << "^";
 			}
 			else {
 				*buff_flags &= ~WRITING_BUFF1;
 				*buff_flags |= WRITING_BUFF2;
 				active_buff = head_buff2;
-				std::cout << "2";
+				//std::cout << "2";
 			}
 		}
 		else {
 			if (*buff_flags&READING_BUFF1) {
 				// do nothing
-				std::cout << ".";
+				//std::cout << ".";
 			}
 			else {
 				*buff_flags &= ~WRITING_BUFF2;
 				*buff_flags |= WRITING_BUFF1;
 				active_buff = head_buff1;
-				std::cout << "1";
+				//std::cout << "1";
 			}
 		}
 
 		// This should safely stop live loop.
 		std::unique_lock<std::mutex> flg(crit2);
-		if (incoming.flags & STOP_LIVE) {
+		if (live_thread_data.flags & STOP_LIVE) {
 			capture = false;
 			std::cout << "Exiting Live." << std::endl;
 		}
@@ -1750,9 +1766,9 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
-			std::cout << "Before Retreive" << std::endl;
+			//std::cout << "Before Retreive" << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
-			std::cout << "After Retreive" << std::endl;
+			//std::cout << "After Retreive" << std::endl;
 
 			// Image grabbed successfully?
 			if (ptrGrabResult->GrabSucceeded())
@@ -1805,6 +1821,7 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 	std::unique_lock<std::mutex> flg(crit2);
 	outgoing.flags &= ~LIVE_RUNNING;
+	usb_outgoing.flags |= STOP_COUNT;
 	flg.unlock();
 
 	// Free Memory Maps
@@ -1812,21 +1829,32 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	FreeMemoryMap(&shm1);
 	FreeMemoryMap(&shm2);
 
-	// Clear Threads
-	threads.clear();
+	// Clear Threads   
 }
 
 // thread for live view mode
-/*void* live_thread(void* flags) {
-
-	uint32_t* sig_flags = (uint32_t*)flags;
+void* live_thread(void* live_data) {
+	LIVE_THD_DATA* thd_dat = (LIVE_THD_DATA*)live_data;
+	std::mutex lk;
+	//uint32_t* sig_flags = (uint32_t*)flags;
 
 	uint8_t running = 1;
 	while (running) {
-
+		std::unique_lock<std::mutex> sleep(lk);
+		thd_dat->signal_live->wait(sleep);
+		std::unique_lock<std::mutex> flg(*thd_dat->crit);
+		if (!(thd_dat->flags & EXIT_THREAD)) {
+			flg.unlock();
+			live_capture(thd_dat->serials, thd_dat->camera_names, thd_dat->zNums, thd_dat->cam_dat, thd_dat->total_cams, thd_dat->image_size);
+		}
+		else {
+			flg.unlock();
+			running = 0;
+		}
 	}
-
-}*/
+	std::cout << "Exiting live capture thread" << std::endl;
+	return 0;
+}
 
 void identify_camera(std::string* serial, std::vector<std::string>* camera_names, std::vector<int>* zNums) {
 	switch(std::stoi(*serial, nullptr, 0)) {
