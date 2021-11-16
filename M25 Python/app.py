@@ -201,7 +201,12 @@ def liveView_func():
         plt.ion()
         buff1.seek(0)
         buff2.seek(0)
-        myimg = plt.imshow(np.zeros([vert*2, horz*2]))
+
+        if horz <= 960:
+            myimg = plt.imshow(np.zeros([vert*5, horz*5]))
+        else:
+            myimg = plt.imshow(np.zeros([vert*2, horz*2]))
+
         dst = Image.new('L', [horz * 5, vert * 5])
         while live_running:
             start = time.time()
@@ -236,13 +241,16 @@ def liveView_func():
                 image_conv = Image.frombuffer("L", [horz, vert],
                                               frameVect[i],
                                               'raw', 'L', 0, 1)
-                dst.paste(image_conv, [horz * (i % 5), vert * (4 - (i // 5 % 5))])
+                dst.paste(image_conv, [horz * (i % 5), vert * ((i // 5 % 5))])
 
+            if horz < 960:
+                myimg.set_data(dst)
+            else:
+                myimg.set_data(dst.resize((horz*2, vert*2)))
 
-            myimg.set_data(dst.resize((horz*2, vert*2)))
             #plt.axis('off')
             #plt.show()
-            plt.pause(0.1)
+            plt.pause(0.001)
 
             if not live_running:
                 plt.close()
