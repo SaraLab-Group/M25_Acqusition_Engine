@@ -87,10 +87,13 @@ myEXE = "Basler_Candidate.exe"
 
 live_running = False
 zMode = False
+singleMode = False
+singleCam = 13
 
 write_mutex = threading.Lock()
 def client_thread():
     #time.sleep(2)
+    global run
     prevFlag = 0
     while run:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -113,27 +116,38 @@ def client_thread():
             packer = struct.Struct('L L L L L L L 255s 255s L d')
             packed_data = packer.pack(*values)
             s.sendall(packed_data)
+
             #print('flags: %d' % int(flags))
-            flags = 0
+
             #print('flags after: %d' % int(flags))
-            write_mutex.release()
+
+
+            if flags & EXIT_THREAD:
+                write_mutex.release()
+                print('Closing Socket')
+                run = False
+                s.close()
+            else:
+                flags = 0
+                write_mutex.release()
+                data: bytes = s.recv(1024)
+                (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_z_frames, rec_capTime,
+                 rec_path, rec_proName,
+                 rec_flags, rec_gain) = unpack(
+                    'L L L L L L L'
+                    '255s'
+                    '255s'
+                    'L'
+                    'd',
+                    data
+                )
             #print(inData.path);
             #outData: bytes = inData
             #values: Tuple[Any, Any, Any, Any, Any, Any, str, Any] = (inData.horz, inData.vert, inData.fps, inData.exp, inData.bpp, inData.capTime, inData.path, inData.flags)
             #packer = struct.Struct('L L L L L L 255s H')
             #packed_data = Payload(inData)
             #s.sendall(outData)
-            data: bytes = s.recv(1024)
-            (rec_horz, rec_vert, rec_fps, rec_exp, rec_bpp, rec_z_frames,rec_capTime,
-             rec_path, rec_proName,
-             rec_flags, rec_gain) = unpack(
-                'L L L L L L L'
-                '255s'
-                '255s'
-                'L'
-                'd',
-                data
-            )
+
         #pathStr = convert(rec_path)
         #print('Received horz: %d' % int(rec_horz))
         #print('Received vert: %d' % int(rec_vert))
@@ -142,15 +156,15 @@ def client_thread():
         #print('Received bpp: %d' % int(rec_bpp))
         #print('Received capTime: %d' % int(rec_capTime))
         #print('Received path: %s' % rec_path)
-        write_mutex.acquire()
-        if prevFlag != rec_flags:
-            print('Received flags: %d' % int(rec_flags))
+            write_mutex.acquire()
+            if prevFlag != rec_flags:
+                print('Received flags: %d' % int(rec_flags))
 
-        flags = flags | rec_flags
-        prevFlag = rec_flags
-        write_mutex.release()
-        #print('Received ' + repr(data))
-        time.sleep(0.1)
+            flags = flags | rec_flags
+            prevFlag = rec_flags
+            write_mutex.release()
+            #print('Received ' + repr(data))
+            time.sleep(0.1)
 
 global sleep_mutex
 sleep_mutex = threading.Event()
@@ -202,12 +216,16 @@ def liveView_func():
         buff1.seek(0)
         buff2.seek(0)
 
-        if horz <= 960:
-            myimg = plt.imshow(np.zeros([vert*5, horz*5]))
+        if singleMode:
+            myimg = plt.imshow(np.zeros([vert, horz]))
+            dst = Image.new('L', [horz, vert])
         else:
-            myimg = plt.imshow(np.zeros([vert*2, horz*2]))
+            if horz < 960:
+                myimg = plt.imshow(np.zeros([vert*5, horz*5]))
+            else:
+                myimg = plt.imshow(np.zeros([vert*2, horz*2]))
+            dst = Image.new('L', [horz * 5, vert * 5])
 
-        dst = Image.new('L', [horz * 5, vert * 5])
         while live_running:
             start = time.time()
             # do stuff
@@ -236,17 +254,22 @@ def liveView_func():
             print("Then length: ", len(frameVect[i]))
             # RW_flags &= ~( READING_BUFF1 | READING_BUFF2 )
 
-
-            for i in range(25):
-                image_conv = Image.frombuffer("L", [horz, vert],
-                                              frameVect[i],
+            if singleMode:
+                dst = Image.frombuffer("L", [horz, vert],
+                                              frameVect[singleCam - 1],
                                               'raw', 'L', 0, 1)
-                dst.paste(image_conv, [horz * (i % 5), vert * ((i // 5 % 5))])
-
-            if horz < 960:
                 myimg.set_data(dst)
             else:
-                myimg.set_data(dst.resize((horz*2, vert*2)))
+                for i in range(25):
+                    image_conv = Image.frombuffer("L", [horz, vert],
+                                                  frameVect[i],
+                                                  'raw', 'L', 0, 1)
+                    dst.paste(image_conv, [horz * (i % 5), vert * ((i // 5 % 5))])
+
+                if horz < 960:
+                    myimg.set_data(dst)
+                else:
+                    myimg.set_data(dst.resize((horz*2, vert*2)))
 
             #plt.axis('off')
             #plt.show()
@@ -268,7 +291,8 @@ def liveView_thread():
         print("Before Wait")
         sleep_mutex.wait(None)
         print("Before LiveView Function")
-        liveView_func()
+        if run:
+            liveView_func()
         print("Bottom of Looop")
 
 
@@ -289,6 +313,8 @@ class Window(QMainWindow, Ui_MainWindow):
         global bpp
         bpp = 8
         global run
+        global singleCam
+        singleCam = self.CamSpinBox.value()
         th.start()
         l_th.start()
 
@@ -395,6 +421,24 @@ class Window(QMainWindow, Ui_MainWindow):
             zMode = False
         write_mutex.release()
 
+    def singleClicked(self):
+        global singleMode
+        global write_mutex
+        write_mutex.acquire()
+        box = self.sender()
+        if box.isChecked():
+            singleMode = True
+        else:
+            singleMode = False
+        write_mutex.release()
+
+    def singleSpinClicked(self):
+        global singleCam
+        global write_mutex
+        write_mutex.acquire()
+        singleCam = self.CamSpinBox.value()
+        write_mutex.release()
+
     def browseState(self):
         global path
         path = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
@@ -465,6 +509,8 @@ class Window(QMainWindow, Ui_MainWindow):
                 sleep_mutex.set()
         write_mutex.release()
 
+
+
     def closeEvent(self, event):
         global write_mutex
         global sleep_mutex
@@ -481,6 +527,7 @@ class Window(QMainWindow, Ui_MainWindow):
         sleep_mutex.set()
         th.join
         l_th.join
+        time.sleep(0.2)
 
 
 class FindReplaceDialog(QDialog):
