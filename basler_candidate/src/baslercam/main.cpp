@@ -1107,19 +1107,19 @@ bool FreeMemoryMap(SharedMemory* shm)
 void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Should this be monitored in Write Thread?
 	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
-
+	std::string strDirName = strDirectryName;
 	// Create the Write Directory "Root"
-	_mkdir(strDirectryName.c_str());
+	_mkdir(strDirName.c_str());
 
 	//append path for destination folder
-	strDirectryName += "\\binaries";
+	strDirName += "\\binaries";
 
 	//_mkdir(tiff_dir.c_str());
 
 	//tiff_dir += "\\tiff";
 
 	// create subfolders
-	_mkdir(strDirectryName.c_str());
+	_mkdir(strDirName.c_str());
 	_mkdir(raw_dir.c_str());
 	std::string sub_dir = raw_dir + "\\" + proj_sub_dir;
 	_mkdir(sub_dir.c_str());
@@ -1377,7 +1377,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 			//std::cout << "Past Lock" << std::endl;
 
 			//auto start = chrono::steady_clock::now();
-			std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(write_count) + ".bin";
+			std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(write_count) + ".bin";
 			printf("%s\n", Filename.c_str());
 			saveBigBuffer(Filename.c_str(), out_buff, buff_size);
 			write_count++;
@@ -1468,7 +1468,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 				//std::cout << "^";
 			}
 			else {
-				std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+				std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 				uint64_t outNumberofBytes;
 				//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 				readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1540,7 +1540,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 	start = chrono::steady_clock::now();
 
-	std::string Filename = strDirectryName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+	std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 	uint64_t outNumberofBytes;
 	//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 	readFile(Filename.c_str(), &outNumberofBytes, buff1);
