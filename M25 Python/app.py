@@ -69,10 +69,10 @@ READING_BUFF2 = 0x8
 
 
 
-horz: int = 1920
-vert: int = 1200
-fps: int = 65
-exp: int = 6700
+horz: int = 960
+vert: int = 600
+fps: int = 2
+exp: int = 250000
 bpp: int = 8
 capTime: int = 10
 z_frames: int = 0;
@@ -412,6 +412,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def checkClicked(self):
         global zMode
+        global fps
         global write_mutex
         write_mutex.acquire()
         box = self.sender()
