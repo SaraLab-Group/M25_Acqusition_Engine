@@ -66,8 +66,8 @@
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\LCD_Char</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\LCD_Char_LCDPort</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PERIOD_ISR</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Pin_1</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PWM_1</v>
+<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PWM_OUT</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\READY</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\RESET_RDY_TIMER</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\STAGE_COACH</v>
@@ -132,9 +132,9 @@
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_PM.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\main.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PERIOD_ISR.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Pin_1.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_OUT.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY_PM.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER.lst</v>
@@ -212,9 +212,9 @@
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_PM.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\main.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PERIOD_ISR.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Pin_1.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1_PM.lst</v>
+<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_OUT.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY_PM.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER.lst</v>
@@ -317,7 +317,7 @@
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1199, 681" SelectedTabbedMdiWindow="d766cc37-d1db-4aba-9956-0e830a7e6cad"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="4418367e-f364-49ca-ad40-e17b3ababbee" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="9fedd40c-fdb7-4bfd-9d29-867d4ff34230" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cydwr" Guid="9b99c21d-a7b7-4a47-9a6e-17689307bc3d" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="d766cc37-d1db-4aba-9956-0e830a7e6cad" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1199, 681" SelectedTabbedMdiWindow="9fedd40c-fdb7-4bfd-9d29-867d4ff34230"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="4418367e-f364-49ca-ad40-e17b3ababbee" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="9fedd40c-fdb7-4bfd-9d29-867d4ff34230" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cydwr" Guid="9b99c21d-a7b7-4a47-9a6e-17689307bc3d" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="d766cc37-d1db-4aba-9956-0e830a7e6cad" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>
