@@ -132,7 +132,7 @@ void* USB_THREAD(void* data)
             //thd_data->outgoing->flags &= ~START_COUNT;
             send_data = 1;
         }
-        cnt_lk.unlock();
+        //cnt_lk.unlock();
         
 
         if (thd_data->outgoing->flags & EXIT_THREAD) {
@@ -141,6 +141,7 @@ void* USB_THREAD(void* data)
         flg.unlock();
 
         if (send_data) {
+            
             flg.lock();
             ret = usb_bulk_write(dev, EP_OUT, (char*)thd_data->outgoing, sizeof(usb_data), 500);
             flg.unlock();
@@ -158,12 +159,7 @@ void* USB_THREAD(void* data)
                 //thd_data->incoming->flags &= ~CHANGE_CONFIG;
                 flg.unlock();
             }
-
-            //flg.lock();
-            //thd_data->outgoing->flags &= CHANGE_CONFIG; //~(CHANGE_FPS);
-            //thd_data->incoming->flags &= ~CHANGE_CONFIG;
-            //flg.unlock();
-            //send_data = 0;
+            cnt_lk.unlock();
         }
         //#endif
 

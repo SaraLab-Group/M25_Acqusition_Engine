@@ -1819,8 +1819,10 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 	std::cout << "Live View Finished" << std::endl;
 
-	std::unique_lock<std::mutex> flg(crit2);
+	std::unique_lock<std::mutex> flg2(crit2);
 	outgoing.flags &= ~LIVE_RUNNING;
+	flg2.unlock();
+	std::unique_lock<std::mutex> flg(crit);
 	usb_outgoing.flags |= STOP_COUNT;
 	flg.unlock();
 
