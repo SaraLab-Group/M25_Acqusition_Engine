@@ -952,9 +952,9 @@ int main(int argc, char* argv[])
 
 
 	// Comment the following two lines to disable waiting on exit.
-	cerr << endl << "Press Enter to exit." << endl;
-	while (cin.get() != '\n');
-	
+	//cerr << endl << "Press Enter to exit." << endl;
+	//while (cin.get() != '\n');
+    PostMessage(GetConsoleWindow(), WM_CLOSE, 0, 0);
 
 	return exitCode;
 }
@@ -1740,6 +1740,7 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		if (live_thread_data.flags & STOP_LIVE) {
 			capture = false;
 			std::cout << "Exiting Live." << std::endl;
+			live_thread_data.flags &= ~STOP_LIVE;
 		}
 		flg.unlock();
 

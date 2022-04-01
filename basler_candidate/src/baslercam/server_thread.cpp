@@ -141,7 +141,7 @@ void* SERVER_THREAD(void* server_data)
                     *server_thread_data->live_flags = server_thread_data->incoming_data->flags;
                 }
                 else {
-                    *server_thread_data->live_flags = 0;
+                    //*server_thread_data->live_flags = 0;
                 }
 
                 
