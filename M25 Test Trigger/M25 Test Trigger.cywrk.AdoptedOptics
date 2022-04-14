@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="M25 Test Trigger">
 <ExpandedNodeIds>
 <v>M25 Test Trigger</v>
 <v>M25 Test Trigger\Camera Trigger</v>
@@ -31,7 +31,6 @@
 <v>M25 Test Trigger\Camera Trigger\Header Files</v>
 <v>M25 Test Trigger\Camera Trigger\Source Files</v>
 <v>M25 Test Trigger\Camera Trigger\Source Files\main.c</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
@@ -52,35 +51,6 @@
 <v>M25 Test Trigger\Camera Trigger\Source Files</v>
 <v>M25 Test Trigger\Camera Trigger\Source Files\main.c</v>
 <v>M25 Test Trigger\Camera Trigger\Generated_Source</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Clock_2</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Clock_3</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Clock_4</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Clock_5</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\CMRA_RDY_IN</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\cy_boot</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\DEMUX_SWITCH</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Em_EEPROM_Dynamic</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Frame_Period_Timer</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\FRAME_TRIG_Reg</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\LCD_Char</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\LCD_Char_LCDPort</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PERIOD_ISR</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PWM_1</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\PWM_OUT</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\READY</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\RESET_RDY_TIMER</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\STAGE_COACH</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\STAGE_ISR</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\STAGE_PERIOD</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Stage_Trig</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\TRG_OUT</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\TRIG_ISR</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\TRIG_PERIOD</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\Trigger_Count</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\USBFS</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\USBFS_Dm</v>
-<v>M25 Test Trigger\Camera Trigger\Generated_Source\PSoC5\USBFS_Dp</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
@@ -205,26 +175,6 @@
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\DEMUX_SWITCH_PM.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Frame_Period_Timer.lst</v>
 <v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Frame_Period_Timer_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\FRAME_TRIG_Reg.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\FRAME_TRIG_Reg_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_LCDPort.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\LCD_Char_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\main.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PERIOD_ISR.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_1_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\PWM_OUT.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\READY_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\RESET_RDY_TIMER_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\STAGE_COACH.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\STAGE_COACH_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\STAGE_ISR.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\STAGE_PERIOD.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\STAGE_PERIOD_PM.lst</v>
-<v>M25 Test Trigger\Camera Trigger\CortexM3\ARM_GCC_541\Debug\Listing Files\Stage_Trig.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>
@@ -293,11 +243,6 @@
 <v>M25 Test Trigger\Camera Trigger\not_v1_0</v>
 <v>M25 Test Trigger\Camera Trigger\not_v1_0\not_v1_0.pdf</v>
 <v>M25 Test Trigger\Camera Trigger\or_v1_0</v>
-<v>M25 Test Trigger\Camera Trigger\or_v1_0\or_v1_0.pdf</v>
-<v>M25 Test Trigger\Camera Trigger\PWM_v3_30.pdf</v>
-<v>M25 Test Trigger\Camera Trigger\Timer_v2_80</v>
-<v>M25 Test Trigger\Camera Trigger\Timer_v2_80\Timer_v2_80.pdf</v>
-<v>M25 Test Trigger\Camera Trigger\USBFS_v3_20.pdf</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStatesV2>
@@ -308,8 +253,8 @@
 <Unloaded />
 <OpenDocs>
 <name v=".\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" />
-<name v=".\Camera Trigger.cydsn\Camera Trigger.cydwr" />
 <name v=".\Camera Trigger.cydsn\main.c" />
+<name v=".\Camera Trigger.cydsn\Camera Trigger.cydwr" />
 </OpenDocs>
 <OpenDocsLayout><![CDATA[<?xml version="1.0"?><!--
 
@@ -317,7 +262,7 @@
   Copyright (c) 2001-2016 Actipro Software LLC.  All rights reserved.
   http://www.actiprosoftware.com
 
---><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="1199, 681" SelectedTabbedMdiWindow="9fedd40c-fdb7-4bfd-9d29-867d4ff34230"><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="4418367e-f364-49ca-ad40-e17b3ababbee" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="9fedd40c-fdb7-4bfd-9d29-867d4ff34230" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cydwr" Guid="9b99c21d-a7b7-4a47-9a6e-17689307bc3d" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="d766cc37-d1db-4aba-9956-0e830a7e6cad" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
+--><DocumentLayout Version="1.0"><LayoutData><TabbedMdiRootContainer Orientation="Horizontal"><TabbedMdiContainer Size="996, 368" SelectedTabbedMdiWindow="d22320fc-29b8-481f-88d8-bac32a89243b"><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\TopDesign\TopDesign.cysch" Guid="9fedd40c-fdb7-4bfd-9d29-867d4ff34230" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\main.c" Guid="d766cc37-d1db-4aba-9956-0e830a7e6cad" /><DocumentWindow Key="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cydwr" Guid="d22320fc-29b8-481f-88d8-bac32a89243b" /><ToolWindow Key="Start Page:bd4649ab-da6b-4d04-a663-c722b8bf99db:Start Page" Guid="4418367e-f364-49ca-ad40-e17b3ababbee" /></TabbedMdiContainer></TabbedMdiRootContainer><FloatingContainers /></LayoutData></DocumentLayout>]]></OpenDocsLayout>
 <config v="" />
 <AutoUpdate v="true" />
 </CyGuid_843a90a4-0c4b-4e44-991d-05e7fb117a21>

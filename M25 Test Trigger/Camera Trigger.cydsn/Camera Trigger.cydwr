@@ -331,7 +331,7 @@
       <Data key="4c36baaa-1db7-4c74-a5b2-27d07e109b1f" value="STAGE_READY" />
       <Data key="6cf36fa8-446a-4ca4-9ee3-1a930c3ddce0" value="CMRA_RDY_IN_1" />
       <Data key="6d415d0c-6e19-4843-a1e7-ac39c11d9e81" value="STAGE_TRIGG" />
-      <Data key="8c6db9a9-71c9-4b42-8972-862bd12883a9" value="Pin_1" />
+      <Data key="8c6db9a9-71c9-4b42-8972-862bd12883a9" value="PWM_OUT" />
       <Data key="8d318d8b-cf7b-4b6b-b02c-ab1c5c49d0ba" value="CMRA_RDY_IN" />
       <Data key="818ad578-6067-466f-9b44-7c03cafa3e48/ed092b9b-d398-4703-be89-cebf998501f6" value="LCD_Char_LCDPort" />
       <Data key="d95feff8-b9eb-4edc-a19e-f078f362257e" value="STROBE_OUT" />

@@ -78,7 +78,9 @@
 
 #define DEFAULT_FPS (100)
 #define CAM_PERIOD (10u)
-#define STAGE_PERIOD (240000u)
+//#define STAGE_PERIOD (240000u) //for PI Stage
+
+#define STAGE_PERIOD (240000u) //for ASI Stage
 
 struct usb_data{
     uint16 fps;
