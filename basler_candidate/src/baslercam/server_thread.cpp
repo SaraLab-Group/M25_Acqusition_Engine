@@ -135,16 +135,16 @@ void* SERVER_THREAD(void* server_data)
                     server_thread_data->outgoing_data->flags |= USB_HERE;
                     server_thread_data->outgoing_data->fps = server_thread_data->usb_incoming->fps;
                 } 
+                usb_srv_lk.unlock();
                 
-
                 if (server_thread_data->incoming_data->flags & STOP_LIVE) {
                     *server_thread_data->live_flags = server_thread_data->incoming_data->flags;
                 }
                 else {
-                    *server_thread_data->live_flags = 0;
+                    //*server_thread_data->live_flags = 0;
                 }
 
-                usb_srv_lk.unlock();
+                
 
                 if (server_thread_data->incoming_data->flags & (CHANGE_CONFIG | ACQUIRE_CAMERAS | RELEASE_CAMERAS | START_CAPTURE | START_LIVE | START_Z_STACK | EXIT_THREAD)) {
                     // Wakeup main loop if one of these event flags is present
