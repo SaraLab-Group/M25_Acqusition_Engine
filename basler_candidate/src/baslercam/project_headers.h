@@ -113,9 +113,12 @@ typedef struct cam_event {
 #define START_LIVE 0x100000
 #define LIVE_RUNNING 0x200000
 #define STOP_LIVE 0x400000
+#define START_Z_STACK 0x800000
+#define Z_STACK_RUNNING 0x1000000
+#define STOP_Z_STACK 0x2000000
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
-
+#define MAX_CAMS (25u)
 //#define EXIT_USB 0x8000  Big Yikes
 
 // Camera Serials
@@ -177,6 +180,7 @@ typedef struct TCP_IP_DAT {
     uint32_t fps;
     uint32_t exp;
     uint32_t bpp;
+    uint32_t z_frames;
     uint32_t capTime;
     char path[255];
     char proName[255];
@@ -192,15 +196,30 @@ typedef struct USB_THD_DATA {
     std::mutex* usb_srv_mtx;
 };
 
+typedef struct LIVE_THD_DATA {
+    std::vector<std::string>* serials;
+    std::vector<std::string>* camera_names;
+    std::vector<int>* zNums;
+    std::condition_variable* signal_live;
+    std::mutex* crit;
+    cam_data* cam_dat;
+    unsigned int* total_cams;
+    uint64_t* image_size;
+    uint32_t flags;
+};
+
 typedef struct SERVER_THD_DATA {
     TCP_IP_DAT* incoming_data;
     TCP_IP_DAT* outgoing_data;
     usb_data* usb_incoming;
     usb_data* usb_outgoing;
+    uint32_t* live_flags;
     std::condition_variable* signal_ptr;
     std::mutex* mtx_ptr;
     std::mutex* usb_srv_mtx;
 };
+
+
 
 //https://stackoverflow.com/questions/26114518/ipc-between-python-and-win32-on-windows-os
 

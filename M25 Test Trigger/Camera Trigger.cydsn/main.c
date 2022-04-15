@@ -63,12 +63,24 @@
 #define STOP_COUNT 0x40
 #define CAMERAS_ACQUIRED 0x100
 #define RELEASE_CAMERAS 0x200
+#define START_CAPTURE 0x800
+#define CAPTURING 0x1000
 #define STAGE_TRIGG_ENABLE 0x40000
 #define STAGE_TRIGG_DISABLE 0x80000
 #define SEND_TRIGG 0x100000
 #define TRIGG_SENT 0x200000
+#define START_LIVE 0x100000
+#define LIVE_RUNNING 0x200000
+#define STOP_LIVE 0x400000
+#define START_Z_STACK 0x800000
+#define Z_STACK_RUNNING 0x1000000
+#define STOP_Z_STACK 0x2000000
 
 #define DEFAULT_FPS (100)
+#define CAM_PERIOD (10u)
+//#define STAGE_PERIOD (240000u) //for PI Stage
+
+#define STAGE_PERIOD (240000u) //for ASI Stage
 
 struct usb_data{
     uint16 fps;
@@ -106,6 +118,26 @@ CY_ISR(PERIOD_ISR){
 //        lcd_draw = 1;
 //    }
 }
+volatile uint16 stage_cnt = 0;
+CY_ISR(STAGE_ISR){
+    // Switch between Trigger Camera and Trigger Stage
+    if(DEMUX_SWITCH_Read() & REG_ON){
+        DEMUX_SWITCH_Write(REG_OFF);
+        STAGE_COACH_WritePeriod(STAGE_PERIOD);
+    } else {
+        DEMUX_SWITCH_Write(REG_ON);
+        STAGE_COACH_WritePeriod(CAM_PERIOD);
+    }
+    //STAGE_COACH_ReadStatusRegister();
+    STAGE_PERIOD_Write(REG_ON);
+    STAGE_PERIOD_Write(REG_OFF);
+    //STAGE_ISR_ClearPending();
+    /*LCD_Char_ClearDisplay();
+    LCD_Char_Position(0u,0u);
+    LCD_Char_PrintString("ISR CNT");
+    LCD_Char_Position(1u,0u);
+    LCD_Char_PrintDecUint16(stage_cnt++);*/
+}
 
 /*CY_ISR(TRIG_ISR_BOD){
     Trigger_Count_ReadStatusRegister();  
@@ -122,17 +154,22 @@ int main(void)
     CyGlobalIntEnable; /* Enable global interrupts. */
 
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+    
     Trigger_Count_Start(); // Counts how many times a capture event has occured.
-    STROBE_Start();
+    PWM_1_Start();
     //Frame_Period_Timer_Start(); // Main Capture Rate
     TRIG_PERIOD_Start(); //Counting Time Camera isn't Ready
 
     PERIOD_ISR_StartEx(PERIOD_ISR);
+    STAGE_COACH_Start();
+    READY_Start();
+    STAGE_ISR_StartEx(STAGE_ISR);
     //TRIG_ISR_StartEx(TRIG_ISR_BOD);
     LCD_Char_Start();
     
     
-    uint32 count = 0;
+    
+    //uint32 count = 0;
     char msg[16];
     char msg2[16];
     sprintf(msg2, "CNT DSBLD STOP");
@@ -165,8 +202,11 @@ int main(void)
     LCD_Char_PrintString(msg);
     LCD_Char_Position(1u,0u);
     LCD_Char_PrintString(msg2);
+  
     
     CyDelay(1000);
+    STAGE_PERIOD_Write(REG_ON);
+    STAGE_PERIOD_Write(REG_OFF);
     
     
     for(;;)
@@ -209,10 +249,21 @@ int main(void)
             // Until all of the CAMERAS have been acquired, and stops the trigger timer
             // If the Cameras are released
             
-            if(incoming.flags & CAMERAS_ACQUIRED){
-                Frame_Period_Timer_Start();
-                incoming.flags &= ~(CAMERAS_ACQUIRED);
-                sprintf(msg2, "CNT ENBLD STOP");
+            if(incoming.flags & START_CAPTURE){
+                Z_TRIG_Reg_Write(REG_OFF);
+                FRAME_TRIG_Reg_Write(REG_ON);
+                //Frame_Period_Timer_Start();
+                incoming.flags &= ~(START_CAPTURE);
+                if(incoming.flags & START_LIVE){
+                    incoming.flags &= ~START_LIVE;
+                    sprintf(msg2, "LIVE MODE");
+                } else {
+                    outgoing.count = 0;
+                    send_count = 1;
+                    outgoing.flags |= START_COUNT;
+                    incoming.flags &= ~(START_COUNT);
+                    sprintf(msg2, "CNT ENBLD START");
+                }
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
@@ -222,6 +273,8 @@ int main(void)
             
             if(incoming.flags & RELEASE_CAMERAS){
                 Frame_Period_Timer_Stop();
+                FRAME_TRIG_Reg_Write(REG_OFF);
+                Z_TRIG_Reg_Write(REG_OFF);
                 incoming.flags &= !(RELEASE_CAMERAS);
                 sprintf(msg2, "CNT DSBLD STOP");
                 LCD_Char_ClearDisplay();    
@@ -244,7 +297,7 @@ int main(void)
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
              
-            } else if(incoming.flags & START_COUNT){
+            } /*else if(incoming.flags & START_COUNT){
                 outgoing.count = 0;
                 send_count = 1;
                 outgoing.flags |= START_COUNT;
@@ -256,39 +309,46 @@ int main(void)
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
                 
-            } else if(incoming.flags & STOP_COUNT){
+            } */else if(incoming.flags & STOP_COUNT){
                 send_count = 0;
+                //Frame_Period_Timer_Stop();
+                FRAME_TRIG_Reg_Write(REG_OFF);
+                Z_TRIG_Reg_Write(REG_OFF);
                 incoming.flags &= ~(STOP_COUNT);
                 outgoing.flags &= ~(START_COUNT);
-                sprintf(msg2, "CNT ENBLD STOP");
+                sprintf(msg2, "CNT DSBLD STOP");
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
-            } /*else if(incoming.flags & SOFT_TRIGG_MODE) {
-                Frame_Period_Timer_Stop();
-                incoming.flags &= ~(SOFT_TRIGG_MODE);
-                outgoing.flags |= ~(SOFT_TRIGG_MODE);
-                outgoing.flags &= ~(TIMED_TRIGG_MODE);
-                sprintf(msg2, "SOFT TRIGGER");
+            }   else if(incoming.flags & START_Z_STACK) {
+                //Frame_Period_Timer_Stop();
+                FRAME_TRIG_Reg_Write(REG_ON);
+                Z_TRIG_Reg_Write(REG_ON);
+                incoming.flags &= ~(START_Z_STACK);
+                //outgoing.flags |= ~(SOFT_TRIGG_MODE);
+                //outgoing.flags &= ~(TIMED_TRIGG_MODE);
+                sprintf(msg2, "Z STACK");
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
-            } else if(incoming.flags & TIMED_TRIGG_MODE) {
+            } else if(incoming.flags & CAMERAS_ACQUIRED) {
+                FRAME_TRIG_Reg_Write(REG_OFF);
+                Z_TRIG_Reg_Write(REG_OFF);                
                 Frame_Period_Timer_Start();
-                incoming.flags &= ~(TIMED_TRIGG_MODE);
-                outgoing.flags |= ~(TIMED_TRIGG_MODE);
-                outgoing.flags &= ~(SOFT_TRIGG_MODE);
-                sprintf(msg2, "TIMED TRIGGER");
+                incoming.flags &= ~(CAMERAS_ACQUIRED);
+                outgoing.flags |= ~(CAMERAS_ACQUIRED);
+                //outgoing.flags &= ~(SOFT_TRIGG_MODE);
+                sprintf(msg2, "TRIGGER ARMED");
                 LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
-            }*/
+            }
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
             /* Wait until DMA completes copying data from OUT endpoint buffer. */
@@ -309,12 +369,13 @@ int main(void)
         * host.
         */
         //if(to_send){
-        CyDelay(1);   
+          
             outgoing.time_waiting = time_btwn_trig;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
             outgoing.flags &= ~(NEW_CNT);
             to_send = 0;
+            CyDelayUs(100); 
         //}
         
 //        if(lcd_draw){

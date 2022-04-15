@@ -109,6 +109,7 @@ uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint32_t bitDepth = 8;
 uint32_t fps = 65;
+uint32_t z_frames = 100;
 double gain = 0;
 
 
@@ -720,13 +721,15 @@ void identify_camera(std::string* serial, std::vector<std::string>* camera_name,
 bool CreateMemoryMap(SharedMemory* shm);
 bool FreeMemoryMap(SharedMemory* shm);
 
-//void* live_thread(void* flags);
+void* live_thread(void* live_data);
 
 // Some More Globals to go with main
 USB_THD_DATA usb_thread_data;
 usb_data usb_incoming, usb_outgoing;
 SERVER_THD_DATA server_thread_data;
-std::condition_variable signal_main;
+LIVE_THD_DATA live_thread_data;
+
+std::condition_variable signal_main, signal_live;
 std::mutex sleep_loop;
 TCP_IP_DAT incoming, outgoing;
 std::vector<cam_event> events[25]; // This is for testing for dropped frames
@@ -754,6 +757,7 @@ int main(int argc, char* argv[])
 	server_thread_data.signal_ptr = &signal_main;
 	server_thread_data.mtx_ptr = &crit2;
 	server_thread_data.usb_srv_mtx = &crit3;
+	server_thread_data.live_flags = &live_thread_data.flags;
 	
 	usb_thread_data.incoming = &usb_incoming;
 	usb_thread_data.outgoing = &usb_outgoing;
@@ -766,7 +770,7 @@ int main(int argc, char* argv[])
 	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
 
     
-	cam_data cam_dat[c_maxCamerasToUse];
+	cam_data cam_dat[MAX_CAMS];
 
 	// For keeping track of which index has which serial
     // A switch case could be used to Number the cameras to their position
@@ -784,6 +788,20 @@ int main(int argc, char* argv[])
 	if (image_size % ALIGNMENT_BYTES) {
 		image_size += (ALIGNMENT_BYTES - (image_size % ALIGNMENT_BYTES));
 	}
+    
+	// Set up Live Capture Thread
+	live_thread_data.camera_names = &camera_names;
+	live_thread_data.serials = &serials;
+	live_thread_data.zNums = &camera_zNums;
+	live_thread_data.image_size = &image_size;
+	live_thread_data.cam_dat = cam_dat;
+	live_thread_data.signal_live = &signal_live;
+	live_thread_data.crit = &crit2;
+	live_thread_data.total_cams = &total_cams;
+
+	std::thread LIVE_THD_OBJ(live_thread, (void*)&live_thread_data);
+	// Make sure the trigger isn't running after a crash.
+	usb_outgoing.flags |= RELEASE_CAMERAS;
 
 
 	// This will act as the primary interface to change configurations, aquire cameras, start image capture, etc.
@@ -808,11 +826,12 @@ int main(int argc, char* argv[])
 			else {
 				prot.lock();
 				outgoing.flags |= CAMERAS_ACQUIRED;
+				usb_outgoing.flags |= CAMERAS_ACQUIRED;
 				outgoing.flags &= ~ACQUIRING_CAMERAS;
 				prot.unlock();
 			}
 		}
-		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & RELEASE_CAMERAS && outgoing.flags & CAMERAS_ACQUIRED && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING))) {
 			incoming.flags &= ~RELEASE_CAMERAS;
 			printf("Release Cameras\n");
 			prot.unlock();
@@ -840,6 +859,7 @@ int main(int argc, char* argv[])
 			fps = incoming.fps;
 			seconds = incoming.capTime;
 			gain = incoming.gain;
+			z_frames = incoming.z_frames;
 			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
 			raw_dir = incoming.path;
 			proj_sub_dir = incoming.proName;
@@ -862,21 +882,36 @@ int main(int argc, char* argv[])
 			incoming.flags &= ~CHANGE_CONFIG;
 			prot.unlock();
 		}
-		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & START_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_CAPTURE;
+			usb_outgoing.flags |= START_CAPTURE;
 			outgoing.flags |= CAPTURING;
 			prot.unlock();
 			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~CAPTURING;
 		}
-		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+		else if (incoming.flags & START_Z_STACK && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+			incoming.flags &= ~(START_CAPTURE|START_Z_STACK);
+			usb_outgoing.flags |= (START_Z_STACK);
+			outgoing.flags |= Z_STACK_RUNNING;
+			prot.unlock();
+			start_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~Z_STACK_RUNNING;
+		}
+		else if (incoming.flags & START_LIVE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
 			incoming.flags &= ~START_LIVE;
 			outgoing.flags |= LIVE_RUNNING;
+			usb_outgoing.flags |= (START_LIVE | START_CAPTURE);
 			prot.unlock();
-			live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			/*** This needs to be started in a worker thread using a control mutex temporary ***/
+			//live_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			//outgoing.flags &= ~LIVE_RUNNING;
+			signal_live.notify_one();
 		}
 		else if (incoming.flags & EXIT_THREAD) {
-			usb_outgoing.flags |= EXIT_THREAD;
+			usb_outgoing.flags |= EXIT_THREAD;		
 			prot.unlock();
+			signal_live.notify_one();
 			active = false;
 		}
 		else {
@@ -895,6 +930,7 @@ int main(int argc, char* argv[])
 		// usb_thread_data.incoming->flags |= EXIT_THREAD;
 		USB_THD_OBJ.join();
 		SRVR_THD_OBJ.join();
+		LIVE_THD_OBJ.join();
 		//auto start = chrono::steady_clock::now();
 		//cout << "Before FileName" << endl;
 		//FileName << strDirectryName << "MyBigFatGreekWedding" << ".bin";
@@ -916,9 +952,9 @@ int main(int argc, char* argv[])
 
 
 	// Comment the following two lines to disable waiting on exit.
-	cerr << endl << "Press Enter to exit." << endl;
-	while (cin.get() != '\n');
-	
+	//cerr << endl << "Press Enter to exit." << endl;
+	//while (cin.get() != '\n');
+    PostMessage(GetConsoleWindow(), WM_CLOSE, 0, 0);
 
 	return exitCode;
 }
@@ -968,9 +1004,11 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 		// Create and attach all Pylon Devices.
 		// We could probably not use the pcam array and just allocate directly to cam_dat
 
+		//Device Index
+		unsigned int k = 0;
 		for (unsigned int i = 0; i < *total_cams; i++)
 		{
-			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[i]));
+			pcam[i] = new CInstantCamera(tlFactory.CreateDevice(devices[k]));
 			//pcam[i].Attach(tlFactory.CreateDevice(devices[i]));
 
 			INodeMap& nodemap = pcam[i]->GetNodeMap();
@@ -988,13 +1026,27 @@ int aquire_cameras(std::vector<std::string>* serials, std::vector<std::string>* 
 
 			serials->push_back(pcam[i]->GetDeviceInfo().GetSerialNumber().c_str());
 			std::cout << "Using device " << pcam[i]->GetDeviceInfo().GetModelName() << " SN " << pcam[i]->GetDeviceInfo().GetSerialNumber() << endl;
-			cam_dat[i].number = i;
-			cam_dat[i].offset = i * (*image_size);
+
 			cam_dat[i].camPtr = pcam[i];
 			// Moved this out of the thread initilization stuff
 			cam_dat[i].camPtr->MaxNumBuffer = 5; // I haven't played with this but it seems fine
 			cam_dat[i].camPtr->StartGrabbing(GrabStrategy_OneByOne, GrabLoop_ProvidedByUser); // Priming the cameras
 			identify_camera(&serials->back(), camera_names, zNums);
+			cam_dat[i].number = ((uint8_t)zNums->back() - 1);
+			cam_dat[i].offset = ((uint64_t)zNums->back() - 1) * (*image_size);
+
+			// Added this little piece of code to pop any unverified cam serial numbers off the list and Destroy Device
+			if (zNums->back() > 25) {
+				serials->pop_back();
+				zNums->pop_back();
+				camera_names->pop_back();
+				pcam[i]->DestroyDevice();
+				i--; // undo index for cam data;
+				std::cout << "*** Invalid Camera Serial Number for M25 array Deleted ***" << std::endl;
+			}
+
+			// Trying to keep devices index moving in case we encounter an invalid serial.
+			k++;
 		}
 
 		// Only allow trigger timer to run once all cameras are acquired to prevent the buffers
@@ -1055,19 +1107,19 @@ bool FreeMemoryMap(SharedMemory* shm)
 void start_capture(std::vector<std::string>* serials, std::vector<std::string>* camera_names, std::vector<int>* zNums, cam_data* cam_dat, unsigned int* total_cams, uint64_t* image_size) {
 	// Should this be monitored in Write Thread?
 	uint32_t ImagesRemain = c_countOfImagesToGrab; // Probably Change to Frames_To_Grab
-
+	std::string strDirName = strDirectryName;
 	// Create the Write Directory "Root"
-	_mkdir(strDirectryName.c_str());
+	_mkdir(strDirName.c_str());
 
 	//append path for destination folder
-	//strDirectryName += "\\binaries";
+	strDirName += "\\binaries";
 
 	//_mkdir(tiff_dir.c_str());
 
 	//tiff_dir += "\\tiff";
 
 	// create subfolders
-	_mkdir(strDirectryName.c_str());
+	_mkdir(strDirName.c_str());
 	_mkdir(raw_dir.c_str());
 	std::string sub_dir = raw_dir + "\\" + proj_sub_dir;
 	_mkdir(sub_dir.c_str());
@@ -1097,7 +1149,17 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// of the lamda functions I'm using to make my thread loop.
 
 	// frames will probably need to come from the tcp/ip pycromanager interface
-	frames = seconds * fps;
+	if(outgoing.flags & Z_STACK_RUNNING){
+		frames = z_frames;
+		myfile << "Mode: Z STACK" << std::endl;
+		myfile << "Time Captured(s): NA" << std::endl;
+	}
+	else {
+		frames = seconds * fps;
+		myfile << "Mode: Capture" << std::endl;
+		myfile << "Time Captured(s): " << (int)seconds << std::endl;
+	}
+
 	printf("frames: %u\n", frames);
 	// How Many Large Binary Chunks of 100 frames we'll Write
 	uint64_t binary_chunks = seconds;
@@ -1108,7 +1170,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	// data_size is the actual size of the data stored which
 	// may or may not be byte aligned.
 
-	uint64_t frame_size = (*image_size) * (*total_cams);
+	uint64_t frame_size = (*image_size) * MAX_CAMS;
 	uint64_t data_size = frame_size * fps;
 	uint64_t buff_size = data_size;
 
@@ -1120,9 +1182,8 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 		buff_size += (ALIGNMENT_BYTES - (buff_size % ALIGNMENT_BYTES));
 	}
 
-	myfile << "Time Captured(s): " << (int)seconds << std::endl;
 	myfile << "Raw image size (sector aligned 512B): " << (int)*image_size << std::endl;
-	myfile << "Frame Size(B): " << (int)frame_size << std::endl;
+	myfile << "Frame Size(B): " << (int)frame_size << " (BASED ON MAX_CAMS 25)" << std::endl;
 	myfile.close();
 
 	// Allocate Aligned buffers
@@ -1164,25 +1225,29 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 	auto buffer_swap = [&]() noexcept {
+		/**** Removed the 2 cycles of buffer pre-fill on 10/2/2021 ****/
+	    /**** The code is now simply commented out this needs      ****/
+		/**** to happen to make z-stack collection work properly   ****/
+
 		// Currently Swaps Buffer every fps Frames
 		//std::cout << "Completed Cycle: " << std::endl;
-		if (pre_write > 1) {
-			if (frame_count == 0) {
-				std::cout << "START_COUNT" << std::endl;
-				std::unique_lock<std::mutex> flg(crit);
-				usb_thread_data.outgoing->flags |= START_COUNT;
-				flg.unlock();
-			}
+		//if (pre_write > 1) {
+		//	if (frame_count == 0) {
+		//		std::cout << "START_COUNT" << std::endl;
+		//		std::unique_lock<std::mutex> flg(crit);
+		//		usb_thread_data.outgoing->flags |= START_COUNT;
+		//		flg.unlock();
+		//	}
 			if (!begin_writing && frame_count == fps - 1) {
 				begin_writing = 1;
 			}
 			frame_count++;
-		}
+		//}
 
 
 		if (frame_count == frames) {
 			capture = false;
-			std::cout << "START_COUNT" << std::endl;
+			std::cout << "STOP_COUNT" << std::endl;
 			std::unique_lock<std::mutex> flg(crit);
 			usb_thread_data.outgoing->flags |= STOP_COUNT;
 			flg.unlock();
@@ -1216,7 +1281,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 				mtx.unlock(); // unlunk
 			}
 			else {
-				pre_write++;
+				//pre_write++;
 			}
 		}
 		else {
@@ -1247,6 +1312,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
+			//std::cout << "camera: " << (int)cam->number << " waiting." << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
 
 			// Image grabbed successfully?
@@ -1254,14 +1320,15 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 			{
 				// A little Pointer Arithmatic never hurt anybody
 				memcpy((void*)(in_buff + cam->offset), (const void*)ptrGrabResult->GetBuffer(), ptrGrabResult->GetPayloadSize());
-				if (pre_write > 1) {
+				/** Removed the 2 frames of pre buffering, no longer using "pre_write" flag **/
+				//if (pre_write > 1) {
 					cam_event thd_event;
 					thd_event.frame = frame_count;
 					//thd_event.missed_frame_count = ptrGrabResult->GetNumberOfSkippedImages();
 					//thd_event.sensor_readout = CFloatPtr(nodemap.GetNode("SensorReadoutTime"))->GetValue();   //Microseconds					
 					thd_event.time_stamp = ptrGrabResult->GetTimeStamp() / 1.0;
 					events[cam->number].push_back(thd_event);
-				}
+				//}
 
 				// Hurry up and wait
 				sync_point.arrive_and_wait();
@@ -1310,7 +1377,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 			//std::cout << "Past Lock" << std::endl;
 
 			//auto start = chrono::steady_clock::now();
-			std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(write_count) + ".bin";
+			std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(write_count) + ".bin";
 			printf("%s\n", Filename.c_str());
 			saveBigBuffer(Filename.c_str(), out_buff, buff_size);
 			write_count++;
@@ -1401,7 +1468,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 				//std::cout << "^";
 			}
 			else {
-				std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+				std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 				uint64_t outNumberofBytes;
 				//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 				readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1473,7 +1540,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 	start = chrono::steady_clock::now();
 
-	std::string Filename = strDirectryName + "\\binaries" + "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
+	std::string Filename = strDirName + /*"\\binaries" +*/ "\\binary_chunk_" + std::to_string(chunk_number) + ".bin";
 	uint64_t outNumberofBytes;
 	//std::cout << "expected size: " << sizeof(frame_buffer) * total_cams << std::endl;
 	readFile(Filename.c_str(), &outNumberofBytes, buff1);
@@ -1503,36 +1570,37 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 	std::cout << std::endl << "Finished Converting to tif" << std::endl;
+	if (!(outgoing.flags & Z_STACK_RUNNING)) {
+		uint32_t max_dropped = 0;
+		// Checking For Longer than acceptable Frame Times
+		for (int i = 0; i < 25; i++) {
+			uint32_t dropped_frames = 0;
+			int64_t prev = events[i][0].time_stamp;
+			int64_t first_miss_cnt = events[i][0].missed_frame_count;
+			for (int j = 1; j < frames; j++) {
+				if (events[i].size() > j) {
+					if ((abs(events[i][j].time_stamp - prev)) > 5.0 / ((float)fps * 4) * 1e9) {
+						std::cout << "camera: " << i << std::endl;
+						//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
+						std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
+						dropped_frames++;
+						//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
+						//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+					}
 
-	uint32_t max_dropped = 0;
-	// Checking For Longer than acceptable Frame Times
-	for (int i = 0; i < 25; i++) {
-		uint32_t dropped_frames = 0;
-		int64_t prev = events[i][0].time_stamp;
-		int64_t first_miss_cnt = events[i][0].missed_frame_count;
-		for (int j = 1; j < frames; j++) {
-			if (events[i].size() > j) {
-				if ((abs(events[i][j].time_stamp - prev)) >  5.0 / ((float)fps * 4) * 1e9) {
-					std::cout << "camera: " << i << std::endl;
-					//std::cout << "Current: " << events[i][j].time_stamp << " prev: " << prev << std::endl;
-					std::cout << "Abnormal Time Diff: " << events[i][j].time_stamp - prev << " at frame: " << events[i][j].frame << std::endl;
-					dropped_frames++;
-					//std::cout << "Sensor Readout: " << events[i][j].sensor_readout << std::endl;
-					//std::cout << " Missed Frame Count: " << events[i][j].missed_frame_count - first_miss_cnt << std::endl;
+					prev = events[i][j].time_stamp;
 				}
-
-				prev = events[i][j].time_stamp;
+				else {
+					std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
+				}
 			}
-			else {
-				std::cout << "This Vector has: " << events[i].size() << " elements vs. " << (int)frames << " frames." << std::endl;
-			}
+			std::cout << ".";
+			max_dropped = max(max_dropped, dropped_frames);
 		}
-		std::cout << ".";
-		max_dropped = max(max_dropped, dropped_frames);
+		std::cout << std::endl;
+		std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
+		std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
 	}
-	std::cout << std::endl;
-	std::cout << "Dropped Frames: " << (int)max_dropped << " Total Frames: " << (int)frames << std::endl;
-	std::cout << "Dropped Ratio: " << (double)max_dropped / (double)frames << std::endl;
 
 	// Free These Aligned Buffers PLEASE!
 	_aligned_free(buff1);
@@ -1565,7 +1633,7 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 
 
-	uint64_t frame_size = (*image_size) * (*total_cams);
+	uint64_t frame_size = (*image_size) * MAX_CAMS;
 //	uint64_t data_size = frame_size * fps;
 //	uint64_t buff_size = data_size;
 
@@ -1645,33 +1713,34 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		if (*buff_flags & WRITING_BUFF1) {
 			if (*buff_flags & READING_BUFF2) {
 				// do nothing
-				std::cout << "^";
+				//std::cout << "^";
 			}
 			else {
 				*buff_flags &= ~WRITING_BUFF1;
 				*buff_flags |= WRITING_BUFF2;
 				active_buff = head_buff2;
-				std::cout << "2";
+				//std::cout << "2";
 			}
 		}
 		else {
 			if (*buff_flags&READING_BUFF1) {
 				// do nothing
-				std::cout << ".";
+				//std::cout << ".";
 			}
 			else {
 				*buff_flags &= ~WRITING_BUFF2;
 				*buff_flags |= WRITING_BUFF1;
 				active_buff = head_buff1;
-				std::cout << "1";
+				//std::cout << "1";
 			}
 		}
 
 		// This should safely stop live loop.
 		std::unique_lock<std::mutex> flg(crit2);
-		if (incoming.flags & STOP_LIVE) {
+		if (live_thread_data.flags & STOP_LIVE) {
 			capture = false;
 			std::cout << "Exiting Live." << std::endl;
+			live_thread_data.flags &= ~STOP_LIVE;
 		}
 		flg.unlock();
 
@@ -1698,9 +1767,9 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		while (capture) {
 			// Wait for an image and then retrieve it. A timeout of 5000 ms is used.
 			//auto start = chrono::steady_clock::now();
-			std::cout << "Before Retreive" << std::endl;
+			//std::cout << "Before Retreive" << std::endl;
 			cam->camPtr->RetrieveResult(5000, ptrGrabResult, TimeoutHandling_ThrowException);
-			std::cout << "After Retreive" << std::endl;
+			//std::cout << "After Retreive" << std::endl;
 
 			// Image grabbed successfully?
 			if (ptrGrabResult->GrabSucceeded())
@@ -1751,8 +1820,11 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 	std::cout << "Live View Finished" << std::endl;
 
-	std::unique_lock<std::mutex> flg(crit2);
+	std::unique_lock<std::mutex> flg2(crit2);
 	outgoing.flags &= ~LIVE_RUNNING;
+	flg2.unlock();
+	std::unique_lock<std::mutex> flg(crit);
+	usb_outgoing.flags |= STOP_COUNT;
 	flg.unlock();
 
 	// Free Memory Maps
@@ -1760,21 +1832,32 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	FreeMemoryMap(&shm1);
 	FreeMemoryMap(&shm2);
 
-	// Clear Threads
-	threads.clear();
+	// Clear Threads   
 }
 
 // thread for live view mode
-/*void* live_thread(void* flags) {
-
-	uint32_t* sig_flags = (uint32_t*)flags;
+void* live_thread(void* live_data) {
+	LIVE_THD_DATA* thd_dat = (LIVE_THD_DATA*)live_data;
+	std::mutex lk;
+	//uint32_t* sig_flags = (uint32_t*)flags;
 
 	uint8_t running = 1;
 	while (running) {
-
+		std::unique_lock<std::mutex> sleep(lk);
+		thd_dat->signal_live->wait(sleep);
+		std::unique_lock<std::mutex> flg(*thd_dat->crit);
+		if (!(thd_dat->flags & EXIT_THREAD)) {
+			flg.unlock();
+			live_capture(thd_dat->serials, thd_dat->camera_names, thd_dat->zNums, thd_dat->cam_dat, thd_dat->total_cams, thd_dat->image_size);
+		}
+		else {
+			flg.unlock();
+			running = 0;
+		}
 	}
-
-}*/
+	std::cout << "Exiting live capture thread" << std::endl;
+	return 0;
+}
 
 void identify_camera(std::string* serial, std::vector<std::string>* camera_names, std::vector<int>* zNums) {
 	switch(std::stoi(*serial, nullptr, 0)) {
@@ -1881,6 +1964,7 @@ void identify_camera(std::string* serial, std::vector<std::string>* camera_names
 		default:
 			std::cout << "error with switch case" << std::endl;
 			camera_names->push_back(*serial);
+			zNums->push_back(26);
 			break;
 	}
 }
