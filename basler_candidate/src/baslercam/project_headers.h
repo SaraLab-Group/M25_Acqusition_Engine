@@ -93,7 +93,7 @@ typedef struct cam_event {
 #define CHANGE_CONFIG 0x1
 #define DROPPED_FRAME 0x2
 #define NEW_CNT 0x4
-#define ACK_CMD 0x8
+#define LAPSE_STOP 0x8
 #define START_COUNT 0x10
 #define COUNTING 0x20
 #define STOP_COUNT 0x40
@@ -116,6 +116,9 @@ typedef struct cam_event {
 #define START_Z_STACK 0x800000
 #define Z_STACK_RUNNING 0x1000000
 #define STOP_Z_STACK 0x2000000
+#define TOGGLE_EMMISION 0x4000000
+#define TOGGLE_DIG_MOD 0x8000000
+#define LAPSE_CAPTURE 0x10000000 
 #define EXIT_THREAD 0x80000000
 #define DEFAULT_FPS (65u)
 #define MAX_CAMS (25u)
@@ -154,7 +157,14 @@ typedef struct cam_event {
 #define READING_BUFF1 0x4
 #define READING_BUFF2 0x8
 
+/*  To Be Added After Napari Is Updated */
 
+//typedef struct usb_data {
+//    float fps;
+//    uint32_t flags;
+//    uint32_t time_waiting; // Currently Time between not ready and ready
+//    uint64_t count;
+//};
 
 typedef struct usb_data {
     uint16_t fps;
@@ -173,6 +183,27 @@ typedef struct usb_data {
     ('path', c_char),
     ('flags', c_uint16)]
 */
+
+/* For Improved Implementation Coming soon!! */
+
+//typedef struct TCP_IP_DAT {
+//    uint32_t horz;
+//    uint32_t vert;
+//    float fps;
+//    uint32_t exp;
+//    uint32_t bpp;
+//    uint32_t z_frames;
+//    uint32_t capTime;
+//    float lapse_min;
+//    uint32_t lapse_count;
+//    char path[256];
+//    char proName[256];
+//    uint32_t flags;
+//    double gain;
+//};
+
+
+
 
 typedef struct TCP_IP_DAT {
     uint32_t horz;

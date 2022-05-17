@@ -106,7 +106,7 @@ void* USB_THREAD(void* data)
         //printf("top of the mornin to yah\n");
         std::unique_lock<std::mutex> flg(*thd_data->usb_srv_mtx);
         //std::cout << "in usb mutex" << std::endl;
-        if (thd_data->outgoing->flags & (CHANGE_CONFIG | CAMERAS_ACQUIRED | RELEASE_CAMERAS)) {
+        if (thd_data->outgoing->flags & (CHANGE_CONFIG | CAMERAS_ACQUIRED | RELEASE_CAMERAS | TOGGLE_DIG_MOD | TOGGLE_EMMISION)) {
             //printf("Outer IF\n");
             //if (!(thd_data->outgoing->flags & ACK_CMD)) {
                 printf("****USB_CHANGE CONF****\n");
@@ -155,12 +155,13 @@ void* USB_THREAD(void* data)
                 printf("success: bulk write %d bytes\n", ret);
                 send_data = 0;
                 flg.lock();
-                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | ACK_CMD | START_COUNT | STOP_COUNT | CAMERAS_ACQUIRED | RELEASE_CAMERAS | START_CAPTURE | START_LIVE |START_Z_STACK); //~(CHANGE_FPS);
+                thd_data->outgoing->flags &= ~(CHANGE_CONFIG | LAPSE_STOP | START_COUNT | STOP_COUNT | CAMERAS_ACQUIRED | RELEASE_CAMERAS | START_CAPTURE | START_LIVE | START_Z_STACK | TOGGLE_DIG_MOD | TOGGLE_EMMISION); //~(CHANGE_FPS);
                 //thd_data->incoming->flags &= ~CHANGE_CONFIG;
                 flg.unlock();
             }
-            cnt_lk.unlock();
+            //cnt_lk.unlock();
         }
+        cnt_lk.unlock(); // Woops caused a little deadlock putting this inside the if.
         //#endif
 
         //#ifdef TEST_BULK_READ
