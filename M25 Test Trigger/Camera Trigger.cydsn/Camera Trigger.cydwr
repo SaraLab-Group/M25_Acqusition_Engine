@@ -339,6 +339,7 @@
       <Data key="e132037f-c24e-49f4-9816-e59c3a50f5ec" value="Stage_Trig" />
       <Data key="f87de44a-b6a5-4e65-943a-d331f174d302/8b77a6c4-10a0-4390-971c-672353e2a49c" value="USBFS_Dm" />
       <Data key="f87de44a-b6a5-4e65-943a-d331f174d302/618a72fc-5ddd-4df5-958f-a3d55102db42" value="USBFS_Dp" />
+      <Data key="ff5b81c2-ba7c-47c0-a87a-8a5cbd7fabb6" value="DIODE_ON" />
     </Group>
   </Group>
   <Group key="EEPROM">
@@ -3488,6 +3489,11 @@
         <Data key="Port Format" value="0,7" />
       </Group>
     </Group>
+    <Group key="ff5b81c2-ba7c-47c0-a87a-8a5cbd7fabb6">
+      <Group key="0">
+        <Data key="Port Format" value="1,4" />
+      </Group>
+    </Group>
     <Group key="UnAssigned Pins" />
   </Group>
   <Group key="PlaceDir">
@@ -3501,10 +3507,10 @@
     <Data key="CYDEV_DEBUGGING_DPS" value="SWD_SWV" />
     <Data key="CYDEV_DEBUGGING_XRES" value="False" />
     <Data key="CYDEV_ECC_ENABLE" value="False" />
-    <Data key="CYDEV_HEAP_SIZE" value="0x80" />
+    <Data key="CYDEV_HEAP_SIZE" value="0x2000" />
     <Data key="CYDEV_INSTRUCT_CACHE_ENABLED" value="True" />
     <Data key="CYDEV_PROTECTION_ENABLE" value="False" />
-    <Data key="CYDEV_STACK_SIZE" value="0x0800" />
+    <Data key="CYDEV_STACK_SIZE" value="0x4000" />
     <Data key="CYDEV_TEMPERATURE" value="-40C - 85/125C" />
     <Data key="CYDEV_TRACE_ENABLED" value="False" />
     <Data key="CYDEV_USE_BUNDLED_CMSIS" value="True" />

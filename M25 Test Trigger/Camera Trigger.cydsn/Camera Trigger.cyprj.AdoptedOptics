@@ -574,6 +574,15 @@
 <v>Generated_Source\PSoC5\PWM_OUT_aliases.h</v>
 <v>Generated_Source\PSoC5\PWM_OUT.c</v>
 <v>Generated_Source\PSoC5\PWM_OUT.h</v>
+<v>Generated_Source\PSoC5\DIODE_PWR.h</v>
+<v>Generated_Source\PSoC5\DIODE_PWR.c</v>
+<v>Generated_Source\PSoC5\DIODE_PWR_PM.c</v>
+<v>Generated_Source\PSoC5\DIG_MOD.h</v>
+<v>Generated_Source\PSoC5\DIG_MOD.c</v>
+<v>Generated_Source\PSoC5\DIG_MOD_PM.c</v>
+<v>Generated_Source\PSoC5\DIODE_ON_aliases.h</v>
+<v>Generated_Source\PSoC5\DIODE_ON.c</v>
+<v>Generated_Source\PSoC5\DIODE_ON.h</v>
 </gen_list>
 <warp_dep>
 <v>C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\ieee\work\stdlogic.vif</v>
@@ -583,7 +592,7 @@
 <v>C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\rtlpkg.vif</v>
 <v>C:\Program Files (x86)\Cypress\PSoC Creator\4.4\PSoC Creator\warp\lib\common\stdlogic\cy_psoc3.vif</v>
 </warp_dep>
-<deps_time v="132877074226768970" />
+<deps_time v="132974075163839528" />
 <top_block v="TopDesign" />
 <last_generation v="11" />
 <pdl_path v="" />
@@ -742,6 +751,57 @@
 <dep name=".\Generated_Source\PSoC5\cytypes.h" />
 </file>
 <file name=".\Generated_Source\PSoC5\DEMUX_SWITCH_PM.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\DIG_MOD.o">
+<dep name=".\Generated_Source\PSoC5\DIG_MOD.c" />
+<dep name=".\Generated_Source\PSoC5\DIG_MOD.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\DIG_MOD.c" />
+<file name=".\Generated_Source\PSoC5\DIG_MOD.h" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\DIG_MOD_PM.o">
+<dep name=".\Generated_Source\PSoC5\DIG_MOD.h" />
+<dep name=".\Generated_Source\PSoC5\DIG_MOD_PM.c" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\DIG_MOD_PM.c" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\DIODE_ON.o">
+<dep name=".\Generated_Source\PSoC5\DIODE_ON.c" />
+<dep name=".\Generated_Source\PSoC5\DIODE_ON.h" />
+<dep name=".\Generated_Source\PSoC5\DIODE_ON_aliases.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cypins.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\DIODE_ON.c" />
+<file name=".\Generated_Source\PSoC5\DIODE_ON.h" />
+<file name=".\Generated_Source\PSoC5\DIODE_ON_aliases.h" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\DIODE_PWR.o">
+<dep name=".\Generated_Source\PSoC5\DIODE_PWR.c" />
+<dep name=".\Generated_Source\PSoC5\DIODE_PWR.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\DIODE_PWR.c" />
+<file name=".\Generated_Source\PSoC5\DIODE_PWR.h" />
+<file name=".\CortexM3\ARM_GCC_541\Debug\DIODE_PWR_PM.o">
+<dep name=".\Generated_Source\PSoC5\DIODE_PWR.h" />
+<dep name=".\Generated_Source\PSoC5\DIODE_PWR_PM.c" />
+<dep name=".\Generated_Source\PSoC5\cydevice.h" />
+<dep name=".\Generated_Source\PSoC5\cydevice_trm.h" />
+<dep name=".\Generated_Source\PSoC5\cyfitter.h" />
+<dep name=".\Generated_Source\PSoC5\cytypes.h" />
+</file>
+<file name=".\Generated_Source\PSoC5\DIODE_PWR_PM.c" />
 <file name=".\CortexM3\ARM_GCC_541\Debug\FRAME_TRIG_Reg.o">
 <dep name=".\Generated_Source\PSoC5\FRAME_TRIG_Reg.c" />
 <dep name=".\Generated_Source\PSoC5\FRAME_TRIG_Reg.h" />
@@ -1569,6 +1629,10 @@
 <dep name=".\Generated_Source\PSoC5\CyLib.h" />
 <dep name=".\Generated_Source\PSoC5\CySpc.h" />
 <dep name=".\Generated_Source\PSoC5\DEMUX_SWITCH.h" />
+<dep name=".\Generated_Source\PSoC5\DIG_MOD.h" />
+<dep name=".\Generated_Source\PSoC5\DIODE_ON.h" />
+<dep name=".\Generated_Source\PSoC5\DIODE_ON_aliases.h" />
+<dep name=".\Generated_Source\PSoC5\DIODE_PWR.h" />
 <dep name=".\Generated_Source\PSoC5\FRAME_TRIG_Reg.h" />
 <dep name=".\Generated_Source\PSoC5\Frame_Period_Timer.h" />
 <dep name=".\Generated_Source\PSoC5\LCD_Char.h" />
@@ -1879,6 +1943,11 @@
 <dep name=".\CortexM3\ARM_GCC_541\Debug\READY_PM.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\Clock_5.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\PWM_OUT.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\DIODE_PWR.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\DIODE_PWR_PM.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\DIG_MOD.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\DIG_MOD_PM.o" />
+<dep name=".\CortexM3\ARM_GCC_541\Debug\DIODE_ON.o" />
 <dep name=".\CortexM3\ARM_GCC_541\Debug\Camera Trigger.a" />
 <dep name="${CyRoot}\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CortexM3\ARM_GCC_541\Debug\CyComponentLibrary.a" />
 </file>
@@ -1946,7 +2015,7 @@
 <name_val_pair name="Generated_Source\PSoC5\CySpc.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\cyutils.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\cy_em_eeprom.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
-<name_val_pair name="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\CortexM3\ARM_GCC_541\Debug\Camera Trigger.hex" v="-mcpu=cortex-m3 -mthumb -L Generated_Source\PSoC5 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T Generated_Source\PSoC5\cm3gcc.ld -specs=nano.specs -Wl,--gc-sections -g -ffunction-sections -Og -ffat-lto-objects" />
+<name_val_pair name="C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\CortexM3\ARM_GCC_541\Debug\Camera Trigger.hex" v="-mcpu=cortex-m3 -mthumb -L Generated_Source\PSoC5 -Wl,-Map,${OutputDir}/${ProjectShortName}.map -T Generated_Source\PSoC5\cm3gcc.ld -specs=nano.specs -Wl,--gc-sections -u_printf_float -g -ffunction-sections -Og -ffat-lto-objects" />
 <name_val_pair name="Generated_Source\PSoC5\Z_TRIG_Reg.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\Z_TRIG_Reg_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\STAGE_READY.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
@@ -1973,6 +2042,11 @@
 <name_val_pair name="Generated_Source\PSoC5\READY_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\Clock_5.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 <name_val_pair name="Generated_Source\PSoC5\PWM_OUT.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\DIODE_PWR.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\DIODE_PWR_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\DIG_MOD.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\DIG_MOD_PM.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
+<name_val_pair name="Generated_Source\PSoC5\DIODE_ON.c" v="-mcpu=cortex-m3 -mthumb -I. -IGenerated_Source\PSoC5 -Wa,-alh=${OutputDir}/${CompileFile}.lst -g -D DEBUG -D CY_CORE_ID=0 -Wall -ffunction-sections -ffat-lto-objects -Og" />
 </name>
 </genericCmdLineData>
 <codeGenCmdLineTag v="-.appdatapath &quot;C:\Users\AdoptedOptics\AppData\Local\Cypress Semiconductor\PSoC Creator\4.4&quot; -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p &quot;C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Camera Trigger.cyprj&quot; -d CY8C5888LTI-LP097 -s &quot;C:\Users\AdoptedOptics\Documents\GIT\M25_basler\M25 Test Trigger\Camera Trigger.cydsn\Generated_Source\PSoC5&quot; -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE" />
@@ -1981,7 +2055,7 @@
 <dataGuid v="769d31ea-68b1-4f0c-b90a-7c10a43ee563">
 <CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563 type_name="CyDesigner.Common.ProjMgmt.Model.CyLinkCustomData" version="1">
 <link_deps_times>
-<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM3" v="132877074319846134" />
+<name_val_pair name="c9323d49-d323-40b8-9b59-cc008d68a989@Debug@CortexM3" v="132974075276768743" />
 </link_deps_times>
 </CyGuid_769d31ea-68b1-4f0c-b90a-7c10a43ee563>
 </dataGuid>
@@ -2027,6 +2101,11 @@
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </tree_states>
 </CyGuid_718b6b01-68ba-4a17-b632-d38dc61ebb3b>
+</dataGuid>
+<dataGuid v="237c8ed1-e161-4c9d-af97-582eda6d6952">
+<CyGuid_d442b0b8-dd66-4eee-b5be-1cb213792b31 type_name="CyDesigner.Device.FitterPSoC.Common.DesignWideResources.DeviceEditor.CyCustomAnalogDevData" version="1" ZoomToPage="True" ZoomScale="0.2330839" ScrollX="0" ScrollY="-103">
+<ComponentStates />
+</CyGuid_d442b0b8-dd66-4eee-b5be-1cb213792b31>
 </dataGuid>
 </userData>
 </CyGuid_fdba8dfd-b15b-4469-9bbb-9e40c3e70997>
