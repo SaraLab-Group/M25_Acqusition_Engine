@@ -75,17 +75,15 @@
 #define START_Z_STACK 0x800000
 #define Z_STACK_RUNNING 0x1000000
 #define STOP_Z_STACK 0x2000000
-#define TOGGLE_LED 0x4000000
-#define TOGGLE_DIG_MOD 0x8000000
 
-#define DEFAULT_FPS (50)
+#define DEFAULT_FPS (100)
 #define CAM_PERIOD (10u)
 //#define STAGE_PERIOD (240000u) //for PI Stage
 
 #define STAGE_PERIOD (240000u) //for ASI Stage
 
 struct usb_data{
-    float fps;
+    uint16 fps;
     uint32 flags;
     uint32 time_waiting; // Currently Time between not ready and ready
     uint64 count;
@@ -102,7 +100,6 @@ volatile uint8 lcd_draw = 0;
 volatile uint32 time_btwn_trig = 0;
 volatile double time_sec = 0;
 volatile uint16 counter = 0;
-volatile float current_fps = DEFAULT_FPS;
 
 // This just grabs the counter time until ready value in clock ticks
 CY_ISR(PERIOD_ISR){
@@ -173,56 +170,38 @@ int main(void)
     
     
     //uint32 count = 0;
-    char msg[20];
-    char msg2[20];
-    char msg3[20];
-    char msg4[20];
-    
-    sprintf(msg2, "CNT DSBLD STOP     ");
-    sprintf(msg, "fps: %.2f         ", incoming.fps);
-    sprintf(msg3, "Enjoy Delicious    ");
-    sprintf(msg4, "    Sandwhich      ");
+    char msg[16];
+    char msg2[16];
+    sprintf(msg2, "CNT DSBLD STOP");
+    sprintf(msg, "fps: %u", incoming.fps);
     
     //char bfr[] = "before";
     //char aftr[] = "after";
     
     // Currently just sleeps for 1sec and counts up
-    //LCD_Char_ClearDisplay();
+    LCD_Char_ClearDisplay();
     LCD_Char_Position(1u,0u);
-    LCD_Char_PrintString(msg);
     
-    LCD_Char_Position(0u, 0u);
     LCD_Char_PrintString(msg2);
-    
-    LCD_Char_Position(2u, 0u);
-    LCD_Char_PrintString(msg3);
-   
-    LCD_Char_Position(3u, 0u);
-    LCD_Char_PrintString(msg4);
-    
+    LCD_Char_Position(0u, 0u);
     
     /* Start USBFS operation with 5V operation. */
     USBFS_Start(USBFS_DEVICE, USBFS_5V_OPERATION);
-    //LCD_Char_PrintString(sand);
+    char sand[] = "sandwhich";
+    LCD_Char_PrintString(sand);
     /* Wait until device is enumerated by host. */
     while (0u == USBFS_GetConfiguration())
     {
     }
-    //set_fps();
-    //Just added this since not sure why just ran set fps
-    Frame_Period_Timer_WritePeriod(set_fps());
+    set_fps();
     /* Enable OUT endpoint to receive data from host. */
     USBFS_EnableOutEP(OUT_EP_NUM);
     
-    //LCD_Char_ClearDisplay();
-    LCD_Char_Position(1u,0u);
-    LCD_Char_PrintString(msg);
+    LCD_Char_ClearDisplay();
     LCD_Char_Position(0u,0u);
+    LCD_Char_PrintString(msg);
+    LCD_Char_Position(1u,0u);
     LCD_Char_PrintString(msg2);
-    LCD_Char_Position(2u,0u);
-    LCD_Char_PrintString(msg3);
-    LCD_Char_Position(3u,0u);
-    LCD_Char_PrintString(msg4);
   
     
     CyDelay(1000);
@@ -277,15 +256,15 @@ int main(void)
                 incoming.flags &= ~(START_CAPTURE);
                 if(incoming.flags & START_LIVE){
                     incoming.flags &= ~START_LIVE;
-                    sprintf(msg2, "LIVE MODE          ");
+                    sprintf(msg2, "LIVE MODE");
                 } else {
                     outgoing.count = 0;
                     send_count = 1;
                     outgoing.flags |= START_COUNT;
                     incoming.flags &= ~(START_COUNT);
-                    sprintf(msg2, "CNT ENBLD START    ");
+                    sprintf(msg2, "CNT ENBLD START");
                 }
-                //LCD_Char_ClearDisplay();    
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
@@ -297,8 +276,8 @@ int main(void)
                 FRAME_TRIG_Reg_Write(REG_OFF);
                 Z_TRIG_Reg_Write(REG_OFF);
                 incoming.flags &= !(RELEASE_CAMERAS);
-                sprintf(msg2, "CNT DSBLD STOP     ");
-                //LCD_Char_ClearDisplay();    
+                sprintf(msg2, "CNT DSBLD STOP");
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
@@ -311,8 +290,8 @@ int main(void)
                 outgoing.fps = incoming.fps;
                 incoming.flags &= ~(CHANGE_FPS);
                 
-                sprintf(msg, "fps: %.2f          ", outgoing.fps);
-                //LCD_Char_ClearDisplay();    
+                sprintf(msg, "fps: %u", outgoing.fps);
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
@@ -337,8 +316,8 @@ int main(void)
                 Z_TRIG_Reg_Write(REG_OFF);
                 incoming.flags &= ~(STOP_COUNT);
                 outgoing.flags &= ~(START_COUNT);
-                sprintf(msg2, "CNT DSBLD STOP      ");
-                //LCD_Char_ClearDisplay();    
+                sprintf(msg2, "CNT DSBLD STOP");
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
@@ -350,8 +329,8 @@ int main(void)
                 incoming.flags &= ~(START_Z_STACK);
                 //outgoing.flags |= ~(SOFT_TRIGG_MODE);
                 //outgoing.flags &= ~(TIMED_TRIGG_MODE);
-                sprintf(msg2, "Z STACK             ");
-                //LCD_Char_ClearDisplay();    
+                sprintf(msg2, "Z STACK");
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
@@ -363,47 +342,13 @@ int main(void)
                 incoming.flags &= ~(CAMERAS_ACQUIRED);
                 outgoing.flags |= ~(CAMERAS_ACQUIRED);
                 //outgoing.flags &= ~(SOFT_TRIGG_MODE);
-                sprintf(msg2, "TRIGGER ARMED       ");
-                //LCD_Char_ClearDisplay();    
+                sprintf(msg2, "TRIGGER ARMED");
+                LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
                 LCD_Char_PrintString(msg2);
             }
-            
-            /* Toggle Emmision */
-            
-            if(incoming.flags & TOGGLE_LED){
-                if(DIODE_PWR_Read()){
-                    DIODE_PWR_Write(REG_OFF);
-                    sprintf(msg3, "LED: OFF ");
-                    LCD_Char_Position(2u,0u);
-                    LCD_Char_PrintString(msg3);
-                } else {
-                    DIODE_PWR_Write(REG_ON);
-                    sprintf(msg3, "LED: ON  ");
-                    LCD_Char_Position(2u,0u);
-                    LCD_Char_PrintString(msg3);
-                }
-                incoming.flags &= ~TOGGLE_LED;
-            }
-            
-            /* Toggle Digital Modulation) */
-            if(incoming.flags & TOGGLE_DIG_MOD){
-                if(DIG_MOD_Read()){
-                    DIG_MOD_Write(REG_OFF);
-                    sprintf(msg3, "MOD: OFF  ");
-                    LCD_Char_Position(2u,9u);
-                    LCD_Char_PrintString(msg3);
-                } else {
-                    DIG_MOD_Write(REG_ON);
-                    sprintf(msg3, "MOD: ON   ");
-                    LCD_Char_Position(2u,9u);
-                    LCD_Char_PrintString(msg3);
-                }
-                incoming.flags &= ~TOGGLE_DIG_MOD;
-            }
-            
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
 
             /* Wait until DMA completes copying data from OUT endpoint buffer. */
@@ -426,12 +371,11 @@ int main(void)
         //if(to_send){
           
             outgoing.time_waiting = time_btwn_trig;
-            outgoing.fps = current_fps;
             USBFS_LoadInEP(IN_EP_NUM, (uint8*)&outgoing, sizeof(struct usb_data));
             /* (USBFS_GEN_16BITS_EP_ACCESS) */
             outgoing.flags &= ~(NEW_CNT);
             to_send = 0;
-            CyDelayUs(1000); 
+            CyDelayUs(100); 
         //}
         
 //        if(lcd_draw){
@@ -453,7 +397,6 @@ int main(void)
 uint32 set_fps(){
     incoming.flags &= ~(CHANGE_FPS);
     outgoing.fps = incoming.fps;
-    current_fps = incoming.fps;
     return (CLOCK_FREQ / incoming.fps);
 }
 
