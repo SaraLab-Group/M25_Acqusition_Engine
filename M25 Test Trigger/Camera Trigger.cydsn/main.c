@@ -78,7 +78,7 @@
 #define TOGGLE_LED 0x4000000
 #define TOGGLE_DIG_MOD 0x8000000
 
-#define DEFAULT_FPS (50)
+#define DEFAULT_FPS (50.0f)
 #define CAM_PERIOD (10u)
 //#define STAGE_PERIOD (240000u) //for PI Stage
 
