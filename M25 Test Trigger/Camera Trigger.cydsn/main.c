@@ -135,10 +135,10 @@ CY_ISR(STAGE_ISR){
     STAGE_PERIOD_Write(REG_ON);
     STAGE_PERIOD_Write(REG_OFF);
     //STAGE_ISR_ClearPending();
-    /*LCD_Char_ClearDisplay();
-    LCD_Char_Position(0u,0u);
+    //LCD_Char_ClearDisplay();
+    /*LCD_Char_Position(3u,0u);
     LCD_Char_PrintString("ISR CNT");
-    LCD_Char_Position(1u,0u);
+    LCD_Char_Position(3u,9u);
     LCD_Char_PrintDecUint16(stage_cnt++);*/
 }
 
@@ -345,17 +345,18 @@ int main(void)
                 LCD_Char_PrintString(msg2);
             }   else if(incoming.flags & START_Z_STACK) {
                 //Frame_Period_Timer_Stop();
+                stage_cnt = 0;
                 FRAME_TRIG_Reg_Write(REG_ON);
                 Z_TRIG_Reg_Write(REG_ON);
                 incoming.flags &= ~(START_Z_STACK);
                 //outgoing.flags |= ~(SOFT_TRIGG_MODE);
                 //outgoing.flags &= ~(TIMED_TRIGG_MODE);
-                sprintf(msg2, "Z STACK             ");
+                sprintf(msg3, "Z STACK             ");
                 //LCD_Char_ClearDisplay();    
                 LCD_Char_Position(0u,0u);
                 LCD_Char_PrintString(msg);
                 LCD_Char_Position(1u,0u);
-                LCD_Char_PrintString(msg2);
+                LCD_Char_PrintString(msg3);
             } else if(incoming.flags & CAMERAS_ACQUIRED) {
                 FRAME_TRIG_Reg_Write(REG_OFF);
                 Z_TRIG_Reg_Write(REG_OFF);                
