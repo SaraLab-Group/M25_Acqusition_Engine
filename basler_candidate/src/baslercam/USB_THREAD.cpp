@@ -77,21 +77,6 @@ void* USB_THREAD(void* data)
     }
 #endif
 
-    //#ifdef TEST_BULK_WRITE
-
-    //#ifdef BENCHMARK_DEVICE
-    //    ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
-    //        14, /* set/get test */
-    //        2,  /* test type    */
-    //        MY_INTF,  /* interface id */
-    //        tmp, 1, 1000);
-    //#endif
-
-    //#ifdef TEST_ASYNC
-    //    // Running an async write test
-    //    ret = transfer_bulk_async(dev, EP_OUT, tmp, sizeof(tmp), 5000);
-    //#else
-
     /* This is just a hard coded write test for sending frame rate change instruction to PSOC */
     //thd_data->incoming->flags = CHANGE_CONFIG;
     //outgoing.flags |= CHANGE_FPS;
@@ -162,26 +147,7 @@ void* USB_THREAD(void* data)
             //cnt_lk.unlock();
         }
         cnt_lk.unlock(); // Woops caused a little deadlock putting this inside the if.
-        //#endif
 
-        //#ifdef TEST_BULK_READ
-
-        //#ifdef BENCHMARK_DEVICE
-        //        ret = usb_control_msg(dev, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
-        //            14, /* set/get test */
-        //            1,  /* test type    */
-        //            MY_INTF,  /* interface id */
-        //            tmp, 1, 1000);
-        //#endif
-
-        //#ifdef TEST_ASYNC
-        //        // Running an async read test
-        //        ret = transfer_bulk_async(dev, EP_IN, tmp, sizeof(tmp), 5000);
-        //#else
-                // Running a sync read test
-        //printf("before read\n");
-        //flg.lock();
-        //printf("USB.incoming.flags %u\n", thd_data->incoming->flags);
         ret = usb_bulk_read(dev, EP_IN | 0x80, (char*)thd_data->incoming, sizeof(usb_data), 0);
         //printf("USB.incoming.flags %u after\n", thd_data->incoming->flags);
         //flg.unlock();
