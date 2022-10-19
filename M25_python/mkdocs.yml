@@ -1,9 +1,0 @@
-site_name: m25_viewer
-site_description: GUI to control the M25 multifocus microscopy system
-site_author: Eduardo Hirata
-
-theme: readthedocs
-
-
-pages:
-- Home: index.md

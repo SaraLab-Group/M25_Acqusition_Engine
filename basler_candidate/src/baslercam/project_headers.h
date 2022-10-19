@@ -174,37 +174,6 @@ typedef struct usb_data {
 };
 
 
-/*class ConfData(Structure) :
-    __fields__ = [('horz', c_uint),
-    ('vert', c_uint),
-    ('fps', c_uint),
-    ('bpp', c_uint),
-    ('capTime', c_uint),
-    ('path', c_char),
-    ('flags', c_uint16)]
-*/
-
-/* For Improved Implementation Coming soon!! */
-
-//typedef struct TCP_IP_DAT {
-//    uint32_t horz;
-//    uint32_t vert;
-//    float fps;
-//    uint32_t exp;
-//    uint32_t bpp;
-//    uint32_t z_frames;
-//    uint32_t capTime;
-//    float lapse_min;
-//    uint32_t lapse_count;
-//    char path[256];
-//    char proName[256];
-//    uint32_t flags;
-//    double gain;
-//};
-
-
-
-
 typedef struct TCP_IP_DAT {
     uint32_t horz;
     uint32_t vert;

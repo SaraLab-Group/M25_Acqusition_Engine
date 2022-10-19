@@ -29,7 +29,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{CADADEB8-D978-444C-8899-53F46481E586}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Basler_Candidate</ProjectName>
+    <ProjectName>M25_Basler_Acquisition</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
