@@ -1,0 +1,3 @@
+[submodule "flir"]
+	path = flir
+	url = https://github.com/SaraLab-Group/m25_FLIR.git
