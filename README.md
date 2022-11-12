@@ -19,13 +19,15 @@ C++20
 ## Usage
 This engine can be used as CLI or [Napari Plugin](pending). 
 
+## Folders
+- `basler` - Basler cameras
+- `flir` - FLIR cameras
+
 ## Branches
-- `basler` - branch for Basler cameras
-- `flir` - branch for FLIR cameras
 - `dev` - development
 
 ## License
-This project is licensed under BSD-3-clause License -- see the LICENSE.md for more details.
+This project is licensed under BSD-3-clause License -- see the [LICENSE](LICENSE) for more details.
 
 
 
