@@ -27,7 +27,7 @@ This engine can be used as CLI or [Napari Plugin](pending).
 - `dev` - development
 
 ## License
-This project is licensed under BSD-3-clause License -- see the LICENSE.md for more details.
+This project is licensed under BSD-3-clause License -- see the LICENSE for more details.
 
 
 
