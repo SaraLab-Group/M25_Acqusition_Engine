@@ -124,6 +124,7 @@ typedef struct cam_event {
 #define MAX_CAMS (25u)
 //#define EXIT_USB 0x8000  Big Yikes
 
+/* These Serials only apply to our batch of basler cameras. */
 // Camera Serials
 #define CAM_1 23206716
 #define CAM_2 23206693
