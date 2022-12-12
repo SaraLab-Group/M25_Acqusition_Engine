@@ -159,19 +159,19 @@ typedef struct cam_event {
 
 /*  To Be Added After Napari Is Updated */
 
-//typedef struct usb_data {
-//    float fps;
-//    uint32_t flags;
-//    uint32_t time_waiting; // Currently Time between not ready and ready
-//    uint64_t count;
-//};
-
 typedef struct usb_data {
-    uint16_t fps;
+    float fps;
     uint32_t flags;
     uint32_t time_waiting; // Currently Time between not ready and ready
     uint64_t count;
 };
+
+/*typedef struct usb_data {
+    uint16_t fps;
+    uint32_t flags;
+    uint32_t time_waiting; // Currently Time between not ready and ready
+    uint64_t count;
+};*/
 
 
 /*class ConfData(Structure) :
@@ -184,28 +184,27 @@ typedef struct usb_data {
     ('flags', c_uint16)]
 */
 
-/* For Improved Implementation Coming soon!! */
-
-//typedef struct TCP_IP_DAT {
-//    uint32_t horz;
-//    uint32_t vert;
-//    float fps;
-//    uint32_t exp;
-//    uint32_t bpp;
-//    uint32_t z_frames;
-//    uint32_t capTime;
-//    float lapse_min;
-//    uint32_t lapse_count;
-//    char path[256];
-//    char proName[256];
-//    uint32_t flags;
-//    double gain;
-//};
-
-
-
 
 typedef struct TCP_IP_DAT {
+    uint32_t horz;
+    uint32_t vert;
+    float fps;
+    uint32_t exp;
+    uint32_t bpp;
+    uint32_t z_frames;
+    uint32_t capTime;
+    float lapse_min;
+    uint32_t lapse_count;
+    char path[256];
+    char proName[256];
+    uint32_t flags;
+    double gain;
+};
+
+
+
+// old struct
+/*typedef struct TCP_IP_DAT {
     uint32_t horz;
     uint32_t vert;
     uint32_t fps;
@@ -217,7 +216,7 @@ typedef struct TCP_IP_DAT {
     char proName[255];
     uint32_t flags;
     double gain;
-};
+};*/
 
 typedef struct USB_THD_DATA {
     // Do I need this?

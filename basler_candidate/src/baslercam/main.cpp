@@ -104,16 +104,16 @@ const uint32_t vert_max = 1200;
 uint32_t exposure = 6700; // In Micro Seconds
 uint32_t seconds = 0;
 /* Add Me after updating Napari */
-//float lapse_minutes = 1.0f;
-//uint32_t lapse_count = 100;
+float lapse_minutes = 1.0f;
+uint32_t lapse_count = 100;
 uint32_t horz = horz_max;
 uint32_t vert = vert_max;
 uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint32_t bitDepth = 8;
 /* Change Me after updating Napari */
-//float fps = 5;
-uint32_t fps = 65;
+float fps = 5;
+//uint32_t fps = 65;
 uint32_t z_frames = 100;
 double gain = 0;
 
@@ -755,8 +755,8 @@ int main(int argc, char* argv[])
 	incoming.bpp = bitDepth;
 	incoming.capTime = seconds;
 	/* Add after we update Napari */
-	//incoming.lapse_min = lapse_minutes;
-	//incoming.lapse_count = lapse_count;
+	incoming.lapse_min = lapse_minutes;
+	incoming.lapse_count = lapse_count;
 	usb_incoming.flags = incoming.flags = 0;
 
 	server_thread_data.incoming_data = &incoming;
@@ -773,6 +773,8 @@ int main(int argc, char* argv[])
 
 	usb_thread_data.crit = &crit;
 	usb_thread_data.usb_srv_mtx = &crit3;
+
+	printf("Size of TCP_IP_Data: %d\n", sizeof(TCP_IP_DAT));
 
 	// Start the USB and Server Threads
 	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
@@ -873,8 +875,8 @@ int main(int argc, char* argv[])
 
 			/* Time Lapse Values */
 			/* Add after updating Napari */
-			//lapse_minutes = incoming.lapse_min;
-			//lapse_count = incoming.lapse_count;
+			lapse_minutes = incoming.lapse_min;
+			lapse_count = incoming.lapse_count;
 
 			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
 			raw_dir = incoming.path;
@@ -1168,7 +1170,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	myfile << "Bit Depth: " << (int)bitDepth << std::endl;
 	myfile << "Gain (dB): " << (float)gain << std::endl;
 	/* After Napari */
-	//myfile << "Frames Per Second: " << (float)fps << std::endl;
+	myfile << "Frames Per Second: " << (float)fps << std::endl;
 	myfile << "Frames Per Second: " << (int)fps << std::endl;
 	myfile << "Exposure time(us): " << (int)exposure << std::endl;
 

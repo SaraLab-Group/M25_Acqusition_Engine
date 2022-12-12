@@ -142,6 +142,7 @@ void* SERVER_THREAD(void* server_data)
                 
                 if (server_thread_data->incoming_data->flags & STOP_LIVE) {
                     *server_thread_data->live_flags = server_thread_data->incoming_data->flags;
+                    printf("STOP_LIVE received!\n");
                 }
                 else {
                     //*server_thread_data->live_flags = 0;
