@@ -2253,7 +2253,6 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	// 511 Bytes
 
 	// Allocate Mem Maps
-
 	SharedMemory RW_flags = { 0 };
 	RW_flags.Size = 8;
 	sprintf_s(RW_flags.MapName, "Local\\Flags");
@@ -2420,7 +2419,7 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 	};
 
 
-	std::cout << "Building Threads: " << std::endl;
+	std::cout << "Building Live Threads: " << std::endl;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < *total_cams; i++) {
 		// To place Cameras in memory array in Z depth order (1 to 25) - 1
