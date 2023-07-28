@@ -32,6 +32,7 @@
 
 aab: 10.02.21 removed buffer prefill in buffer swap
 ehm: 04.11.22 removed unecessary parts of code
+ehm: 08.20.22 merged timelapse functionality from dev
 
 */
 
@@ -97,8 +98,8 @@ uint32_t vert = vert_max;
 uint32_t horz_off_set = 0;
 uint32_t vert_off_set = 0;
 uint32_t bitDepth = 8;
-
-float fps = 5;  /* Change Me after updating Napari */
+/* Change Me after updating Napari */
+float fps = 5;
 //uint32_t fps = 65;
 uint32_t z_frames = 100;
 double gain = 0;
@@ -114,6 +115,7 @@ void SetPixelFormat_unofficial(INodeMap& nodemap, String_t format);
 
 
 //Directory name images to be saved.
+// TODO:Should probably be set from pycro or micro manager.
 string  strDirectryName = "D:\\Ant1 Test";//\\binaries";
 // From Basler Fast Write Example Not currently used;
 string  strMetaFileName = "Meta.txt";
@@ -122,6 +124,17 @@ string  strMetaFileName = "Meta.txt";
 string raw_dir = "D:\\Ant1 Test";// \\Tiff";
 string proj_sub_dir;
 
+
+// From Basler Sample Code for fast binary writes;
+void saveBuffer(const char* FileName, CGrabResultPtr ptrGrabResult)
+{
+	ofstream fs(FileName, std::ifstream::binary);
+	const uint8_t* pImageBuffer = (uint8_t*)ptrGrabResult->GetBuffer();
+	fs.write((char*)pImageBuffer, ptrGrabResult->GetPayloadSize());
+	//How big it be?
+	//printf("PayloadSize: %ld\n", (long)ptrGrabResult->GetPayloadSize());
+	fs.close();
+}
 
 /********************** LIGHTNING FAST VCR REPAIR **************************************************
 * This Buffer to disk method uses the Windows SDK File Handle methods
@@ -207,19 +220,26 @@ void saveBigBuffer(const char* FileName, uint8_t* buffer/*, uint8_t cam_count*/,
 }
 
 
-/* This little function is for the convert Binary to .raw .tif phase post acquisition.*/
+/* This little function is for the convert Binary to tif phase*/
 void readFile(const char* fileName, uint64_t* outNumberofBytes, uint8_t* chunk)
 {   
 	ifstream fs(fileName, std::ifstream::binary);
 	fs.seekg(0, fs.end);
 	long long int size = fs.tellg();
 	fs.seekg(0, fs.beg);
-
+	//fs.read((char*)chunk, size);
+	//char* bufferTemp = new char[size];
+	// allocate memory for file content
+	/*if (fs)
+		std::cout << "all characters read successfully.";
+	else
+		std::cout << "error: only " << fs.gcount() << " could be read" << std::endl;
+	std::cout << "size: " << size << std::endl;*/
+	//buffer->push_back(bufferTemp);
 	//returning the file size, needed for converting the buffer into an Pylon image into a bitmap
 	*outNumberofBytes = size;
 	fs.close();
 
-	
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 	LPOFSTRUCT lpReOpenBuff;
 
@@ -274,7 +294,6 @@ void readFile(const char* fileName, uint64_t* outNumberofBytes, uint8_t* chunk)
 				// asynchronous writes.
 				printf("Error: dwBytesWritten != dwBytesToWrite\n");
 			}
-			// Nothing to see here
 			bytes_read += dwBytesRead;
 			std::cout << "^";
 			if (size - bytes_read < dwBytesToRead) {
@@ -306,21 +325,6 @@ void mkdirTree(string sub, string dir) {
 	if (i + 1 < sub.length())
 		mkdirTree(sub.substr(i + 1), dir);
 }
-
-
-/* Not Currently in use From Basler binary write sample code*/
-//void Save_Metadata(list<string>& strList, string strMetaFilename)
-//{
-//	ofstream fs(strMetaFilename);
-//	for (auto it = strList.begin();it != strList.end(); it++)
-//	{
-//		string s = *it;
-//		fs.write(s.c_str(), s.length());
-//		fs.write("\n", 1);
-//	}
-//	fs.close();
-//}
-
 
 /*Interesting I think the normal Sleep function is allows context switching and "sleeps threads the same"*/
 void sleep(int sec) {
@@ -510,9 +514,8 @@ int main(int argc, char* argv[])
 	incoming.exp = exposure;
 	incoming.bpp = bitDepth;
 	incoming.capTime = seconds;
-
-	incoming.lapse_min = lapse_minutes; 	/* Add after we update Napari */
-	incoming.lapse_count = lapse_count; 	/* Add after we update Napari */
+	incoming.lapse_min = lapse_minutes;
+	incoming.lapse_count = lapse_count;
 	usb_incoming.flags = incoming.flags = 0;
 
 	server_thread_data.incoming_data = &incoming;
@@ -529,6 +532,8 @@ int main(int argc, char* argv[])
 
 	usb_thread_data.crit = &crit;
 	usb_thread_data.usb_srv_mtx = &crit3;
+
+	printf("Size of TCP_IP_Data: %d\n", sizeof(TCP_IP_DAT));
 
 	// Start the USB and Server Threads
 	std::thread SRVR_THD_OBJ(SERVER_THREAD, (void*)&server_thread_data);
@@ -628,9 +633,8 @@ int main(int argc, char* argv[])
 			z_frames = incoming.z_frames;
 
 			/* Time Lapse Values */
-			/* Add after updating Napari */
-			//lapse_minutes = incoming.lapse_min;
-			//lapse_count = incoming.lapse_count;
+			lapse_minutes = incoming.lapse_min;
+			lapse_count = incoming.lapse_count;
 
 			//std::cout << "gain: " << gain << " incoming.gain: " << incoming.gain << std::endl;
 			raw_dir = incoming.path;
@@ -686,15 +690,14 @@ int main(int argc, char* argv[])
 			//outgoing.flags &= ~LIVE_RUNNING;
 			signal_live.notify_one();
 		}
-		/* Add Me sometime For big fun */
-		//else if (incoming.flags & LAPSE_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
-		//	incoming.flags &= ~LAPSE_CAPTURE;
-		//	//usb_outgoing.flags |= LAPSE_CAPTURE;
-		//	outgoing.flags |= CAPTURING;
-		//	prot.unlock();
-		//	lapse_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
-		//	outgoing.flags &= ~CAPTURING;
-		//}
+		else if (incoming.flags & LAPSE_CAPTURE && ~(outgoing.flags & (CAPTURING | CONVERTING | LIVE_RUNNING)) && outgoing.flags & CAMERAS_ACQUIRED) {
+			incoming.flags &= ~LAPSE_CAPTURE;
+			//usb_outgoing.flags |= LAPSE_CAPTURE;
+			outgoing.flags |= CAPTURING;
+			prot.unlock();
+			lapse_capture(&serials, &camera_names, &camera_zNums, cam_dat, &total_cams, &image_size);
+			outgoing.flags &= ~CAPTURING;
+		}
 		else if (incoming.flags & EXIT_THREAD) {
 			usb_outgoing.flags |= EXIT_THREAD;		
 			prot.unlock();
@@ -709,10 +712,6 @@ int main(int argc, char* argv[])
 		
 
 	}
-
-
-
-
 
 		// usb_thread_data.incoming->flags |= EXIT_THREAD;
 		USB_THD_OBJ.join();
@@ -729,7 +728,6 @@ int main(int argc, char* argv[])
 		//cout << "Total time grabbing and writing: " << elapsed + total_time << "us" << std::endl;
 		//cout << "Size writen: " << sizeof(frame_buffer) * c_countOfImagesToGrab << endl;
 		//cout << "Throughput: " << sizeof(frame_buffer) * c_countOfImagesToGrab / (elapsed * 1e-6) << endl;
-
 
 		//while (1);
 		// after grabbing has been done, write the meta file in same directory 
@@ -924,7 +922,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 	myfile << "Bit Depth: " << (int)bitDepth << std::endl;
 	myfile << "Gain (dB): " << (float)gain << std::endl;
 	/* After Napari */
-	//myfile << "Frames Per Second: " << (float)fps << std::endl;
+	myfile << "Frames Per Second: " << (float)fps << std::endl;
 	myfile << "Frames Per Second: " << (int)fps << std::endl;
 	myfile << "Exposure time(us): " << (int)exposure << std::endl;
 
@@ -1384,7 +1382,7 @@ void start_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 
-	std::cout << std::endl << "Finished Converting to tif" << std::endl;
+	std::cout << std::endl << "Finished splitting into raw files" << std::endl;
 	if (!(outgoing.flags & Z_STACK_RUNNING)) {
 		uint32_t max_dropped = 0;
 		// Checking For Longer than acceptable Frame Times
@@ -1948,7 +1946,7 @@ void lapse_capture(std::vector<std::string>* serials, std::vector<std::string>* 
 
 
 
-		std::cout << std::endl << "Finished Converting to raw" << std::endl;
+		std::cout << std::endl << "Finished seperating images to raw" << std::endl;
 
 		/*if (!(outgoing.flags & Z_STACK_RUNNING)) {
 			uint32_t max_dropped = 0;
@@ -2135,7 +2133,6 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 
 		CGrabResultPtr ptrGrabResult;
 		INodeMap& nodemap = cam->camPtr->GetNodeMap();
-
 		//Find if all the cameras are ready
 		std::mutex sleeper;
 		std::unique_lock<std::mutex> sleepDiddy(sleeper);
@@ -2174,7 +2171,8 @@ void live_capture(std::vector<std::string>* serials, std::vector<std::string>* c
 		//std::cout << "thd: " << (int)cam->number << " joining" << std::endl;
 	};
 
-	std::cout << "Building Threads: " << std::endl;
+
+	std::cout << "Building Live Threads: " << std::endl;
 	std::vector<std::thread> threads;
 	for (int i = 0; i < *total_cams; i++) {
 		// To place Cameras in memory array in Z depth order (1 to 25) - 1

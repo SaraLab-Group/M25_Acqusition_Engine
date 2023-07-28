@@ -124,6 +124,7 @@ typedef struct cam_event {
 #define MAX_CAMS (25u)
 //#define EXIT_USB 0x8000  Big Yikes
 
+/* These Serials only apply to our batch of basler cameras. */
 // Camera Serials
 #define CAM_1 23206716
 #define CAM_2 23206693
@@ -159,15 +160,8 @@ typedef struct cam_event {
 
 /*  To Be Added After Napari Is Updated */
 
-//typedef struct usb_data {
-//    float fps;
-//    uint32_t flags;
-//    uint32_t time_waiting; // Currently Time between not ready and ready
-//    uint64_t count;
-//};
-
 typedef struct usb_data {
-    uint16_t fps;
+    float fps;
     uint32_t flags;
     uint32_t time_waiting; // Currently Time between not ready and ready
     uint64_t count;
@@ -177,16 +171,19 @@ typedef struct usb_data {
 typedef struct TCP_IP_DAT {
     uint32_t horz;
     uint32_t vert;
-    uint32_t fps;
+    float fps;
     uint32_t exp;
     uint32_t bpp;
     uint32_t z_frames;
     uint32_t capTime;
-    char path[255];
-    char proName[255];
+    float lapse_min;
+    uint32_t lapse_count;
+    char path[256];
+    char proName[256];
     uint32_t flags;
     double gain;
 };
+
 
 typedef struct USB_THD_DATA {
     // Do I need this?
