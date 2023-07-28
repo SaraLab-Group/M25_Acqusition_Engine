@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/381771573.svg)](https://zenodo.org/badge/latestdoi/381771573)
+
 # M25 Acquisition Engine for Basler and FLIR Cameras
 The M25 acquisition engine is a C++ multithreaded program that controls the acquisition of the 25-plane camera array multifocus microscope (M25) for fast and simultaneous 3D imaging. The engine captures simultaneously from 25 machine vision cameras (FLIR or Basler Ace) to run at >160FPS without loss of frames to capture fast and live 3D dynamics of biological organisms. 
 
